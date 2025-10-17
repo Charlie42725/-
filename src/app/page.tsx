@@ -1,103 +1,124 @@
-import Image from "next/image";
+import Header from '@/components/Header';
+import Banner from '@/components/Banner';
+import FilterSection from '@/components/FilterSection';
+import ProductGrid from '@/components/ProductGrid';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gray-900 text-white w-full">
+      {/* 頂部導航 */}
+      <Header />
+      
+      {/* 主要 Banner */}
+      <Banner />
+      
+      {/* 篩選區域 */}
+      <FilterSection />
+      
+      {/* 最新一番賞區域 */}
+      <main className="w-full">
+        <div className="max-w-screen-xl mx-auto px-4 py-8">
+          <section className="mb-12">
+            <div className="flex items-center mb-6 bg-slate-800/50 rounded-lg p-4 backdrop-blur-sm">
+              <span className="text-orange-400 mr-3 text-2xl">≫</span>
+              <h2 className="text-2xl font-bold text-white">最新一番賞（214套）</h2>
+            </div>
+          
+          <ProductGrid />
+        </section>
+        
+        {/* 說明區域 */}
+        <section className="mt-20 bg-gradient-to-b from-slate-800/50 to-slate-900/50 rounded-2xl p-8 backdrop-blur-sm border border-slate-700">
+          {/* 第一區塊 */}
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
+            <p className="text-slate-300 mb-8 max-w-4xl mx-auto leading-relaxed text-lg">
+              想輪手氣嗎？老野夠好玩的呀受衝擊層面！雲我們的新站上發覺一筆賞類眾人來當賞！您只需要遊戲我們顧客的一番賞系列，選擇您喜愛的套式，然後決定您想購買的次數，覺一踫運氣受不周吧法！一筆寶室又周套都會對該套產電不可少玩的蔗！花可毒的小賄可對票惡優使雜魔當月讓有！
+            </p>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <hr className="border-slate-600 mb-16" />
+          
+          {/* 第二區塊 */}
+          <div className="text-center mb-16">
+            <h3 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">什麼是獵人賞任務？</h3>
+            <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
+              良級聯賞業買得創新專人賞任務，有全聯不可能於推週可可有，你個在自該想是一個實拥和會講議等等獎賞口妨！需要可得不妙，可讓能可會獲大當優感的10%、每10抽可妨獲一個憲會買賞，跟每日芒次抽，五款大賞等任賞！竟成像可審覺顧外幹陵會常期願！
+            </p>
+          </div>
+
+          <hr className="border-slate-600 mb-16" />
+          
+          {/* 特色區塊 */}
+          <div className="text-center">
+            <h3 className="text-3xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">良級懸賞特色</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="text-center p-6 bg-slate-800/50 rounded-xl border border-slate-600 hover:border-cyan-400 transition-all">
+                <div className="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h4 className="font-bold text-white mb-4 text-lg">一筒賞GK免費修復</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  紫昇躁一提供免費保修服務，若良路線收件
+                  時拐一筒賞GK破損，符合條件即可享
+                  受免費的修復服務！
+                </p>
+              </div>
+              
+              <div className="text-center p-6 bg-slate-800/50 rounded-xl border border-slate-600 hover:border-purple-400 transition-all">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h4 className="font-bold text-white mb-4 text-lg">Hash驗證</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  紫昇躁一透過區塊鏈 Hash 值提供大賞號碼
+                  抽選，透過 Hash 值路徑不可修改、皇牌，
+                  讓違守人講定型態，哈通無人能夠作弊，
+                  任一完成系統能行驗證
+                </p>
+              </div>
+              
+              <div className="text-center p-6 bg-slate-800/50 rounded-xl border border-slate-600 hover:border-yellow-400 transition-all">
+                <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </div>
+                <h4 className="font-bold text-white mb-4 text-lg">實體店面</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  紫昇躁一旦有實體店面的線上一當獎品帥，
+                  其程序夜店商昆兄，用固版版，訊觀完以
+                  及完的更方便的享受一筒賞的樂趣！
+                </p>
+              </div>
+              
+              <div className="text-center p-6 bg-slate-800/50 rounded-xl border border-slate-600 hover:border-green-400 transition-all">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h4 className="font-bold text-white mb-4 text-lg">任務回饋</h4>
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  紫昇躁首任務回饋，完成任務回獲得獎賞
+                  幣輔助，可究優多優惠券，讓你收以出喜
+                  動的享受一當獎的樂趣！
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      
+      {/* 頁腳 */}
+      <Footer />
     </div>
   );
 }
