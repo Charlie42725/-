@@ -58,6 +58,33 @@ body {
   }
 }
 
+/* 改善整體間距和呼吸感 */
+section {
+  margin-bottom: 2rem;
+}
+
+/* 大區塊間距 */
+.section-spacing {
+  margin-top: 6rem;
+  margin-bottom: 4rem;
+}
+
+/* 卡片間距改善 */
+.card-spacing {
+  margin-bottom: 2rem;
+}
+
+/* 標題間距 */
+h1, h2, h3 {
+  margin-bottom: 1.5rem;
+}
+
+/* 段落間距 */
+p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+
 a {
   color: inherit;
   text-decoration: none;

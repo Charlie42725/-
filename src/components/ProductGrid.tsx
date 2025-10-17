@@ -58,7 +58,7 @@ export default function ProductGrid() {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
       {products.map((product) => (
         <div key={product.id} className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 shadow-xl hover:shadow-2xl border border-slate-700 hover:border-orange-400 product-card">
           {/* 商品圖片 */}

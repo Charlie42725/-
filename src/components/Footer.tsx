@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="w-full bg-gray-800 mt-16 py-8 border-t border-gray-700">
+    <footer className="w-full bg-gray-800 mt-24 py-12 border-t border-gray-700">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 公司資訊 */}
