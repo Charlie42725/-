@@ -8,7 +8,7 @@ export default function FilterSection() {
   return (
     <section className="w-full py-8 mt-8 mb-12">
       <div className="max-w-screen-xl mx-auto px-4">
-        <div className="bg-slate-800/80 backdrop-blur-sm rounded-lg p-6 border border-slate-700 shadow-xl">
+        <div className="p-6">
           <div className="flex items-center justify-between">
           {/* 篩選按鈕 */}
           <div className="flex items-center space-x-3">

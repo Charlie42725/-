@@ -20,7 +20,7 @@ export default function Home() {
       <main className="w-full">
         <div className="max-w-screen-xl mx-auto px-4 py-12">
           <section className="mb-16">
-            <div className="flex items-center mb-8 bg-slate-800/50 rounded-xl p-6 backdrop-blur-sm shadow-lg">
+            <div className="flex items-center mb-8 p-6">
               <span className="text-orange-400 mr-4 text-3xl">≫</span>
               <h2 className="text-3xl font-bold text-white">最新一番賞（214套）</h2>
             </div>
