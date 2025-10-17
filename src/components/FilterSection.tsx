@@ -6,9 +6,10 @@ export default function FilterSection() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
-    <section className="w-full bg-slate-800/80 backdrop-blur-sm py-4 border-b border-slate-700">
+    <section className="w-full py-4">
       <div className="max-w-screen-xl mx-auto px-4">
-        <div className="flex items-center justify-between">
+        <div className="bg-slate-800/80 backdrop-blur-sm rounded-lg p-4 border border-slate-700">
+          <div className="flex items-center justify-between">
           {/* 篩選按鈕 */}
           <div className="flex items-center space-x-3">
             <button 
@@ -118,6 +119,7 @@ export default function FilterSection() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </section>
   );
