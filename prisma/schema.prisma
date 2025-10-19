@@ -83,8 +83,9 @@ model ProductVariant {
   id         Int       @id @default(autoincrement())
   product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId  Int
-  name       String
-  rarity     String?
+  prize      String    // 賞等 (A賞、B賞、C賞、Last賞等)
+  name       String    // 獎項名稱 (特等獎公仔、限定海報等)
+  rarity     String?   // 稀有度 (SSR/SR/R/N)
   stock      Int       @default(0)
   imageUrl   String?
   isActive   Boolean   @default(true)

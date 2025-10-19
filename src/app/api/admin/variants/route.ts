@@ -42,12 +42,12 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { productId, name, rarity, stock, imageUrl, isActive } = body;
+    const { productId, prize, name, rarity, stock, imageUrl, isActive } = body;
 
     // 驗證必填欄位
-    if (!productId || !name) {
+    if (!productId || !prize || !name) {
       return NextResponse.json(
-        { error: '商品 ID 和獎項名稱為必填' },
+        { error: '商品 ID、賞等和獎項名稱為必填' },
         { status: 400 }
       );
     }
@@ -65,6 +65,7 @@ export async function POST(request: Request) {
     const variant = await prisma.productVariant.create({
       data: {
         productId: parseInt(productId),
+        prize,
         name,
         rarity: rarity || null,
         stock: parseInt(stock) || 0,

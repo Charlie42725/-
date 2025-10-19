@@ -11,6 +11,7 @@ interface Product {
 
 interface Variant {
   id: number;
+  prize: string;
   name: string;
   rarity: string | null;
   stock: number;
@@ -35,6 +36,7 @@ export default function VariantsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     productId: '',
+    prize: '',
     name: '',
     rarity: '',
     stock: '',
@@ -97,6 +99,7 @@ export default function VariantsPage() {
   function handleEdit(variant: Variant) {
     setFormData({
       productId: variant.product.id.toString(),
+      prize: variant.prize,
       name: variant.name,
       rarity: variant.rarity || '',
       stock: variant.stock.toString(),
@@ -131,6 +134,7 @@ export default function VariantsPage() {
   function resetForm() {
     setFormData({
       productId: '',
+      prize: '',
       name: '',
       rarity: '',
       stock: '',
@@ -184,30 +188,44 @@ export default function VariantsPage() {
             {editingId ? '編輯獎項' : '新增獎項'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-slate-300 mb-2">選擇商品 *</label>
+              <select
+                required
+                disabled={!!editingId}
+                value={formData.productId}
+                onChange={(e) =>
+                  setFormData({ ...formData, productId: e.target.value })
+                }
+                className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
+              >
+                <option value="">請選擇商品</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+              {editingId && (
+                <p className="text-xs text-slate-500 mt-1">
+                  編輯時無法更改所屬商品
+                </p>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-300 mb-2">選擇商品 *</label>
-                <select
+                <label className="block text-slate-300 mb-2">賞等 *</label>
+                <input
+                  type="text"
                   required
-                  disabled={!!editingId}
-                  value={formData.productId}
+                  value={formData.prize}
                   onChange={(e) =>
-                    setFormData({ ...formData, productId: e.target.value })
+                    setFormData({ ...formData, prize: e.target.value })
                   }
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
-                >
-                  <option value="">請選擇商品</option>
-                  {products.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name}
-                    </option>
-                  ))}
-                </select>
-                {editingId && (
-                  <p className="text-xs text-slate-500 mt-1">
-                    編輯時無法更改所屬商品
-                  </p>
-                )}
+                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+                  placeholder="例如：A賞、B賞、Last賞"
+                />
               </div>
 
               <div>
@@ -220,7 +238,7 @@ export default function VariantsPage() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
-                  placeholder="例如：A賞 - 特等獎"
+                  placeholder="例如：特等獎公仔、限定海報"
                 />
               </div>
             </div>
@@ -310,6 +328,9 @@ export default function VariantsPage() {
                   ID
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                  賞等
+                </th>
+                <th className="text-left px-6 py-4 text-slate-300 font-medium">
                   獎項名稱
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
@@ -332,7 +353,7 @@ export default function VariantsPage() {
             <tbody className="divide-y divide-slate-700">
               {variants.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
                     目前沒有獎項
                   </td>
                 </tr>
@@ -340,6 +361,11 @@ export default function VariantsPage() {
                 variants.map((variant) => (
                   <tr key={variant.id} className="hover:bg-slate-700/50">
                     <td className="px-6 py-4 text-slate-300">{variant.id}</td>
+                    <td className="px-6 py-4">
+                      <span className="text-orange-400 font-bold">
+                        {variant.prize}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
                         {variant.imageUrl && (
@@ -383,7 +409,7 @@ export default function VariantsPage() {
                           編輯
                         </button>
                         <button
-                          onClick={() => handleDelete(variant.id, variant.name)}
+                          onClick={() => handleDelete(variant.id, `${variant.prize} ${variant.name}`)}
                           className="text-red-400 hover:text-red-300 text-sm transition-colors"
                         >
                           刪除

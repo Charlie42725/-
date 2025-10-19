@@ -41,7 +41,7 @@ export async function PUT(
   try {
     const { id } = await context.params;
     const body = await request.json();
-    const { name, rarity, stock, imageUrl, isActive } = body;
+    const { prize, name, rarity, stock, imageUrl, isActive } = body;
 
     // 檢查獎項是否存在
     const existingVariant = await prisma.productVariant.findUnique({
@@ -56,6 +56,7 @@ export async function PUT(
     const variant = await prisma.productVariant.update({
       where: { id: parseInt(id) },
       data: {
+        prize: prize || existingVariant.prize,
         name: name || existingVariant.name,
         rarity: rarity !== undefined ? rarity : existingVariant.rarity,
         stock: stock !== undefined ? parseInt(stock) : existingVariant.stock,
