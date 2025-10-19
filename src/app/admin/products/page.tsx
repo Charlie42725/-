@@ -14,6 +14,7 @@ interface Product {
   soldTickets: number;
   status: string;
   series: {
+    id: number;
     name: string;
     brand: {
       name: string;
@@ -32,6 +33,7 @@ export default function ProductsPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     seriesId: '',
     name: '',
@@ -70,14 +72,20 @@ export default function ProductsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const res = await fetch('/api/admin/products', {
-        method: 'POST',
+      const url = editingId
+        ? `/api/admin/products/${editingId}`
+        : '/api/admin/products';
+      const method = editingId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
       if (res.ok) {
         setShowForm(false);
+        setEditingId(null);
         setFormData({
           seriesId: '',
           name: '',
@@ -92,11 +100,73 @@ export default function ProductsPage() {
         fetchData();
       } else {
         const data = await res.json();
-        alert(data.error || '新增失敗');
+        alert(data.error || (editingId ? '更新失敗' : '新增失敗'));
       }
     } catch (error) {
-      console.error('新增商品失敗:', error);
+      console.error(editingId ? '更新商品失敗:' : '新增商品失敗:', error);
     }
+  }
+
+  async function handleEdit(product: Product) {
+    // 獲取完整商品資料（包含圖片）
+    try {
+      const res = await fetch(`/api/products/${product.slug}`);
+      const data = await res.json();
+
+      setFormData({
+        seriesId: product.series.id?.toString() || '',
+        name: product.name,
+        slug: product.slug,
+        shortDescription: data.product.shortDescription || '',
+        price: product.price.toString(),
+        totalTickets: product.totalTickets.toString(),
+        status: product.status,
+        coverImage: data.product.coverImage || '',
+        galleryImages: data.product.images?.map((img: any) => img.url) || [],
+      });
+      setEditingId(product.id);
+      setShowForm(true);
+    } catch (error) {
+      console.error('載入商品資料失敗:', error);
+      alert('載入商品資料失敗');
+    }
+  }
+
+  async function handleDelete(id: number, name: string) {
+    if (!confirm(`確定要刪除「${name}」嗎？此操作無法復原。`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        fetchData();
+      } else {
+        alert('刪除失敗');
+      }
+    } catch (error) {
+      console.error('刪除商品失敗:', error);
+      alert('刪除失敗');
+    }
+  }
+
+  function handleCancelEdit() {
+    setShowForm(false);
+    setEditingId(null);
+    setFormData({
+      seriesId: '',
+      name: '',
+      slug: '',
+      shortDescription: '',
+      price: '',
+      totalTickets: '',
+      status: 'draft',
+      coverImage: '',
+      galleryImages: [],
+    });
   }
 
   if (loading) {
@@ -117,17 +187,25 @@ export default function ProductsPage() {
           <p className="text-slate-400">管理所有一番賞商品</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (showForm) {
+              handleCancelEdit();
+            } else {
+              setShowForm(true);
+            }
+          }}
           className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-pink-600 transition-all"
         >
           {showForm ? '取消' : '+ 新增商品'}
         </button>
       </div>
 
-      {/* 新增表單 */}
+      {/* 新增/編輯表單 */}
       {showForm && (
         <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-8">
-          <h2 className="text-xl font-bold text-white mb-4">新增商品</h2>
+          <h2 className="text-xl font-bold text-white mb-4">
+            {editingId ? '編輯商品' : '新增商品'}
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -253,7 +331,7 @@ export default function ProductsPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setShowForm(false)}
+                onClick={handleCancelEdit}
                 className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-500 transition-colors"
               >
                 取消
@@ -339,13 +417,27 @@ export default function ProductsPage() {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <Link
-                          href={`/products/${product.slug}`}
-                          target="_blank"
-                          className="text-blue-400 hover:text-blue-300 text-sm"
-                        >
-                          查看
-                        </Link>
+                        <div className="flex items-center space-x-3">
+                          <Link
+                            href={`/products/${product.slug}`}
+                            target="_blank"
+                            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                          >
+                            查看
+                          </Link>
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="text-orange-400 hover:text-orange-300 text-sm transition-colors"
+                          >
+                            編輯
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id, product.name)}
+                            className="text-red-400 hover:text-red-300 text-sm transition-colors"
+                          >
+                            刪除
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
