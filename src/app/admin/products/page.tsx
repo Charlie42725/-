@@ -431,6 +431,12 @@ export default function ProductsPage() {
                           >
                             編輯
                           </button>
+                          <Link
+                            href={`/admin/products/${product.id}/variants`}
+                            className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                          >
+                            獎項
+                          </Link>
                           <button
                             onClick={() => handleDelete(product.id, product.name)}
                             className="text-red-400 hover:text-red-300 text-sm transition-colors"

@@ -1,13 +1,46 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+// 取得單一商品
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await context.params;
+
+    const product = await prisma.product.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        series: {
+          include: {
+            brand: true,
+          },
+        },
+        images: true,
+        variants: true,
+      },
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 });
+    }
+
+    return NextResponse.json({ product });
+  } catch (error) {
+    console.error('查詢商品失敗:', error);
+    return NextResponse.json({ error: '查詢商品失敗' }, { status: 500 });
+  }
+}
+
 // 刪除商品
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: idStr } = await context.params;
+    const id = parseInt(idStr);
 
     // 先刪除關聯的圖片記錄
     await prisma.image.deleteMany({
@@ -29,10 +62,11 @@ export async function DELETE(
 // 更新商品
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: idStr } = await context.params;
+    const id = parseInt(idStr);
     const body = await request.json();
     const {
       seriesId,

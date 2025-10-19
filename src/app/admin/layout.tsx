@@ -15,6 +15,7 @@ export default function AdminLayout({
     { href: '/admin/brands', label: '品牌管理', icon: '🏷️' },
     { href: '/admin/series', label: '系列管理', icon: '📦' },
     { href: '/admin/products', label: '商品管理', icon: '🎁' },
+    { href: '/admin/variants', label: '獎項管理', icon: '🎯' },
   ];
 
   return (
