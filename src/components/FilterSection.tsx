@@ -1,9 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+
+interface Brand {
+  id: number;
+  name: string;
+  slug: string;
+  series: {
+    id: number;
+    name: string;
+    slug: string;
+    _count: {
+      products: number;
+    };
+  }[];
+}
 
 export default function FilterSection() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  const [selectedSeries, setSelectedSeries] = useState<string>('');
+
+  useEffect(() => {
+    async function fetchBrands() {
+      try {
+        const response = await fetch('/api/brands');
+        const data = await response.json();
+        setBrands(data.brands);
+      } catch (error) {
+        console.error('無法載入品牌資料:', error);
+      }
+    }
+
+    fetchBrands();
+  }, []);
+
+  const selectedBrandData = brands.find((b) => b.slug === selectedBrand);
+  const availableSeries = selectedBrandData?.series || [];
 
   return (
     <section className="w-full py-8 mt-8 mb-12">
@@ -61,12 +96,38 @@ export default function FilterSection() {
               {/* 品牌篩選 */}
               <div>
                 <label className="block text-white font-bold mb-2">品牌</label>
-                <select className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2">
-                  <option>全部品牌</option>
-                  <option>Banpresto</option>
-                  <option>Good Smile Company</option>
-                  <option>Kotobukiya</option>
-                  <option>SEGA</option>
+                <select
+                  className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2"
+                  value={selectedBrand}
+                  onChange={(e) => {
+                    setSelectedBrand(e.target.value);
+                    setSelectedSeries(''); // 重置系列選擇
+                  }}
+                >
+                  <option value="">全部品牌</option>
+                  {brands.map((brand) => (
+                    <option key={brand.id} value={brand.slug}>
+                      {brand.name} ({brand.series.reduce((sum, s) => sum + s._count.products, 0)} 個商品)
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 系列篩選 */}
+              <div>
+                <label className="block text-white font-bold mb-2">系列</label>
+                <select
+                  className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 disabled:opacity-50"
+                  value={selectedSeries}
+                  onChange={(e) => setSelectedSeries(e.target.value)}
+                  disabled={!selectedBrand}
+                >
+                  <option value="">全部系列</option>
+                  {availableSeries.map((series) => (
+                    <option key={series.id} value={series.slug}>
+                      {series.name} ({series._count.products} 個商品)
+                    </option>
+                  ))}
                 </select>
               </div>
 
