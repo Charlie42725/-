@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import ImageUpload from '@/components/ImageUpload';
 
 interface Series {
   id: number;
@@ -33,6 +34,7 @@ export default function SeriesPage() {
     name: '',
     slug: '',
     description: '',
+    coverImage: '',
   });
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function SeriesPage() {
 
       if (res.ok) {
         setShowForm(false);
-        setFormData({ brandId: '', name: '', slug: '', description: '' });
+        setFormData({ brandId: '', name: '', slug: '', description: '', coverImage: '' });
         fetchData();
       } else {
         const data = await res.json();
@@ -174,6 +176,11 @@ export default function SeriesPage() {
                 placeholder="系列簡介..."
               />
             </div>
+            <ImageUpload
+              label="系列封面圖"
+              value={formData.coverImage}
+              onChange={(url) => setFormData({ ...formData, coverImage: url })}
+            />
 
             <div className="flex space-x-4">
               <button

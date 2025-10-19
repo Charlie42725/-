@@ -42,6 +42,7 @@ export async function POST(request: Request) {
       totalTickets,
       status,
       coverImage,
+      galleryImages,
     } = body;
 
     if (!seriesId || !name || !slug || !price || !totalTickets) {
@@ -63,6 +64,13 @@ export async function POST(request: Request) {
         soldTickets: 0,
         status: status || 'draft',
         coverImage: coverImage || null,
+        images: galleryImages && galleryImages.length > 0 ? {
+          create: galleryImages.map((url: string, index: number) => ({
+            url,
+            type: 'gallery',
+            sortOrder: index,
+          })),
+        } : undefined,
       },
     });
 

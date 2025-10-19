@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import ImageUpload from '@/components/ImageUpload';
+import MultiImageUpload from '@/components/MultiImageUpload';
 
 interface Product {
   id: number;
@@ -38,6 +40,8 @@ export default function ProductsPage() {
     price: '',
     totalTickets: '',
     status: 'draft',
+    coverImage: '',
+    galleryImages: [] as string[],
   });
 
   useEffect(() => {
@@ -82,6 +86,8 @@ export default function ProductsPage() {
           price: '',
           totalTickets: '',
           status: 'draft',
+          coverImage: '',
+          galleryImages: [],
         });
         fetchData();
       } else {
@@ -224,6 +230,19 @@ export default function ProductsPage() {
                 />
               </div>
             </div>
+
+            <ImageUpload
+              label="商品封面圖"
+              value={formData.coverImage}
+              onChange={(url) => setFormData({ ...formData, coverImage: url })}
+            />
+
+            <MultiImageUpload
+              label="商品圖片集（最多 4 張）"
+              images={formData.galleryImages}
+              onChange={(images) => setFormData({ ...formData, galleryImages: images })}
+              maxImages={4}
+            />
 
             <div className="flex space-x-4">
               <button
