@@ -22,7 +22,7 @@ export default function Home() {
           <section className="mb-16">
             <div className="flex items-center mb-8 p-6">
               <span className="text-orange-400 mr-4 text-3xl">≫</span>
-              <h2 className="text-3xl font-bold text-white">最新一番賞（214套）</h2>
+              <h2 className="text-3xl font-bold text-white">最新一番賞</h2>
             </div>
           
           <ProductGrid />
