@@ -68,7 +68,7 @@ export default function AdminLayout({
       </header>
 
       {/* 主要內容 */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      <main className="flex justify-center px-4 py-8">
         <div className="w-full max-w-6xl">
           {children}
         </div>
