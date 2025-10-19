@@ -19,7 +19,7 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-slate-900 flex flex-col">
       {/* 頂部導航 */}
       <header className="bg-slate-800 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4">
@@ -68,8 +68,10 @@ export default function AdminLayout({
       </header>
 
       {/* 主要內容 */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {children}
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-6xl">
+          {children}
+        </div>
       </main>
 
       {/* 頁腳 */}

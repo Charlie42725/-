@@ -13,10 +13,10 @@ export default async function AdminDashboard() {
   const [brandCount, seriesCount, productCount, activeProductCount] = stats;
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">後台管理儀表板</h1>
-        <p className="text-slate-400">歡迎來到良級懸賞管理後台</p>
+    <div className="w-full">
+      <div className="mb-12 text-center">
+        <h1 className="text-4xl font-bold text-white mb-4">後台管理儀表板</h1>
+        <p className="text-slate-400 text-lg">歡迎來到良級懸賞管理後台</p>
       </div>
 
       {/* 統計卡片 */}
