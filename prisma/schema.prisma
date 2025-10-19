@@ -1,0 +1,153 @@
+// ======================================
+// 🏗️ 一番賞網站 Prisma Schema (for Supabase)
+// Database: PostgreSQL (Supabase)
+// Author: FuturiX Dev
+// ======================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")   // 用於應用程式連線（會走 Supabase PgBouncer）
+  directUrl = env("DIRECT_URL")     // 用於 migration (直連 port 5432)
+}
+
+// -----------------------------
+// 🔹 品牌 / IP
+// -----------------------------
+model Brand {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  logoUrl     String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  series      Series[]
+}
+
+// -----------------------------
+// 🔹 系列
+// -----------------------------
+model Series {
+  id          Int       @id @default(autoincrement())
+  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId     Int
+  name        String
+  slug        String
+  description String?
+  coverImage  String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+
+  @@unique([brandId, slug])
+}
+
+// -----------------------------
+// 🔹 商品
+// -----------------------------
+model Product {
+  id               Int             @id @default(autoincrement())
+  series           Series          @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  seriesId         Int
+  name             String
+  slug             String
+  shortDescription String?
+  longDescription  String?
+  price            Int
+  totalTickets     Int             @default(0)
+  soldTickets      Int             @default(0)
+  status           ProductStatus   @default(draft)
+  coverImage       String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  variants         ProductVariant[]
+  images           Image[]
+  logs             ProductLog[]
+
+  @@unique([seriesId, slug])
+}
+
+// -----------------------------
+// 🔹 商品獎項 / 版本
+// -----------------------------
+model ProductVariant {
+  id         Int       @id @default(autoincrement())
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  Int
+  name       String
+  rarity     String?
+  stock      Int       @default(0)
+  imageUrl   String?
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+}
+
+// -----------------------------
+// 🔹 圖片庫
+// -----------------------------
+model Image {
+  id         Int       @id @default(autoincrement())
+  product    Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  Int?
+  url        String
+  type       ImageType @default(gallery)
+  sortOrder  Int       @default(0)
+  createdAt  DateTime  @default(now())
+}
+
+// -----------------------------
+// 🔹 後台管理員
+// -----------------------------
+model AdminUser {
+  id            Int        @id @default(autoincrement())
+  username      String     @unique
+  passwordHash  String
+  role          AdminRole  @default(editor)
+  createdAt     DateTime   @default(now())
+
+  logs          ProductLog[]
+}
+
+// -----------------------------
+// 🔹 商品操作紀錄 (上架 / 下架 / 更新)
+// -----------------------------
+model ProductLog {
+  id         Int         @id @default(autoincrement())
+  product    Product?    @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId  Int?
+  admin      AdminUser?  @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  adminId    Int?
+  action     String
+  message    String?
+  createdAt  DateTime    @default(now())
+}
+
+// -----------------------------
+// 🔸 ENUM 定義
+// -----------------------------
+enum ProductStatus {
+  draft
+  active
+  sold_out
+  archived
+}
+
+enum ImageType {
+  cover
+  gallery
+  variant
+}
+
+enum AdminRole {
+  admin
+  editor
+}
