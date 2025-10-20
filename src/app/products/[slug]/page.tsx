@@ -5,6 +5,9 @@ import { prisma } from '@/lib/db';
 import { calculateProgress, statusText, statusColor } from '@/types';
 import LotterySystem from '@/components/LotterySystem';
 
+// 強制動態渲染，避免構建時連接資料庫
+export const dynamic = 'force-dynamic';
+
 export default async function ProductDetailPage({
   params,
 }: {

@@ -3,12 +3,13 @@ import { prisma } from '@/lib/db';
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await context.params;
     const product = await prisma.product.findFirst({
       where: {
-        slug: params.slug,
+        slug,
       },
       include: {
         series: {

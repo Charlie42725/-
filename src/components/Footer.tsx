@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Footer() {
   return (
     <footer className="w-full bg-gray-800 mt-24 py-12 border-t border-gray-700">
@@ -32,11 +34,11 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-4">快速連結</h4>
             <ul className="space-y-2">
-              <li><a href="/" className="text-gray-400 hover:text-white transition-colors text-sm">首頁</a></li>
-              <li><a href="/lottery" className="text-gray-400 hover:text-white transition-colors text-sm">一番賞</a></li>
-              <li><a href="/tasks" className="text-gray-400 hover:text-white transition-colors text-sm">任務中心</a></li>
-              <li><a href="/news" className="text-gray-400 hover:text-white transition-colors text-sm">最新消息</a></li>
-              <li><a href="/about" className="text-gray-400 hover:text-white transition-colors text-sm">關於我們</a></li>
+              <li><Link href="/" className="text-gray-400 hover:text-white transition-colors text-sm">首頁</Link></li>
+              <li><Link href="/lottery" className="text-gray-400 hover:text-white transition-colors text-sm">一番賞</Link></li>
+              <li><Link href="/tasks" className="text-gray-400 hover:text-white transition-colors text-sm">任務中心</Link></li>
+              <li><Link href="/news" className="text-gray-400 hover:text-white transition-colors text-sm">最新消息</Link></li>
+              <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors text-sm">關於我們</Link></li>
             </ul>
           </div>
 
@@ -44,11 +46,11 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-4">客戶服務</h4>
             <ul className="space-y-2">
-              <li><a href="/help" className="text-gray-400 hover:text-white transition-colors text-sm">使用說明</a></li>
-              <li><a href="/faq" className="text-gray-400 hover:text-white transition-colors text-sm">常見問題</a></li>
-              <li><a href="/contact" className="text-gray-400 hover:text-white transition-colors text-sm">聯絡客服</a></li>
-              <li><a href="/shipping" className="text-gray-400 hover:text-white transition-colors text-sm">配送資訊</a></li>
-              <li><a href="/return" className="text-gray-400 hover:text-white transition-colors text-sm">退換貨政策</a></li>
+              <li><Link href="/help" className="text-gray-400 hover:text-white transition-colors text-sm">使用說明</Link></li>
+              <li><Link href="/faq" className="text-gray-400 hover:text-white transition-colors text-sm">常見問題</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors text-sm">聯絡客服</Link></li>
+              <li><Link href="/shipping" className="text-gray-400 hover:text-white transition-colors text-sm">配送資訊</Link></li>
+              <li><Link href="/return" className="text-gray-400 hover:text-white transition-colors text-sm">退換貨政策</Link></li>
             </ul>
           </div>
 
@@ -56,10 +58,10 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-4">法律資訊</h4>
             <ul className="space-y-2">
-              <li><a href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">服務條款</a></li>
-              <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">隱私政策</a></li>
-              <li><a href="/cookies" className="text-gray-400 hover:text-white transition-colors text-sm">Cookie 政策</a></li>
-              <li><a href="/disclaimer" className="text-gray-400 hover:text-white transition-colors text-sm">免責聲明</a></li>
+              <li><Link href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">服務條款</Link></li>
+              <li><Link href="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">隱私政策</Link></li>
+              <li><Link href="/cookies" className="text-gray-400 hover:text-white transition-colors text-sm">Cookie 政策</Link></li>
+              <li><Link href="/disclaimer" className="text-gray-400 hover:text-white transition-colors text-sm">免責聲明</Link></li>
             </ul>
           </div>
         </div>

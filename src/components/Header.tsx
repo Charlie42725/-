@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Header() {
@@ -32,33 +33,33 @@ export default function Header() {
 
           {/* 桌面版導航選單 */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="/" className="text-white hover:text-orange-400 transition-colors">
+            <Link href="/" className="text-white hover:text-orange-400 transition-colors">
               全部一番賞
-            </a>
-            <a href="/lottery" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/lottery" className="text-white hover:text-orange-400 transition-colors">
               專人賞任務
-            </a>
-            <a href="/tasks" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/tasks" className="text-white hover:text-orange-400 transition-colors">
               任務大賞區
-            </a>
-            <a href="/brands" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/brands" className="text-white hover:text-orange-400 transition-colors">
               品牌
-            </a>
-            <a href="/genshin" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/genshin" className="text-white hover:text-orange-400 transition-colors">
               免疫結蛋
-            </a>
-            <a href="/genshin" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/genshin" className="text-white hover:text-orange-400 transition-colors">
               原神 Genshin
-            </a>
-            <a href="/news" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/news" className="text-white hover:text-orange-400 transition-colors">
               實收串
-            </a>
-            <a href="/store" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/store" className="text-white hover:text-orange-400 transition-colors">
               店鋪情報
-            </a>
-            <a href="/events" className="text-white hover:text-orange-400 transition-colors">
+            </Link>
+            <Link href="/events" className="text-white hover:text-orange-400 transition-colors">
               營業新聞
-            </a>
+            </Link>
           </div>
 
           {/* 右側按鈕 */}
@@ -86,34 +87,34 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden bg-gray-800 py-4">
             <div className="flex flex-col space-y-2">
-              <a href="/" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              <Link href="/" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 全部一番賞
-              </a>
-              <a href="/lottery" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/lottery" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 專人賞任務
-              </a>
-              <a href="/tasks" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/tasks" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 任務大賞區
-              </a>
-              <a href="/brands" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/brands" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 品牌
-              </a>
-              <a href="/genshin" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/genshin" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 原神 Genshin
-              </a>
-              <a href="/news" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/news" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 實收串
-              </a>
-              <a href="/store" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/store" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 店鋪情報
-              </a>
+              </Link>
               <hr className="border-gray-600 my-2" />
-              <a href="/login" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              <Link href="/login" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 登入
-              </a>
-              <a href="/register" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+              </Link>
+              <Link href="/register" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 註冊
-              </a>
+              </Link>
             </div>
           </div>
         )}

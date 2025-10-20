@@ -122,7 +122,7 @@ export default function ProductsPage() {
         totalTickets: product.totalTickets.toString(),
         status: product.status,
         coverImage: data.product.coverImage || '',
-        galleryImages: data.product.images?.map((img: any) => img.url) || [],
+        galleryImages: data.product.images?.map((img: { url: string }) => img.url) || [],
       });
       setEditingId(product.id);
       setShowForm(true);
@@ -172,11 +172,6 @@ export default function ProductsPage() {
   if (loading) {
     return <div className="text-white">載入中...</div>;
   }
-
-  const selectedBrand = brands.find((b) =>
-    b.series.some((s) => s.id === parseInt(formData.seriesId))
-  );
-  const availableSeries = selectedBrand?.series || [];
 
   return (
     <div>

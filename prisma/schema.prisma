@@ -1,6 +1,6 @@
 // ======================================
-// 🏗️ 一番賞網站 Prisma Schema (for Supabase)
-// Database: PostgreSQL (Supabase)
+// 🏗️ 一番賞網站 Prisma Schema (for Neon)
+// Database: PostgreSQL (Neon)
 // Author: FuturiX Dev
 // ======================================
 
@@ -9,9 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")   // 用於應用程式連線（會走 Supabase PgBouncer）
-  directUrl = env("DIRECT_URL")     // 用於 migration (直連 port 5432)
+  provider = "postgresql"
+  url      = env("DATABASE_URL")       // <- Neon Connection Pooler
+  directUrl = env("DIRECT_URL")        // <- 用於 migrations 和 Prisma Studio
 }
 
 // -----------------------------

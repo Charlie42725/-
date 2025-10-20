@@ -44,10 +44,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ brand }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('新增品牌失敗:', error);
 
-    if (error.code === 'P2002') {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
       return NextResponse.json(
         { error: 'Slug 已存在，請使用不同的 slug' },
         { status: 400 }

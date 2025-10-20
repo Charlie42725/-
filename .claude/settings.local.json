@@ -4,7 +4,17 @@
       "Bash(npx prisma generate:*)",
       "Bash(npm run build:*)",
       "Bash(npx prisma db push:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(npm rebuild:*)",
+      "Bash(npm install:*)",
+      "Bash(find:*)",
+      "Bash(test:*)",
+      "Bash(ping:*)",
+      "WebFetch(domain:supabase.com)",
+      "Bash(node:*)",
+      "Bash(nslookup db.ykzuwfdvrbtjbhxjwsxv.supabase.co)",
+      "Bash(getent:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

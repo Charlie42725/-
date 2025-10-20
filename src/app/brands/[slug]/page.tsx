@@ -3,6 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/db';
 
+// 強制動態渲染，避免構建時連接資料庫
+export const dynamic = 'force-dynamic';
+
 export default async function BrandPage({
   params,
 }: {

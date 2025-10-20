@@ -49,9 +49,10 @@ export default function ImageUpload({
       const data = await res.json();
       setPreview(data.url);
       onChange(data.url);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('上傳圖片失敗:', error);
-      alert(error.message || '上傳圖片失敗');
+      const errorMessage = error instanceof Error ? error.message : '上傳圖片失敗';
+      alert(errorMessage);
     } finally {
       setUploading(false);
     }

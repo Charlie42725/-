@@ -4,10 +4,11 @@ import { prisma } from '@/lib/db';
 // 刪除系列
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: idStr } = await context.params;
+    const id = parseInt(idStr);
 
     await prisma.series.delete({
       where: { id },
@@ -23,10 +24,11 @@ export async function DELETE(
 // 更新系列
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: idStr } = await context.params;
+    const id = parseInt(idStr);
     const body = await request.json();
     const { name, slug, description, isActive } = body;
 

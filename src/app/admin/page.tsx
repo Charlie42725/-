@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
 
+// 強制動態渲染，避免構建時連接資料庫
+export const dynamic = 'force-dynamic';
+
 export default async function AdminDashboard() {
   // 獲取統計資料
   const stats = await Promise.all([

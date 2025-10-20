@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { ProductStatus } from '@prisma/client';
+import { ProductStatus, Prisma } from '@prisma/client';
 
 export async function GET(request: Request) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // 構建 where 條件
-    const where: any = {};
+    const where: Prisma.ProductWhereInput = {};
 
     if (status) {
       where.status = status;
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     }
 
     // 構建 orderBy 條件
-    let orderBy: any = { createdAt: 'desc' }; // 默認最新
+    let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' }; // 默認最新
 
     switch (sortBy) {
       case 'price_low':

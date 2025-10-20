@@ -57,9 +57,10 @@ export default function MultiImageUpload({
 
       const uploadedUrls = await Promise.all(uploadPromises);
       onChange([...images, ...uploadedUrls]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('上傳圖片失敗:', error);
-      alert(error.message || '上傳圖片失敗');
+      const errorMessage = error instanceof Error ? error.message : '上傳圖片失敗';
+      alert(errorMessage);
     } finally {
       setUploading(false);
       // 清空 input
