@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
+import { Prisma, PointTransactionType } from '@prisma/client';
 
 // 獲取用戶點數異動記錄
 export async function GET(req: NextRequest) {
@@ -29,9 +30,9 @@ export async function GET(req: NextRequest) {
     const type = searchParams.get('type');
 
     // 構建查詢條件
-    const where: any = { userId: payload.userId };
+    const where: Prisma.PointTransactionWhereInput = { userId: payload.userId };
     if (type) {
-      where.type = type;
+      where.type = type as PointTransactionType;
     }
 
     // 查詢點數異動記錄

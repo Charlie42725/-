@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
+import { Prisma, OrderStatus } from '@prisma/client';
 
 // 獲取用戶訂單列表
 export async function GET(req: NextRequest) {
@@ -29,9 +30,9 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
 
     // 構建查詢條件
-    const where: any = { userId: payload.userId };
+    const where: Prisma.OrderWhereInput = { userId: payload.userId };
     if (status) {
-      where.status = status;
+      where.status = status as OrderStatus;
     }
 
     // 查詢訂單
