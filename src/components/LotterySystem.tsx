@@ -27,6 +27,7 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
   const [isDrawing, setIsDrawing] = useState(false);
   const [results, setResults] = useState<LotteryResult[]>([]);
   const [currentRevealIndex, setCurrentRevealIndex] = useState(-1);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   // 生成獎項分配（根據庫存隨機分配給號碼）
   const generatePrizeAllocation = () => {
@@ -66,9 +67,14 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
     });
   };
 
+  const handleConfirmDraw = () => {
+    setShowConfirmDialog(true);
+  };
+
   const handleStartDraw = async () => {
     if (selectedNumbers.length === 0 || isDrawing) return;
 
+    setShowConfirmDialog(false);
     setIsDrawing(true);
     setResults([]);
     setCurrentRevealIndex(-1);
@@ -99,6 +105,51 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
 
   return (
     <div className="space-y-8">
+      {/* 確認對話框 */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-slate-700 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🎯</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">確認開始抽獎？</h3>
+              <p className="text-slate-400">
+                你已選擇 <span className="text-orange-400 font-bold text-xl">{selectedNumbers.length}</span> 個號碼
+              </p>
+            </div>
+
+            <div className="bg-slate-900/50 rounded-xl p-4 mb-6">
+              <p className="text-slate-300 text-sm text-center leading-relaxed">
+                選擇的號碼：
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center mt-3">
+                {selectedNumbers.sort((a, b) => a - b).map(num => (
+                  <span key={num} className="bg-gradient-to-br from-orange-500 to-pink-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                    {num}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowConfirmDialog(false)}
+                className="flex-1 bg-slate-700 text-white font-medium py-3 px-6 rounded-xl hover:bg-slate-600 transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleStartDraw}
+                className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
+              >
+                確認抽獎
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 抽獎結果動畫 */}
       {results.length > 0 && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -128,8 +179,8 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
                       </div>
 
                       {/* 正面 - 獎項 */}
-                      <div className="absolute inset-0 rotate-y-180 backface-hidden bg-slate-800">
-                        <div className="relative h-3/4">
+                      <div className="absolute inset-0 rotate-y-180 backface-hidden bg-slate-800 flex flex-col">
+                        <div className="relative flex-1">
                           {result.variant.imageUrl ? (
                             <Image
                               src={result.variant.imageUrl}
@@ -143,11 +194,11 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
                             </div>
                           )}
                         </div>
-                        <div className="h-1/4 bg-slate-900 p-3 flex flex-col justify-center">
-                          <p className="text-orange-400 font-bold text-center text-sm">
+                        <div className="bg-slate-900 px-3 py-4 flex flex-col justify-center gap-1">
+                          <p className="text-orange-400 font-bold text-center text-sm leading-tight">
                             {result.ticketNumber} - {result.variant.prize}
                           </p>
-                          <p className="text-white text-center text-xs truncate">
+                          <p className="text-white text-center text-xs leading-tight line-clamp-2">
                             {result.variant.name}
                           </p>
                         </div>
@@ -211,7 +262,7 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
         {/* 操作按鈕 */}
         <div className="flex gap-4">
           <button
-            onClick={handleStartDraw}
+            onClick={handleConfirmDraw}
             disabled={selectedNumbers.length === 0 || isDrawing}
             className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
