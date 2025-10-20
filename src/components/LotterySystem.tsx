@@ -117,7 +117,7 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
                     <div
                       className={`
                         absolute inset-0 transition-transform duration-700 transform-style-3d
-                        ${index === currentRevealIndex ? 'rotate-y-180' : ''}
+                        ${index <= currentRevealIndex ? 'rotate-y-180' : ''}
                       `}
                     >
                       {/* 背面 - 號碼 */}
