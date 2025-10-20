@@ -266,17 +266,17 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
         </div>
       )}
 
-      {/* 號碼格子區域 */}
-      <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
-        <div className="flex items-center justify-between mb-4">
+      {/* 號碼格子區域 - 優化：增加內邊距與間距 */}
+      <div className="bg-slate-800/50 rounded-2xl p-6 lg:p-8 border border-slate-700">
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">抽獎號碼池</h2>
           <div className="text-sm text-slate-400">
             已選擇 <span className="text-orange-400 font-bold">{selectedNumbers.length}</span> 個號碼
           </div>
         </div>
 
-        {/* 號碼格子 */}
-        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2 mb-6">
+        {/* 號碼格子 - 優化：增加格子間距到 12px */}
+        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3 mb-8">
           {Array.from({ length: totalTickets }, (_, i) => i + 1).map(number => {
             const drawn = isNumberDrawn(number);
             const selected = isNumberSelected(number);

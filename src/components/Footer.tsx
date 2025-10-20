@@ -2,14 +2,14 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-gray-800 mt-24 py-12 border-t border-gray-700">
+    <footer className="w-full bg-gray-800 mt-32 lg:mt-40 py-12 border-t border-gray-700">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 公司資訊 */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">XXXX</h3>
+            <h3 className="text-white font-bold text-lg mb-4">萬物皆可抽</h3>
             <p className="text-gray-400 text-sm mb-4">
-              專營一番賞抽賞的線上平台，提供最公平、公正、公開的抽賞體驗。
+              萬物皆可抽專營一番賞抽賞的線上平台，提供最公平、公正、公開的抽賞體驗。
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -70,7 +70,7 @@ export default function Footer() {
         <hr className="border-gray-700 my-8" />
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; 2024 XXXX All rights reserved.
+            &copy; 2025 萬物皆可抽 All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <span className="text-gray-400 text-sm">客服時間：週一至週日 09:00-21:00</span>

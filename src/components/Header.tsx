@@ -15,7 +15,7 @@ export default function Header() {
           <div className="flex items-center">
             <Image
               src="/assets/images/logos/logo.png"
-              alt="XXXX"
+              alt="萬物皆可抽"
               width={120}
               height={40}
               className="h-8 w-auto"
@@ -27,7 +27,7 @@ export default function Header() {
               }}
             />
             <div className="text-2xl font-bold text-orange-400" style={{ display: 'none' }}>
-              XXXX
+              萬物皆可抽
             </div>
           </div>
 
