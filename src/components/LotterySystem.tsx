@@ -69,6 +69,14 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
 
   const handleConfirmDraw = () => {
     setShowConfirmDialog(true);
+    // 阻止背景滾動
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmDialog(false);
+    // 恢復背景滾動
+    document.body.style.overflow = '';
   };
 
   const handleStartDraw = async () => {
@@ -79,6 +87,8 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
     setResults([]);
     setCurrentRevealIndex(-1);
 
+    // 背景滾動已經在 handleConfirmDraw 中阻止了
+
     const newResults: LotteryResult[] = selectedNumbers.map(num => ({
       ticketNumber: num,
       variant: prizeAllocation[num],
@@ -86,9 +96,9 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
 
     setResults(newResults);
 
-    // 逐個翻牌動畫
+    // 快速連續翻牌動畫（每 300ms 翻一張）
     for (let i = 0; i < newResults.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 300));
       setCurrentRevealIndex(i);
     }
 
@@ -96,8 +106,14 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
     setDrawnNumbers(prev => [...prev, ...selectedNumbers]);
     setSelectedNumbers([]);
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     setIsDrawing(false);
+  };
+
+  const handleCloseResults = () => {
+    setResults([]);
+    // 恢復背景滾動
+    document.body.style.overflow = '';
   };
 
   const isNumberDrawn = (number: number) => drawnNumbers.includes(number);
@@ -134,7 +150,7 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
 
             <div className="flex gap-3">
               <button
-                onClick={() => setShowConfirmDialog(false)}
+                onClick={handleCancelConfirm}
                 className="flex-1 bg-slate-700 text-white font-medium py-3 px-6 rounded-xl hover:bg-slate-600 transition-colors"
               >
                 取消
@@ -152,25 +168,49 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
 
       {/* 抽獎結果動畫 */}
       {results.length > 0 && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="max-w-4xl w-full">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {results.map((result, index) => (
-                <div
-                  key={result.ticketNumber}
-                  className={`
-                    relative aspect-[3/4] rounded-xl overflow-hidden transition-all duration-500
-                    ${index <= currentRevealIndex ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
-                  `}
-                >
-                  <div className="relative w-full h-full">
-                    {/* 翻牌動畫 */}
-                    <div
-                      className={`
-                        absolute inset-0 transition-transform duration-700 transform-style-3d
-                        ${index <= currentRevealIndex ? 'rotate-y-180' : ''}
-                      `}
-                    >
+        <div
+          className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={(e) => {
+            // 點擊背景關閉
+            if (e.target === e.currentTarget && !isDrawing) {
+              handleCloseResults();
+            }
+          }}
+        >
+          <div className="max-w-6xl w-full h-full max-h-[90vh] flex flex-col">
+            {/* 標題 */}
+            <div className="text-center mb-4 flex-shrink-0">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                {isDrawing ? '抽獎中...' : '抽獎結果'}
+              </h2>
+              <p className="text-slate-400">
+                共抽出 <span className="text-orange-400 font-bold">{results.length}</span> 個號碼
+              </p>
+            </div>
+
+            {/* 可滾動的結果區域 */}
+            <div
+              className="flex-1 overflow-y-auto custom-scrollbar"
+              onTouchMove={(e) => e.stopPropagation()}
+              onWheel={(e) => e.stopPropagation()}
+            >
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4">
+                {results.map((result, index) => (
+                  <div
+                    key={result.ticketNumber}
+                    className={`
+                      relative aspect-[3/4] rounded-xl overflow-hidden transition-all duration-300
+                      ${index <= currentRevealIndex ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}
+                    `}
+                  >
+                    <div className="relative w-full h-full">
+                      {/* 翻牌動畫 */}
+                      <div
+                        className={`
+                          absolute inset-0 transition-transform duration-500 transform-style-3d
+                          ${index <= currentRevealIndex ? 'rotate-y-180' : ''}
+                        `}
+                      >
                       {/* 背面 - 號碼 */}
                       <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center backface-hidden">
                         <div className="text-white text-6xl font-bold">
@@ -209,13 +249,16 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
               ))}
             </div>
 
+            </div>
+
+            {/* 關閉按鈕 */}
             {!isDrawing && (
-              <div className="text-center mt-8">
+              <div className="text-center mt-4 flex-shrink-0">
                 <button
-                  onClick={() => setResults([])}
-                  className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:from-orange-600 hover:to-pink-600 transition-all"
+                  onClick={handleCloseResults}
+                  className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
                 >
-                  關閉
+                  關閉結果
                 </button>
               </div>
             )}
