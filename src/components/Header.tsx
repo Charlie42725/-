@@ -36,12 +36,12 @@ export default function Header() {
 
     window.addEventListener('storage', handleStorageChange);
 
-    // 定期刷新點數（每 5 秒）
+    // 定期刷新點數（每 30 秒）- 減少資料庫查詢頻率
     const intervalId = setInterval(() => {
       if (isAuthenticated()) {
         loadUserPoints();
       }
-    }, 5000);
+    }, 30000);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);

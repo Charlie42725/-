@@ -159,6 +159,12 @@ export default function LotterySystem({
       // 更新用戶點數
       setUserPoints(data.newBalance);
 
+      // 觸發 storage 事件，通知 Header 組件更新點數
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'points_updated',
+        newValue: data.newBalance.toString()
+      }));
+
       // 準備結果數據
       const newResults: LotteryResult[] = data.results.map((r: { ticketNumber: number; variant: Variant }) => ({
         ticketNumber: r.ticketNumber,

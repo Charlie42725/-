@@ -128,6 +128,12 @@ export default function PointsPage() {
       // 重新載入用戶資料
       await loadUserProfile();
 
+      // 觸發 storage 事件，通知 Header 組件更新點數
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'points_updated',
+        newValue: paymentResult.newBalance.toString()
+      }));
+
     } catch (error) {
       console.error('Purchase error:', error);
       alert('購買失敗，請稍後再試');

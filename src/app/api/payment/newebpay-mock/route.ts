@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { cache } from '@/lib/cache';
 
 // 藍新金流模擬 API - 用於測試環境
 // 在真實環境中，這應該替換為實際的藍新金流 API 串接
@@ -95,6 +96,9 @@ export async function POST(req: NextRequest) {
       where: { orderNumber },
       data: { status: 'completed' }
     });
+
+    // 清除用戶快取，確保下次請求時取得最新點數
+    cache.clear(`user:profile:${order.userId}`);
 
     return NextResponse.json({
       success: true,

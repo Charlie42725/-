@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
+import { cache } from '@/lib/cache';
 
 export async function POST(req: NextRequest) {
   try {
@@ -184,6 +185,9 @@ export async function POST(req: NextRequest) {
         pointsUsed: totalPointsNeeded
       };
     });
+
+    // 清除用戶快取，確保下次請求時取得最新點數
+    cache.clear(`user:profile:${payload.userId}`);
 
     return NextResponse.json({
       success: true,

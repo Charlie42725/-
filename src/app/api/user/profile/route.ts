@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
+import { cache } from '@/lib/cache';
 
 // 獲取用戶完整資料（包含點數）
 export async function GET(req: NextRequest) {
@@ -21,6 +22,14 @@ export async function GET(req: NextRequest) {
         { error: '登入已過期，請重新登入' },
         { status: 401 }
       );
+    }
+
+    // 檢查快取（2秒 TTL）
+    const cacheKey = `user:profile:${payload.userId}`;
+    const cachedUser = cache.get(cacheKey);
+
+    if (cachedUser) {
+      return NextResponse.json({ user: cachedUser });
     }
 
     // 從資料庫查詢最新的用戶資料
@@ -45,6 +54,9 @@ export async function GET(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    // 儲存到快取（2秒）
+    cache.set(cacheKey, user, 2000);
 
     return NextResponse.json({ user });
 
