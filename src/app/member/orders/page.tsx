@@ -2,117 +2,37 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { getCurrentUser, isAuthenticated } from '@/lib/auth';
-
-interface OrderItem {
-  id: number;
-  productName: string;
-  productImage: string;
-  variantName: string;
-  prize: string;
-  ticketNumber: number;
-}
 
 interface Order {
   id: number;
   orderNumber: string;
-  productName: string;
-  items: OrderItem[];
-  totalAmount: number;
-  status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
-  createdAt: string;
+  packageName: string;
+  basePoints: number;
+  bonusPoints: number;
+  totalPoints: number;
+  amount: number;
+  status: 'pending' | 'paid' | 'completed' | 'cancelled' | 'failed';
+  paymentMethod?: string;
   paidAt?: string;
-  shippedAt?: string;
-  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
-
-// 模擬訂單資料
-const mockOrders: Order[] = [
-  {
-    id: 1,
-    orderNumber: 'ORD20250121001',
-    productName: '原神 Ver.3 一番賞',
-    items: [
-      {
-        id: 1,
-        productName: '原神 Ver.3 一番賞',
-        productImage: 'https://picsum.photos/200/200?random=1',
-        variantName: '雷電將軍 特等獎公仔',
-        prize: 'A賞',
-        ticketNumber: 42,
-      },
-      {
-        id: 2,
-        productName: '原神 Ver.3 一番賞',
-        productImage: 'https://picsum.photos/200/200?random=2',
-        variantName: '限定海報套組',
-        prize: 'C賞',
-        ticketNumber: 89,
-      },
-    ],
-    totalAmount: 0,
-    status: 'completed',
-    createdAt: '2025-01-15 14:30:00',
-    paidAt: '2025-01-15 14:30:00',
-    shippedAt: '2025-01-16 10:00:00',
-    completedAt: '2025-01-18 15:20:00',
-  },
-  {
-    id: 2,
-    orderNumber: 'ORD20250121002',
-    productName: 'ONE PIECE 劇場版系列',
-    items: [
-      {
-        id: 3,
-        productName: 'ONE PIECE 劇場版系列',
-        productImage: 'https://picsum.photos/200/200?random=3',
-        variantName: '魯夫 特別版公仔',
-        prize: 'A賞',
-        ticketNumber: 15,
-      },
-    ],
-    totalAmount: 0,
-    status: 'shipped',
-    createdAt: '2025-01-20 10:15:00',
-    paidAt: '2025-01-20 10:15:00',
-    shippedAt: '2025-01-21 09:00:00',
-  },
-  {
-    id: 3,
-    orderNumber: 'ORD20250121003',
-    productName: '咒術迴戰 渋谷事變',
-    items: [
-      {
-        id: 4,
-        productName: '咒術迴戰 渋谷事變',
-        productImage: 'https://picsum.photos/200/200?random=4',
-        variantName: '五條悟 限定版',
-        prize: 'Last賞',
-        ticketNumber: 100,
-      },
-    ],
-    totalAmount: 0,
-    status: 'paid',
-    createdAt: '2025-01-21 16:45:00',
-    paidAt: '2025-01-21 16:45:00',
-  },
-];
 
 const statusText: Record<Order['status'], string> = {
   pending: '待付款',
-  paid: '待出貨',
-  shipped: '已出貨',
+  paid: '已付款',
   completed: '已完成',
   cancelled: '已取消',
+  failed: '失敗',
 };
 
 const statusColor: Record<Order['status'], string> = {
   pending: 'bg-yellow-500',
   paid: 'bg-blue-500',
-  shipped: 'bg-purple-500',
   completed: 'bg-green-500',
   cancelled: 'bg-gray-500',
+  failed: 'bg-red-500',
 };
 
 interface User {
@@ -140,26 +60,40 @@ export default function OrdersPage() {
       setUser(userData);
     }
 
-    // 載入訂單資料
-    const loadOrders = async () => {
-      try {
-        // TODO: 實作 API 載入訂單
-        // const response = await fetch('/api/member/orders');
-        // const data = await response.json();
-        // setOrders(data.orders);
-
-        // 暫時使用模擬資料
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setOrders(mockOrders);
-      } catch (error) {
-        console.error('Failed to load orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadOrders();
   }, [router]);
+
+  const loadOrders = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/orders', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to load orders');
+
+      const data = await response.json();
+      setOrders(data.orders);
+    } catch (error) {
+      console.error('Failed to load orders:', error);
+      alert('載入訂單失敗');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   if (!user) {
     return (
@@ -175,7 +109,7 @@ export default function OrdersPage() {
         {/* 頁面標題 */}
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">訂單紀錄</h1>
-          <p className="text-slate-400">查看您的抽獎紀錄與配送狀態</p>
+          <p className="text-slate-400">查看您的點數購買紀錄</p>
         </div>
 
         {loading ? (
@@ -186,12 +120,12 @@ export default function OrdersPage() {
           <div className="bg-slate-800/30 rounded-3xl p-12 text-center backdrop-blur-sm border border-slate-700/50">
             <div className="text-6xl mb-4">📦</div>
             <h3 className="text-2xl font-bold text-white mb-2">尚無訂單紀錄</h3>
-            <p className="text-slate-400 mb-6">快去參加一番賞抽獎吧！</p>
+            <p className="text-slate-400 mb-6">快去購買點數吧！</p>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/member/points')}
               className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-8 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
             >
-              前往商品頁
+              前往購買點數
             </button>
           </div>
         ) : (
@@ -210,7 +144,7 @@ export default function OrdersPage() {
                         {statusText[order.status]}
                       </span>
                     </div>
-                    <p className="text-slate-400 text-sm">{order.createdAt}</p>
+                    <p className="text-slate-400 text-sm">{formatDate(order.createdAt)}</p>
                   </div>
                   <button
                     onClick={() => setSelectedOrder(selectedOrder?.id === order.id ? null : order)}
@@ -220,30 +154,27 @@ export default function OrdersPage() {
                   </button>
                 </div>
 
-                {/* 訂單項目列表 */}
-                <div className="space-y-4">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-900/50 rounded-2xl">
-                      <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                        <Image
-                          src={item.productImage}
-                          alt={item.variantName}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-white font-bold mb-1">{item.variantName}</p>
-                        <p className="text-slate-400 text-sm mb-1">{item.productName}</p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs bg-gradient-to-r from-orange-400 to-pink-400 text-white px-2 py-1 rounded-full font-semibold">
-                            {item.prize}
-                          </span>
-                          <span className="text-slate-400 text-xs">號碼: {item.ticketNumber}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                {/* 訂單基本資訊 */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div className="bg-slate-900/50 rounded-2xl p-4">
+                    <p className="text-slate-400 text-sm mb-1">方案名稱</p>
+                    <p className="text-white font-bold">{order.packageName}</p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-2xl p-4">
+                    <p className="text-slate-400 text-sm mb-1">獲得點數</p>
+                    <p className="text-orange-400 font-bold text-lg">
+                      {order.totalPoints.toLocaleString()}
+                    </p>
+                    <p className="text-slate-400 text-xs">
+                      基礎 {order.basePoints.toLocaleString()} + 贈送 {order.bonusPoints.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-2xl p-4">
+                    <p className="text-slate-400 text-sm mb-1">支付金額</p>
+                    <p className="text-white font-bold text-lg">
+                      NT$ {order.amount.toLocaleString()}
+                    </p>
+                  </div>
                 </div>
 
                 {/* 展開的詳細資訊 */}
@@ -255,7 +186,7 @@ export default function OrdersPage() {
                         <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                         <div className="flex-1">
                           <p className="text-white font-medium">訂單建立</p>
-                          <p className="text-slate-400 text-sm">{order.createdAt}</p>
+                          <p className="text-slate-400 text-sm">{formatDate(order.createdAt)}</p>
                         </div>
                       </div>
                       {order.paidAt && (
@@ -263,25 +194,19 @@ export default function OrdersPage() {
                           <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                           <div className="flex-1">
                             <p className="text-white font-medium">完成付款</p>
-                            <p className="text-slate-400 text-sm">{order.paidAt}</p>
+                            <p className="text-slate-400 text-sm">{formatDate(order.paidAt)}</p>
+                            {order.paymentMethod && (
+                              <p className="text-slate-500 text-xs">付款方式: {order.paymentMethod}</p>
+                            )}
                           </div>
                         </div>
                       )}
-                      {order.shippedAt && (
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                          <div className="flex-1">
-                            <p className="text-white font-medium">商品出貨</p>
-                            <p className="text-slate-400 text-sm">{order.shippedAt}</p>
-                          </div>
-                        </div>
-                      )}
-                      {order.completedAt && (
+                      {order.status === 'completed' && (
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                           <div className="flex-1">
                             <p className="text-white font-medium">訂單完成</p>
-                            <p className="text-slate-400 text-sm">{order.completedAt}</p>
+                            <p className="text-slate-400 text-sm">{formatDate(order.updatedAt)}</p>
                           </div>
                         </div>
                       )}

@@ -118,10 +118,14 @@ model User {
   nickname          String
   gender            Gender?
   phone             String?   @unique
+  points            Int       @default(0)  // 點數餘額
   isEmailVerified   Boolean   @default(false)
   isPhoneVerified   Boolean   @default(false)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
+  orders            Order[]
+  pointTransactions PointTransaction[]
 
   @@index([email])
   @@index([phone])
@@ -170,6 +174,50 @@ model ProductLog {
 }
 
 // -----------------------------
+// 🔹 訂單
+// -----------------------------
+model Order {
+  id              Int          @id @default(autoincrement())
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  orderNumber     String       @unique  // 訂單編號
+  packageName     String       // 方案名稱
+  basePoints      Int          // 基礎點數
+  bonusPoints     Int          // 贈送點數
+  totalPoints     Int          // 總點數
+  amount          Int          // 支付金額
+  status          OrderStatus  @default(pending)
+  paymentMethod   String?      // 付款方式
+  paymentInfo     String?      // 付款資訊 (JSON)
+  paidAt          DateTime?    // 付款時間
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
+}
+
+// -----------------------------
+// 🔹 點數異動紀錄
+// -----------------------------
+model PointTransaction {
+  id            Int                    @id @default(autoincrement())
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  type          PointTransactionType   // 異動類型
+  amount        Int                    // 異動點數 (正數為增加，負數為扣除)
+  balance       Int                    // 異動後餘額
+  description   String                 // 異動說明
+  relatedId     String?                // 相關訂單/活動 ID
+  createdAt     DateTime               @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// -----------------------------
 // 🔸 ENUM 定義
 // -----------------------------
 enum ProductStatus {
@@ -199,4 +247,20 @@ enum Gender {
 enum CodeType {
   email
   phone
+}
+
+enum OrderStatus {
+  pending       // 待付款
+  paid          // 已付款
+  completed     // 已完成
+  cancelled     // 已取消
+  failed        // 失敗
+}
+
+enum PointTransactionType {
+  purchase      // 購買
+  bonus         // 贈送
+  lottery       // 抽獎消耗
+  refund        // 退款
+  admin_adjust  // 管理員調整
 }

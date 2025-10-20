@@ -22,17 +22,19 @@ const pointPackages: PointPackage[] = [
   { id: 6, name: '至尊方案', points: 10000, price: 10000, bonus: 3000 },
 ];
 
-interface User {
+interface UserProfile {
   id: number;
   email: string;
   nickname: string;
+  points: number;
 }
 
 export default function PointsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<PointPackage | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState(false);
 
   useEffect(() => {
     // 檢查登入狀態
@@ -41,39 +43,112 @@ export default function PointsPage() {
       return;
     }
 
-    const userData = getCurrentUser();
-    if (userData) {
-      setUser(userData);
-    }
+    loadUserProfile();
   }, [router]);
+
+  const loadUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to load profile');
+      }
+
+      const data = await response.json();
+      setUser(data.user);
+    } catch (error) {
+      console.error('Load profile error:', error);
+      alert('載入用戶資料失敗：' + (error as Error).message);
+      // 如果是認證錯誤，導向登入頁
+      if ((error as Error).message.includes('登入')) {
+        router.push('/login');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePurchase = async (pkg: PointPackage) => {
     setSelectedPackage(pkg);
-    setLoading(true);
+    setPurchasing(true);
 
     try {
-      // TODO: 實作付款流程 API
-      // const response = await fetch('/api/payment/create-order', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ packageId: pkg.id }),
-      // });
+      const token = localStorage.getItem('auth_token');
 
-      // 暫時模擬
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert(`即將前往付款頁面\n\n購買方案：${pkg.name}\n點數：${pkg.points + pkg.bonus}\n金額：NT$ ${pkg.price}`);
+      // 1. 創建訂單
+      const createOrderResponse = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ packageId: pkg.id }),
+      });
+
+      if (!createOrderResponse.ok) {
+        throw new Error('訂單創建失敗');
+      }
+
+      const { order } = await createOrderResponse.json();
+
+      // 2. 模擬付款（藍新金流）
+      const paymentResponse = await fetch('/api/payment/newebpay-mock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: order.orderNumber,
+          amount: order.amount
+        }),
+      });
+
+      if (!paymentResponse.ok) {
+        throw new Error('付款失敗');
+      }
+
+      const paymentResult = await paymentResponse.json();
+
+      // 3. 付款成功，更新顯示
+      alert(
+        `付款成功！\n\n` +
+        `訂單編號：${order.orderNumber}\n` +
+        `購買方案：${pkg.name}\n` +
+        `基礎點數：${pkg.points.toLocaleString()}\n` +
+        `贈送點數：${pkg.bonus.toLocaleString()}\n` +
+        `總點數：${(pkg.points + pkg.bonus).toLocaleString()}\n` +
+        `支付金額：NT$ ${pkg.price.toLocaleString()}\n\n` +
+        `新點數餘額：${paymentResult.newBalance.toLocaleString()}`
+      );
+
+      // 重新載入用戶資料
+      await loadUserProfile();
+
     } catch (error) {
-      alert('處理失敗，請稍後再試');
+      console.error('Purchase error:', error);
+      alert('購買失敗，請稍後再試');
     } finally {
-      setLoading(false);
+      setPurchasing(false);
       setSelectedPackage(null);
     }
   };
 
-  if (!user) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-xl">載入中...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <div className="text-xl">無法載入用戶資料</div>
       </div>
     );
   }
@@ -91,7 +166,7 @@ export default function PointsPage() {
         <div className="mb-8">
           <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-3xl p-8 backdrop-blur-sm border border-orange-400/30 shadow-2xl text-center">
             <p className="text-slate-300 text-lg mb-2">目前點數餘額</p>
-            <p className="text-5xl font-black text-orange-400">1,250</p>
+            <p className="text-5xl font-black text-orange-400">{user.points.toLocaleString()}</p>
             <p className="text-slate-400 text-sm mt-2">點數可用於抽獎及兌換優惠</p>
           </div>
         </div>
@@ -111,7 +186,7 @@ export default function PointsPage() {
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <div className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                    🔥 最熱門
+                    最熱門
                   </div>
                 </div>
               )}
@@ -153,14 +228,14 @@ export default function PointsPage() {
               {/* 購買按鈕 */}
               <button
                 onClick={() => handlePurchase(pkg)}
-                disabled={loading && selectedPackage?.id === pkg.id}
+                disabled={purchasing && selectedPackage?.id === pkg.id}
                 className={`w-full font-bold py-4 px-6 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
                   pkg.popular
                     ? 'bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white'
                     : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}
               >
-                {loading && selectedPackage?.id === pkg.id ? '處理中...' : '立即購買'}
+                {purchasing && selectedPackage?.id === pkg.id ? '處理中...' : '立即購買'}
               </button>
             </div>
           ))}
@@ -178,7 +253,7 @@ export default function PointsPage() {
             <p>• 點數可用於一番賞抽獎，每次抽獎消耗對應點數</p>
             <p>• 購買後點數即時入帳，永久有效</p>
             <p>• 贈送的點數與購買點數效力相同</p>
-            <p>• 支援多種付款方式：信用卡、ATM 轉帳、超商代碼</p>
+            <p>• 測試帳號可直接購買，無需實際付款</p>
             <p>• 如有任何問題，請聯絡客服</p>
           </div>
         </div>
