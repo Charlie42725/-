@@ -5,29 +5,63 @@ import { prisma } from '@/lib/db';
 import { calculateProgress, statusText, statusColor } from '@/types';
 import LotterySystem from '@/components/LotterySystem';
 
-// 強制動態渲染，避免構建時連接資料庫
-export const dynamic = 'force-dynamic';
+// 優化：使用 ISR (Incremental Static Regeneration) 提升性能
+export const revalidate = 60; // 每 60 秒重新驗證一次
 
 export default async function ProductDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
+  // 優化：使用 select 只取需要的欄位，減少資料傳輸
   const product = await prisma.product.findFirst({
     where: {
       slug: params.slug,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      shortDescription: true,
+      longDescription: true,
+      price: true,
+      totalTickets: true,
+      soldTickets: true,
+      status: true,
+      coverImage: true,
       series: {
-        include: {
-          brand: true,
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          brand: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
         },
       },
       variants: {
         where: { isActive: true },
+        select: {
+          id: true,
+          prize: true,
+          name: true,
+          rarity: true,
+          stock: true,
+          imageUrl: true,
+        },
         orderBy: { name: 'asc' },
       },
       images: {
+        select: {
+          id: true,
+          url: true,
+          type: true,
+          sortOrder: true,
+        },
         orderBy: { sortOrder: 'asc' },
       },
     },
