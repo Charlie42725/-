@@ -109,6 +109,40 @@ model Image {
 }
 
 // -----------------------------
+// 🔹 會員用戶
+// -----------------------------
+model User {
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  passwordHash      String
+  nickname          String
+  gender            Gender?
+  phone             String?   @unique
+  isEmailVerified   Boolean   @default(false)
+  isPhoneVerified   Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([email])
+  @@index([phone])
+}
+
+// -----------------------------
+// 🔹 驗證碼記錄
+// -----------------------------
+model VerificationCode {
+  id         Int       @id @default(autoincrement())
+  type       CodeType  // email 或 phone
+  target     String    // email 地址或手機號碼
+  code       String    // 驗證碼
+  expiresAt  DateTime  // 過期時間
+  isUsed     Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+
+  @@index([target, type, isUsed])
+}
+
+// -----------------------------
 // 🔹 後台管理員
 // -----------------------------
 model AdminUser {
@@ -154,4 +188,15 @@ enum ImageType {
 enum AdminRole {
   admin
   editor
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum CodeType {
+  email
+  phone
 }

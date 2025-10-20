@@ -157,7 +157,7 @@ export default async function ProductDetailPage({
           {/* 右側：商品資訊區 - 優化：增加區塊間距到 32px (space-y-8) */}
           <div className="space-y-6 lg:space-y-8">
             {/* 商品基本資訊卡片 - 優化：增加內邊距與層次感 */}
-            <div className="bg-slate-800/40 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-slate-700/50 shadow-xl">
+            <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
               {/* 品牌與系列 */}
               <div className="flex items-center space-x-3 mb-4 lg:mb-6">
                 <Link
@@ -217,11 +217,11 @@ export default async function ProductDetailPage({
             </div>
 
             {/* 抽獎行動區 - 優化：增加內邊距與層次感 */}
-            <div className="bg-slate-800/40 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-slate-700/50 shadow-xl">
+            <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
               {/* 心理誘因提示 - 優化：增加間距與層次 */}
               <div className="text-center mb-6 space-y-2">
                 <p className="text-orange-400 font-bold text-base mb-1">
-                  🔥 僅剩 {remaining} 抽！                  SSR 獎率提升中 ✨
+                  🔥 僅剩 {remaining} 抽！      SSR 獎率提升中 ✨
                 </p>
 
               </div>
@@ -229,7 +229,7 @@ export default async function ProductDetailPage({
 
             {/* 獎項列表 - 優化：增加內邊距與明確的分隔 */}
             {product.variants.length > 0 && (
-              <div className="bg-slate-800/40 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-slate-700/50 shadow-xl">
+              <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
                 <h2 className="text-2xl font-bold mb-6 flex items-center">
                   <span className="text-2xl mr-3">🏆</span>
                   獎項內容
@@ -294,10 +294,10 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* 抽獎系統區域 - 大幅增加底部間距，確保與 Footer 有充分呼吸空間 */}
+        {/* 抽獎系統區域 - 移除包裝容器，讓組件自由布局 */}
         {product.variants.length > 0 && product.totalTickets > 0 && (
           <div className="mt-12 lg:mt-16 mb-40 lg:mb-56">
-            {/* 抽獎區標題 - 優化：增加間距與視覺層次 */}
+            {/* 抽獎區標題 */}
             <div className="text-center mb-8 lg:mb-10">
               <h3 className="text-slate-200 text-2xl font-bold mb-6">點選號碼開始您的幸運抽獎之旅</h3>
               <div className="flex justify-center items-center space-x-6">
@@ -312,13 +312,11 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
-            {/* 抽獎系統組件 - 優化：增加內邊距與視覺層次 */}
-            <div className="bg-slate-800/40 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-slate-700/50 shadow-xl">
-              <LotterySystem
-                variants={product.variants}
-                totalTickets={product.totalTickets}
-              />
-            </div>
+            {/* 抽獎系統組件 - 直接渲染，不添加額外容器 */}
+            <LotterySystem
+              variants={product.variants}
+              totalTickets={product.totalTickets}
+            />
           </div>
         )}
       </div>
