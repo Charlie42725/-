@@ -221,34 +221,9 @@ export default async function ProductDetailPage({
               {/* 心理誘因提示 - 優化：增加間距與層次 */}
               <div className="text-center mb-6 space-y-2">
                 <p className="text-orange-400 font-bold text-base mb-1">
-                  🔥 僅剩 {remaining} 抽！
+                  🔥 僅剩 {remaining} 抽！                  SSR 獎率提升中 ✨
                 </p>
-                <p className="text-slate-400 font-normal text-sm">
-                  SSR 獎率提升中 ✨
-                </p>
-              </div>
 
-              {/* 主要按鈕 - 優化：增加按鈕間距到 16px */}
-              <div className="space-y-4">
-                <button
-                  className="group w-full bg-gradient-to-r from-pink-500 to-pink-600 text-white font-black py-5 px-8 rounded-2xl hover:from-pink-600 hover:to-pink-700 transition-all transform hover:scale-[1.02] shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
-                  disabled={product.status !== 'active'}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative flex items-center justify-center space-x-3">
-                    <span className="text-2xl">🎯</span>
-                    <span className="text-xl">
-                      {product.status === 'active' ? '立即抽獎' : '目前無法購買'}
-                    </span>
-                  </div>
-                </button>
-
-                <button className="w-full bg-transparent border border-slate-600/50 text-slate-400 font-normal py-3.5 px-6 rounded-2xl hover:border-slate-500 hover:text-slate-300 transition-all hover:bg-slate-700/30">
-                  <span className="flex items-center justify-center space-x-2 text-sm">
-                    <span>♡</span>
-                    <span>加入追蹤</span>
-                  </span>
-                </button>
               </div>
             </div>
 

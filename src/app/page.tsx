@@ -29,7 +29,7 @@ export default function Home() {
           <div className="text-center mb-20">
             <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
             <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
-              想輪手氣嗎？老野夠好玩的呀受衝擊層面！雲我們的新站上發覺一筆賞類眾人來當賞！您只需要遊戲我們顧客的一番賞系列，選擇您喜愛的套式，然後決定您想購買的次數，覺一踫運氣受不周吧法！一筆寶室又周套都會對該套產電不可少玩的蔗！花可毒的小賄可對票惡優使雜魔當月讓有！
+              萬物皆可抽
             </p>
           </div>
 
@@ -39,7 +39,7 @@ export default function Home() {
           <div className="text-center mb-20">
             <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">什麼是獵人賞任務？</h3>
             <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
-              萬物皆可抽買得創新專人賞任務，有全聯不可能於推週可可有，你個在自該想是一個實拥和會講議等等獎賞口妨！需要可得不妙，可讓能可會獲大當優感的10%、每10抽可妨獲一個憲會買賞，跟每日芒次抽，五款大賞等任賞！竟成像可審覺顧外幹陵會常期願！
+              萬物皆可抽
             </p>
           </div>
 
