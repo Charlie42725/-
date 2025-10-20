@@ -44,7 +44,7 @@ export default function Home() {
           <div className="text-center mb-20">
             <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">什麼是獵人賞任務？</h3>
             <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
-              良級聯賞業買得創新專人賞任務，有全聯不可能於推週可可有，你個在自該想是一個實拥和會講議等等獎賞口妨！需要可得不妙，可讓能可會獲大當優感的10%、每10抽可妨獲一個憲會買賞，跟每日芒次抽，五款大賞等任賞！竟成像可審覺顧外幹陵會常期願！
+              XXXX業買得創新專人賞任務，有全聯不可能於推週可可有，你個在自該想是一個實拥和會講議等等獎賞口妨！需要可得不妙，可讓能可會獲大當優感的10%、每10抽可妨獲一個憲會買賞，跟每日芒次抽，五款大賞等任賞！竟成像可審覺顧外幹陵會常期願！
             </p>
           </div>
 
@@ -52,7 +52,7 @@ export default function Home() {
           
           {/* 特色區塊 */}
           <div className="text-center">
-            <h3 className="text-4xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">良級懸賞特色</h3>
+            <h3 className="text-4xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">XXXX特色</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
               <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-cyan-400 transition-all transform hover:scale-105 shadow-lg">

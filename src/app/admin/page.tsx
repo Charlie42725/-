@@ -16,7 +16,7 @@ export default async function AdminDashboard() {
     <div className="w-full">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-white mb-2">後台管理儀表板</h1>
-        <p className="text-slate-400">歡迎來到良級懸賞管理後台</p>
+        <p className="text-slate-400">歡迎來到XXXX管理後台</p>
       </div>
 
       {/* 統計卡片 */}

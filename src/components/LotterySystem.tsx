@@ -228,41 +228,6 @@ export default function LotterySystem({ variants, totalTickets }: LotterySystemP
           )}
         </div>
       </div>
-
-      {/* 獎項說明 */}
-      <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
-        <h3 className="text-lg font-bold text-white mb-4">獎項配置</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {variants.map(variant => (
-            <div
-              key={variant.id}
-              className="bg-slate-900/50 rounded-lg p-3 border border-slate-700"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                {variant.imageUrl && (
-                  <div className="relative w-10 h-10 rounded overflow-hidden flex-shrink-0">
-                    <Image
-                      src={variant.imageUrl}
-                      alt={variant.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-orange-400 font-bold text-sm truncate">
-                    {variant.prize}
-                  </p>
-                  <p className="text-white text-xs truncate">{variant.name}</p>
-                </div>
-              </div>
-              <p className="text-slate-400 text-xs">
-                數量：<span className="text-white font-bold">{variant.stock}</span>
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

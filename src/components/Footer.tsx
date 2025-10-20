@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 公司資訊 */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">良級懸賞</h3>
+            <h3 className="text-white font-bold text-lg mb-4">XXXX</h3>
             <p className="text-gray-400 text-sm mb-4">
               專營一番賞抽賞的線上平台，提供最公平、公正、公開的抽賞體驗。
             </p>
@@ -68,7 +68,7 @@ export default function Footer() {
         <hr className="border-gray-700 my-8" />
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; 2024 良級懸賞. All rights reserved.
+            &copy; 2024 XXXX All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <span className="text-gray-400 text-sm">客服時間：週一至週日 09:00-21:00</span>
