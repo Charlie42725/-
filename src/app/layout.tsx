@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "良級懸賞 - 線上一番賞抽賞平台",
+  title: "線上一番賞抽賞平台",
   description: "專營一番賞抽賞的線上平台，提供最公平、公正、公開的抽賞體驗。支援ACG動漫、潮流玩具、模型公仔等多種商品。",
 };
 
