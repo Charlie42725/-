@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import { calculateProgress, statusText, statusColor } from '@/types';
+import LotterySystem from '@/components/LotterySystem';
 
 export default async function ProductDetailPage({
   params,
@@ -221,6 +222,20 @@ export default async function ProductDetailPage({
             )}
           </div>
         </div>
+
+        {/* 抽獎系統區域 */}
+        {product.variants.length > 0 && product.totalTickets > 0 && (
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-white mb-2">立即抽賞</h2>
+              <p className="text-slate-400">點選號碼開始您的抽獎之旅</p>
+            </div>
+            <LotterySystem
+              variants={product.variants}
+              totalTickets={product.totalTickets}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

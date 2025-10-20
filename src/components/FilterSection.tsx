@@ -37,7 +37,7 @@ export default function FilterSection() {
     fetchBrands();
   }, []);
 
-  const selectedBrandData = brands.find((b) => b.slug === selectedBrand);
+  const selectedBrandData = brands?.find((b) => b.slug === selectedBrand);
   const availableSeries = selectedBrandData?.series || [];
 
   return (
@@ -105,7 +105,7 @@ export default function FilterSection() {
                   }}
                 >
                   <option value="">全部品牌</option>
-                  {brands.map((brand) => (
+                  {brands?.map((brand) => (
                     <option key={brand.id} value={brand.slug}>
                       {brand.name} ({brand.series.reduce((sum, s) => sum + s._count.products, 0)} 個商品)
                     </option>
