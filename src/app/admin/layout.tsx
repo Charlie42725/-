@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 
 export default function AdminLayout({
   children,
@@ -10,7 +9,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { href: '/admin', label: '儀表板', icon: '📊' },
@@ -21,20 +19,19 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* 頂部導航 */}
-      <header className="bg-slate-800 border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4">
+      <header className="bg-slate-900/80 backdrop-blur-lg border-b border-slate-700/50 sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <Link href="/admin" className="flex items-center space-x-2">
-                <span className="text-xl font-bold text-white">
-                  🎮 後台管理系統
+                <span className="text-xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+                   後台管理系統
                 </span>
               </Link>
 
-              {/* 桌面版導航 */}
-              <nav className="hidden md:flex space-x-1">
+              <nav className="hidden md:flex space-x-2">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href;
                   return (
@@ -42,10 +39,10 @@ export default function AdminLayout({
                       key={item.href}
                       href={item.href}
                       className={`
-                        px-3 py-2 rounded text-sm font-medium transition-colors
+                        px-4 py-2 rounded-lg text-sm font-medium transition-all
                         ${isActive
-                          ? 'bg-orange-500 text-white'
-                          : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                          ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/30'
+                          : 'text-slate-300 hover:text-white hover:bg-slate-800'
                         }
                       `}
                     >
@@ -60,85 +57,34 @@ export default function AdminLayout({
             <div className="flex items-center space-x-4">
               <Link
                 href="/"
-                className="hidden md:block text-slate-300 hover:text-white transition-colors"
+                className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors group"
                 target="_blank"
               >
-                查看前台 →
-              </Link>
-
-              {/* 手機版選單按鈕 */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden text-slate-300 hover:text-white focus:outline-none"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  {isMobileMenuOpen ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
+                <span className="text-sm">查看前台</span>
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
-
-          {/* 手機版選單 */}
-          {isMobileMenuOpen && (
-            <nav className="md:hidden py-4 space-y-2">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`
-                      block px-3 py-2 rounded text-sm font-medium transition-colors
-                      ${isActive
-                        ? 'bg-orange-500 text-white'
-                        : 'text-slate-300 hover:text-white hover:bg-slate-700'
-                      }
-                    `}
-                  >
-                    <span className="mr-2">{item.icon}</span>
-                    {item.label}
-                  </Link>
-                );
-              })}
-              <Link
-                href="/"
-                target="_blank"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"
-              >
-                查看前台 →
-              </Link>
-            </nav>
-          )}
         </div>
       </header>
 
       {/* 主要內容 */}
-      <main className="flex justify-center px-4 py-8">
-        <div className="w-full max-w-6xl">
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="animate-fadeIn">
           {children}
         </div>
       </main>
+
+      {/* 頁腳 */}
+      <footer className="border-t border-slate-800 mt-16">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <p className="text-center text-slate-500 text-sm">
+            良級懸賞 後台管理系統 © 2025
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

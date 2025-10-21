@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
 
     // TODO: 實際發送 Email
     // 這裡需要整合 Email 服務（如 SendGrid, AWS SES, Resend 等）
-    // 目前先返回成功，開發環境可以在控制台打印驗證碼
-    console.log(`[開發模式] Email 驗證碼: ${code} (發送到 ${email})`);
+    // 開發環境：僅在服務器控制台顯示驗證碼，不暴露給客戶端
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[開發模式] Email 驗證碼: ${code} (發送到 ${email})`);
+    }
 
     return NextResponse.json({
       success: true,
       message: '驗證碼已發送到您的 Email',
-      // 開發環境返回驗證碼（生產環境應移除）
-      ...(process.env.NODE_ENV === 'development' && { devCode: code }),
     });
   } catch (error) {
     console.error('發送 Email 驗證碼失敗:', error);

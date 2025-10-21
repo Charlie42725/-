@@ -144,7 +144,6 @@ export async function drawWithPity(
     // 強制抽到 Last 賞（如果存在）
     const lastPrize = pool.variants.find(v => v.isLastPrize && v.stock > 0);
     if (lastPrize) {
-      console.log(`🎊 Last 賞觸發！用戶 ${userId} 抽到 ${lastPrize.name}`);
       return {
         variantId: lastPrize.id,
         triggeredPity: false,
@@ -170,8 +169,6 @@ export async function drawWithPity(
       highRarityVariants.forEach(v => {
         probabilities.set(v.id, v.stock / totalStock);
       });
-
-      console.log(`🎁 保底觸發！用戶 ${userId} 在商品 ${productId} 觸發保底機制`);
     }
   }
 

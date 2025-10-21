@@ -17,7 +17,16 @@
       "Bash(curl:*)",
       "Bash(echo:*)",
       "Bash(npm run dev:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(awk:*)",
+      "Bash(for file in src/app/api/admin/brands/[id]/route.ts src/app/api/admin/products/route.ts src/app/api/admin/products/[id]/route.ts src/app/api/admin/series/route.ts src/app/api/admin/series/[id]/route.ts src/app/api/admin/variants/route.ts src/app/api/admin/variants/[id]/route.ts)",
+      "Bash(do)",
+      "Bash(if [ -f \"$file\" ])",
+      "Bash(then)",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(git diff:*)",
+      "Bash(lsof:*)"
     ],
     "deny": [],
     "ask": []

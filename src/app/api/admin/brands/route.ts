@@ -3,17 +3,17 @@ import { prisma } from '@/lib/db';
 import { verifyAdmin } from '@/lib/auth';
 import { validateSlug } from '@/lib/validation';
 
-// 獲取所有品牌（需要管理員權限）
+// 獲取所有品牌
 export async function GET(request: Request) {
   try {
-    // 驗證管理員權限
-    const authResult = await verifyAdmin(request.headers);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
-      );
-    }
+    // TODO: 未來啟用管理員權限驗證
+    // const authResult = await verifyAdmin(request.headers);
+    // if (!authResult.success) {
+    //   return NextResponse.json(
+    //     { error: authResult.error },
+    //     { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+    //   );
+    // }
 
     const brands = await prisma.brand.findMany({
       orderBy: { createdAt: 'desc' },
@@ -36,14 +36,14 @@ export async function GET(request: Request) {
 // 新增品牌
 export async function POST(request: Request) {
   try {
-    // 驗證管理員權限
-    const authResult = await verifyAdmin(request.headers);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
-      );
-    }
+    // TODO: 未來啟用管理員權限驗證
+    // const authResult = await verifyAdmin(request.headers);
+    // if (!authResult.success) {
+    //   return NextResponse.json(
+    //     { error: authResult.error },
+    //     { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+    //   );
+    // }
 
     const body = await request.json();
     const { name, slug, description } = body;

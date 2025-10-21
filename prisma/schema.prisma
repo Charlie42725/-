@@ -126,6 +126,7 @@ model User {
   gender            Gender?
   phone             String?   @unique
   points            Int       @default(0)  // 點數餘額
+  role              UserRole  @default(user)  // 用戶角色
   isEmailVerified   Boolean   @default(false)
   isPhoneVerified   Boolean   @default(false)
   createdAt         DateTime  @default(now())
@@ -274,6 +275,11 @@ enum Gender {
   male
   female
   other
+}
+
+enum UserRole {
+  user
+  admin
 }
 
 enum CodeType {

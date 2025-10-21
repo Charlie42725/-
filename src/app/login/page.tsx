@@ -76,7 +76,7 @@ export default function LoginPage() {
 
       // 導向首頁
       router.push('/');
-    } catch (error) {
+    } catch {
       setErrors({ submit: '登入失敗，請稍後再試' });
     } finally {
       setLoading(false);

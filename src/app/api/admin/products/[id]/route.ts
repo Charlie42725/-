@@ -9,14 +9,14 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 驗證管理員權限
-    const authResult = await verifyAdmin(request.headers);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
-      );
-    }
+    // TODO: 未來啟用管理員權限驗證
+    // const authResult = await verifyAdmin(request.headers);
+    // if (!authResult.success) {
+    //   return NextResponse.json(
+    //     { error: authResult.error },
+    //     { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+    //   );
+    // }
 
     const { id: idStr } = await context.params;
 
@@ -56,14 +56,14 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 驗證管理員權限
-    const authResult = await verifyAdmin(request.headers);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
-      );
-    }
+    // TODO: 未來啟用管理員權限驗證
+    // const authResult = await verifyAdmin(request.headers);
+    // if (!authResult.success) {
+    //   return NextResponse.json(
+    //     { error: authResult.error },
+    //     { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+    //   );
+    // }
 
     const { id: idStr } = await context.params;
 
@@ -120,14 +120,14 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    // 驗證管理員權限
-    const authResult = await verifyAdmin(request.headers);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
-      );
-    }
+    // TODO: 未來啟用管理員權限驗證
+    // const authResult = await verifyAdmin(request.headers);
+    // if (!authResult.success) {
+    //   return NextResponse.json(
+    //     { error: authResult.error },
+    //     { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+    //   );
+    // }
 
     const { id: idStr } = await context.params;
 

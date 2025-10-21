@@ -327,34 +327,34 @@ export default function LotterySystem({
             onWheel={(e) => e.stopPropagation()}
           >
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4">
-              {results.map((result, index) => (
-                <div
-                  key={result.ticketNumber}
-                  className={`
-                    relative aspect-[3/4] rounded-xl overflow-hidden transition-all duration-300
-                    ${index <= currentRevealIndex ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}
-                  `}
-                >
-                  <div className="relative w-full h-full">
-                    <div
-                      className={`
-                        absolute inset-0 transition-transform duration-500 transform-style-3d
-                        ${index <= currentRevealIndex ? 'rotate-y-180' : ''}
-                      `}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center backface-hidden">
+              {results.map((result, index) => {
+                const isRevealed = index <= currentRevealIndex;
+
+                return (
+                  <div
+                    key={result.ticketNumber}
+                    className={`
+                      relative aspect-[3/4] rounded-xl overflow-hidden transition-all duration-300
+                      ${isRevealed ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}
+                    `}
+                  >
+                    {!isRevealed ? (
+                      // 未翻開：顯示號碼
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
                         <div className="text-white text-6xl font-bold">
                           {result.ticketNumber}
                         </div>
                       </div>
-
-                      <div className="absolute inset-0 rotate-y-180 backface-hidden bg-slate-800 flex flex-col">
+                    ) : (
+                      // 已翻開：顯示獎品
+                      <div className="absolute inset-0 bg-slate-800 flex flex-col">
                         <div className="relative flex-1">
                           {result.variant.imageUrl ? (
                             <Image
                               src={result.variant.imageUrl}
                               alt={result.variant.name}
                               fill
+                              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
                               className="object-cover"
                             />
                           ) : (
@@ -372,10 +372,10 @@ export default function LotterySystem({
                           </p>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

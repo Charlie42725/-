@@ -20,12 +20,8 @@ export default function RegisterPage() {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
-  const [emailCodeSent, setEmailCodeSent] = useState(false);
-  const [phoneCodeSent, setPhoneCodeSent] = useState(false);
   const [emailCodeCountdown, setEmailCodeCountdown] = useState(0);
   const [phoneCodeCountdown, setPhoneCodeCountdown] = useState(0);
-  const [devEmailCode, setDevEmailCode] = useState('');
-  const [devPhoneCode, setDevPhoneCode] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -67,11 +63,7 @@ export default function RegisterPage() {
         return;
       }
 
-      setEmailCodeSent(true);
       setEmailCodeCountdown(60);
-      if (data.devCode) {
-        setDevEmailCode(data.devCode);
-      }
 
       // 倒數計時
       const timer = setInterval(() => {
@@ -83,7 +75,7 @@ export default function RegisterPage() {
           return prev - 1;
         });
       }, 1000);
-    } catch (error) {
+    } catch {
       setErrors(prev => ({ ...prev, email: '發送驗證碼失敗，請稍後再試' }));
     } finally {
       setLoading(false);
@@ -111,11 +103,7 @@ export default function RegisterPage() {
         return;
       }
 
-      setPhoneCodeSent(true);
       setPhoneCodeCountdown(60);
-      if (data.devCode) {
-        setDevPhoneCode(data.devCode);
-      }
 
       // 倒數計時
       const timer = setInterval(() => {
@@ -127,7 +115,7 @@ export default function RegisterPage() {
           return prev - 1;
         });
       }, 1000);
-    } catch (error) {
+    } catch {
       setErrors(prev => ({ ...prev, phone: '發送驗證碼失敗，請稍後再試' }));
     } finally {
       setLoading(false);
@@ -156,7 +144,7 @@ export default function RegisterPage() {
       // 註冊成功，導向登入頁
       alert('註冊成功！請登入');
       router.push('/login');
-    } catch (error) {
+    } catch {
       setErrors({ submit: '註冊失敗，請稍後再試' });
     } finally {
       setLoading(false);
@@ -214,9 +202,6 @@ export default function RegisterPage() {
                   {emailCodeCountdown > 0 ? `${emailCodeCountdown}秒` : '發送驗證碼'}
                 </button>
               </div>
-              {devEmailCode && (
-                <p className="text-green-400 text-sm">開發模式：驗證碼 = {devEmailCode}</p>
-              )}
             </div>
 
             {/* 密碼區塊 */}
@@ -327,9 +312,6 @@ export default function RegisterPage() {
                       {phoneCodeCountdown > 0 ? `${phoneCodeCountdown}秒` : '發送驗證碼'}
                     </button>
                   </div>
-                  {devPhoneCode && (
-                    <p className="text-green-400 text-sm">開發模式：驗證碼 = {devPhoneCode}</p>
-                  )}
                 </>
               )}
             </div>

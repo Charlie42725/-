@@ -30,9 +30,10 @@ export default function BrandsPage() {
     try {
       const res = await fetch('/api/admin/brands');
       const data = await res.json();
-      setBrands(data.brands);
+      setBrands(data.brands || []);
     } catch (error) {
       console.error('載入品牌失敗:', error);
+      setBrands([]);
     } finally {
       setLoading(false);
     }
