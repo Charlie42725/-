@@ -89,7 +89,7 @@ export default function ProfilePage() {
         newPassword: '',
         confirmNewPassword: '',
       }));
-    } catch (error) {
+    } catch {
       setErrors({ submit: '更新失敗，請稍後再試' });
     } finally {
       setLoading(false);

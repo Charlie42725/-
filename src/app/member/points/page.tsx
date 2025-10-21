@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, isAuthenticated } from '@/lib/auth';
+import { isAuthenticated } from '@/lib/auth';
 
 interface PointPackage {
   id: number;
@@ -36,17 +36,7 @@ export default function PointsPage() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
 
-  useEffect(() => {
-    // 檢查登入狀態
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
-
-    loadUserProfile();
-  }, [router]);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     try {
       const token = localStorage.getItem('auth_token');
       const response = await fetch('/api/user/profile', {
@@ -72,7 +62,17 @@ export default function PointsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    // 檢查登入狀態
+    if (!isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+
+    loadUserProfile();
+  }, [router, loadUserProfile]);
 
   const handlePurchase = async (pkg: PointPackage) => {
     setSelectedPackage(pkg);

@@ -22,7 +22,7 @@ export function verifyToken(token: string): JWTPayload | null {
       return decoded as JWTPayload;
     }
     return null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

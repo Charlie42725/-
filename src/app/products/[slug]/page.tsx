@@ -280,9 +280,7 @@ export default async function ProductDetailPage({
             {/* 抽獎系統組件 - 直接渲染，不添加額外容器 */}
             <LotterySystem
               productId={product.id}
-              productName={product.name}
               productPrice={product.price}
-              variants={product.variants}
               totalTickets={product.totalTickets}
             />
           </div>

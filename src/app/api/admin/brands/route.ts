@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { verifyAdmin } from '@/lib/auth';
+// import { verifyAdmin } from '@/lib/auth';
 import { validateSlug } from '@/lib/validation';
 
 // 獲取所有品牌
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // TODO: 未來啟用管理員權限驗證
     // const authResult = await verifyAdmin(request.headers);

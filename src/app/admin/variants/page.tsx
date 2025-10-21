@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ImageUpload from '@/components/ImageUpload';
 
 interface Product {
@@ -70,15 +71,7 @@ export default function VariantsPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [variants, filterBrand, filterSeries, filterProduct]);
-
-  function applyFilters() {
+  const applyFilters = useCallback(() => {
     let filtered = [...variants];
 
     if (filterBrand) {
@@ -100,7 +93,15 @@ export default function VariantsPage() {
     }
 
     setFilteredVariants(filtered);
-  }
+  }, [variants, filterBrand, filterSeries, filterProduct]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   async function fetchData() {
     try {
@@ -540,9 +541,11 @@ export default function VariantsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
                         {variant.imageUrl && (
-                          <img
+                          <Image
                             src={variant.imageUrl}
                             alt={variant.name}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 rounded object-cover"
                           />
                         )}

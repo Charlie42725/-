@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser, isAuthenticated } from '@/lib/auth';
+import { isAuthenticated } from '@/lib/auth';
 
 interface PointTransaction {
   id: number;

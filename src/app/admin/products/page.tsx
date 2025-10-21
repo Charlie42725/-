@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
@@ -54,15 +54,7 @@ export default function ProductsPage() {
     galleryImages: [] as string[],
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [products, filterBrand, filterSeries, filterStatus]);
-
-  function applyFilters() {
+  const applyFilters = useCallback(() => {
     let filtered = [...products];
 
     if (filterBrand) {
@@ -78,7 +70,15 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(filtered);
-  }
+  }, [products, filterBrand, filterSeries, filterStatus]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [applyFilters]);
 
   async function fetchData() {
     try {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import ImageUpload from '@/components/ImageUpload';
 
 interface Variant {
@@ -50,11 +51,7 @@ export default function ProductVariantsPage() {
     isActive: true,
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [productId]);
-
-  async function fetchData() {
+  const fetchData = useCallback(async () => {
     try {
       const [productRes, variantsRes] = await Promise.all([
         fetch(`/api/admin/products/${productId}`),
@@ -78,7 +75,11 @@ export default function ProductVariantsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [productId, router]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -373,9 +374,11 @@ export default function ProductVariantsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
                         {variant.imageUrl && (
-                          <img
+                          <Image
                             src={variant.imageUrl}
                             alt={variant.name}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 rounded object-cover"
                           />
                         )}

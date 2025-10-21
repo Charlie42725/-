@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { verifyAdmin } from '@/lib/auth';
+// import { verifyAdmin } from '@/lib/auth';
 import { validateId } from '@/lib/validation';
 
 // 取得單一商品

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { isAuthenticated } from '@/lib/auth';
@@ -16,9 +16,7 @@ interface Variant {
 
 interface LotterySystemProps {
   productId: number;
-  productName?: string;
   productPrice: number;
-  variants?: Variant[];
   totalTickets: number;
   onVariantsUpdate?: (variants: Variant[]) => void;
 }
@@ -35,9 +33,7 @@ interface LotteryResult {
 
 export default function LotterySystem({
   productId,
-  productName,
   productPrice,
-  variants,
   totalTickets,
   onVariantsUpdate
 }: LotterySystemProps) {
@@ -52,13 +48,7 @@ export default function LotterySystem({
   const [userPoints, setUserPoints] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setMounted(true);
-    loadDrawnTickets();
-    loadUserPoints();
-  }, []);
-
-  const loadDrawnTickets = async () => {
+  const loadDrawnTickets = useCallback(async () => {
     try {
       const response = await fetch(`/api/lottery/drawn-tickets?productId=${productId}`);
       if (response.ok) {
@@ -70,7 +60,7 @@ export default function LotterySystem({
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId]);
 
   const loadUserPoints = async () => {
     if (!isAuthenticated()) {
@@ -94,6 +84,12 @@ export default function LotterySystem({
       console.error('Failed to load user points:', error);
     }
   };
+
+  useEffect(() => {
+    setMounted(true);
+    loadDrawnTickets();
+    loadUserPoints();
+  }, [loadDrawnTickets]);
 
   const loadLatestVariants = async () => {
     try {

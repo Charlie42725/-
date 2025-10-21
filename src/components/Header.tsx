@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, logout, isAuthenticated } from '@/lib/auth';
 
@@ -14,6 +14,29 @@ export default function Header() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userPoints, setUserPoints] = useState(0);
   const [loadingPoints, setLoadingPoints] = useState(false);
+
+  const loadUserPoints = useCallback(async () => {
+    if (!isAuthenticated() || loadingPoints) return;
+
+    setLoadingPoints(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserPoints(data.user.points);
+      }
+    } catch (error) {
+      console.error('Failed to load user points:', error);
+    } finally {
+      setLoadingPoints(false);
+    }
+  }, [loadingPoints]);
 
   useEffect(() => {
     // 檢查登入狀態
@@ -47,30 +70,7 @@ export default function Header() {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(intervalId);
     };
-  }, []);
-
-  const loadUserPoints = async () => {
-    if (!isAuthenticated() || loadingPoints) return;
-
-    setLoadingPoints(true);
-    try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/user/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserPoints(data.user.points);
-      }
-    } catch (error) {
-      console.error('Failed to load user points:', error);
-    } finally {
-      setLoadingPoints(false);
-    }
-  };
+  }, [loadUserPoints]);
 
   const handleLogout = () => {
     logout();
