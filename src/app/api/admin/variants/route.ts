@@ -8,23 +8,37 @@ export async function GET(request: Request) {
     const productId = searchParams.get('productId');
 
     if (productId) {
-      // 查詢特定商品的獎項
+      // 查詢特定商品的獎項（包含已抽數量統計）
       const variants = await prisma.productVariant.findMany({
         where: { productId: parseInt(productId) },
+        include: {
+          _count: {
+            select: {
+              lotteryDraws: true,
+            },
+          },
+        },
         orderBy: { id: 'asc' },
       });
 
       return NextResponse.json({ variants });
     }
 
-    // 查詢所有獎項
+    // 查詢所有獎項（包含完整關聯資料用於篩選和已抽數量）
     const variants = await prisma.productVariant.findMany({
       include: {
         product: {
+          include: {
+            series: {
+              include: {
+                brand: true,
+              },
+            },
+          },
+        },
+        _count: {
           select: {
-            id: true,
-            name: true,
-            slug: true,
+            lotteryDraws: true, // 統計被抽走的數量
           },
         },
       },

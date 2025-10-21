@@ -13,6 +13,9 @@ interface Variant {
   imageUrl: string | null;
   isActive: boolean;
   createdAt: string;
+  _count?: {
+    lotteryDraws: number;
+  };
 }
 
 interface Product {
@@ -338,7 +341,7 @@ export default function ProductVariantsPage() {
                   稀有度
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
-                  庫存
+                  抽取狀況
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
                   狀態
@@ -386,7 +389,25 @@ export default function ProductVariantsPage() {
                         {variant.rarity || '-'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-300">{variant.stock}</td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs gap-3">
+                          <span className="text-red-400 font-bold">已抽: {variant._count?.lotteryDraws || 0}</span>
+                          <span className="text-green-400 font-bold">剩餘: {variant.stock - (variant._count?.lotteryDraws || 0)}</span>
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          總數: {variant.stock}
+                        </div>
+                        <div className="w-32 bg-slate-600 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all"
+                            style={{
+                              width: `${variant.stock > 0 ? ((variant._count?.lotteryDraws || 0) / variant.stock) * 100 : 0}%`
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       {variant.isActive ? (
                         <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">

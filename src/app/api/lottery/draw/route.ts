@@ -34,10 +34,20 @@ export async function POST(req: NextRequest) {
 
     // 使用交易確保數據一致性
     const result = await prisma.$transaction(async (tx) => {
-      // 1. 獲取商品資訊
+      // 1. 獲取商品資訊（包含已抽數量統計）
       const product = await tx.product.findUnique({
         where: { id: productId },
-        include: { variants: true }
+        include: {
+          variants: {
+            include: {
+              _count: {
+                select: {
+                  lotteryDraws: true
+                }
+              }
+            }
+          }
+        }
       });
 
       if (!product) {
@@ -85,6 +95,7 @@ export async function POST(req: NextRequest) {
       }
 
       // 7. 生成獎項分配（隨機分配）
+      // stock 現在代表初始總數，剩餘數量 = stock - _count.lotteryDraws
       const draws: Array<{
         userId: number;
         productId: number;
@@ -92,7 +103,19 @@ export async function POST(req: NextRequest) {
         ticketNumber: number;
         pointsUsed: number;
       }> = [];
-      const variantsPool = product.variants.filter(v => v.stock > 0);
+
+      // 計算每個獎項的剩餘數量並創建可用獎項池
+      const variantsWithRemaining = product.variants.map(v => ({
+        ...v,
+        remaining: v.stock - (v._count?.lotteryDraws || 0)
+      })).filter(v => v.remaining > 0);
+
+      if (variantsWithRemaining.length === 0) {
+        throw new Error('所有獎項已全部抽完');
+      }
+
+      // 建立獎項池（根據剩餘數量）
+      const variantsPool: typeof variantsWithRemaining = [...variantsWithRemaining];
 
       for (const ticketNumber of ticketNumbers) {
         // 隨機選擇一個還有庫存的獎項
@@ -111,49 +134,39 @@ export async function POST(req: NextRequest) {
           pointsUsed: product.price
         });
 
-        // 減少該獎項庫存
-        selectedVariant.stock--;
-        if (selectedVariant.stock === 0) {
+        // 減少該獎項的剩餘數量（僅在記憶體中）
+        selectedVariant.remaining--;
+        if (selectedVariant.remaining === 0) {
           variantsPool.splice(randomIndex, 1);
         }
       }
 
-      // 8. 創建抽獎記錄
+      // 8. 創建抽獎記錄（不再更新 stock 欄位）
       await tx.lotteryDraw.createMany({
         data: draws
       });
 
-      // 9. 更新獎項庫存
-      for (const variant of product.variants) {
-        const variantInPool = variantsPool.find(v => v.id === variant.id);
-        const newStock = variantInPool ? variantInPool.stock : 0;
+      // 9. 更新商品已售出數量，並檢查是否需要更新為完售狀態
+      const newSoldTickets = product.soldTickets + ticketNumbers.length;
+      const shouldMarkAsSoldOut = newSoldTickets >= product.totalTickets;
 
-        if (newStock !== variant.stock) {
-          await tx.productVariant.update({
-            where: { id: variant.id },
-            data: { stock: newStock }
-          });
-        }
-      }
-
-      // 10. 更新商品已售出數量
       await tx.product.update({
         where: { id: productId },
         data: {
-          soldTickets: {
-            increment: ticketNumbers.length
-          }
+          soldTickets: newSoldTickets,
+          // 如果已全部售出且當前狀態是 active，則更新為 sold_out
+          ...(shouldMarkAsSoldOut && product.status === 'active' ? { status: 'sold_out' } : {})
         }
       });
 
-      // 11. 扣除用戶點數
+      // 10. 扣除用戶點數
       const newBalance = user.points - totalPointsNeeded;
       await tx.user.update({
         where: { id: payload.userId },
         data: { points: newBalance }
       });
 
-      // 12. 記錄點數異動
+      // 11. 記錄點數異動
       await tx.pointTransaction.create({
         data: {
           userId: payload.userId,
@@ -165,7 +178,7 @@ export async function POST(req: NextRequest) {
         }
       });
 
-      // 13. 獲取完整的抽獎結果
+      // 12. 獲取完整的抽獎結果
       const results = await tx.lotteryDraw.findMany({
         where: {
           productId,

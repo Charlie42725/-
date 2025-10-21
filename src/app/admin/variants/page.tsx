@@ -1,12 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import ImageUpload from '@/components/ImageUpload';
 
 interface Product {
   id: number;
   name: string;
   slug: string;
+  series: {
+    id: number;
+    name: string;
+    brand: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
 interface Variant {
@@ -19,6 +28,15 @@ interface Variant {
   isActive: boolean;
   createdAt: string;
   product: Product;
+  _count?: {
+    lotteryDraws: number;
+  };
+}
+
+interface Brand {
+  id: number;
+  name: string;
+  series: { id: number; name: string }[];
 }
 
 const rarityOptions = [
@@ -30,10 +48,18 @@ const rarityOptions = [
 
 export default function VariantsPage() {
   const [variants, setVariants] = useState<Variant[]>([]);
+  const [filteredVariants, setFilteredVariants] = useState<Variant[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // 篩選狀態
+  const [filterBrand, setFilterBrand] = useState<string>('');
+  const [filterSeries, setFilterSeries] = useState<string>('');
+  const [filterProduct, setFilterProduct] = useState<string>('');
+
   const [formData, setFormData] = useState({
     productId: '',
     prize: '',
@@ -48,18 +74,50 @@ export default function VariantsPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    applyFilters();
+  }, [variants, filterBrand, filterSeries, filterProduct]);
+
+  function applyFilters() {
+    let filtered = [...variants];
+
+    if (filterBrand) {
+      filtered = filtered.filter(
+        (v) => v.product.series?.brand?.id.toString() === filterBrand
+      );
+    }
+
+    if (filterSeries) {
+      filtered = filtered.filter(
+        (v) => v.product.series?.id.toString() === filterSeries
+      );
+    }
+
+    if (filterProduct) {
+      filtered = filtered.filter(
+        (v) => v.product.id.toString() === filterProduct
+      );
+    }
+
+    setFilteredVariants(filtered);
+  }
+
   async function fetchData() {
     try {
-      const [variantsRes, productsRes] = await Promise.all([
+      const [variantsRes, productsRes, brandsRes] = await Promise.all([
         fetch('/api/admin/variants'),
         fetch('/api/admin/products'),
+        fetch('/api/brands'),
       ]);
 
       const variantsData = await variantsRes.json();
       const productsData = await productsRes.json();
+      const brandsData = await brandsRes.json();
 
       setVariants(variantsData.variants);
+      setFilteredVariants(variantsData.variants);
       setProducts(productsData.products);
+      setBrands(brandsData.brands);
     } catch (error) {
       console.error('載入資料失敗:', error);
     } finally {
@@ -155,6 +213,36 @@ export default function VariantsPage() {
     return option?.color || 'text-gray-400';
   }
 
+  function getAvailableSeries() {
+    if (!filterBrand) return [];
+    const brand = brands.find((b) => b.id.toString() === filterBrand);
+    return brand?.series || [];
+  }
+
+  function getAvailableProducts() {
+    let filtered = [...products];
+
+    if (filterBrand) {
+      filtered = filtered.filter(
+        (p) => p.series?.brand?.id.toString() === filterBrand
+      );
+    }
+
+    if (filterSeries) {
+      filtered = filtered.filter(
+        (p) => p.series?.id.toString() === filterSeries
+      );
+    }
+
+    return filtered;
+  }
+
+  function clearFilters() {
+    setFilterBrand('');
+    setFilterSeries('');
+    setFilterProduct('');
+  }
+
   if (loading) {
     return <div className="text-white">載入中...</div>;
   }
@@ -164,8 +252,13 @@ export default function VariantsPage() {
       {/* 頁面標題 */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">獎項管理</h1>
-          <p className="text-slate-400">管理商品的各種獎項（A賞、B賞等）</p>
+          <h1 className="text-3xl font-bold text-white mb-2">全局獎項管理</h1>
+          <p className="text-slate-400">
+            查看所有獎項（共 {filteredVariants.length} 個）
+            <span className="text-slate-500 ml-2">
+              提示：建議從「商品管理」進入各商品的獎項頁面進行管理
+            </span>
+          </p>
         </div>
         <button
           onClick={() => {
@@ -179,6 +272,78 @@ export default function VariantsPage() {
         >
           {showForm ? '取消' : '+ 新增獎項'}
         </button>
+      </div>
+
+      {/* 篩選器 */}
+      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-white">篩選條件</h3>
+          {(filterBrand || filterSeries || filterProduct) && (
+            <button
+              onClick={clearFilters}
+              className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
+            >
+              清除篩選
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-slate-300 mb-2 text-sm">品牌</label>
+            <select
+              value={filterBrand}
+              onChange={(e) => {
+                setFilterBrand(e.target.value);
+                setFilterSeries('');
+                setFilterProduct('');
+              }}
+              className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">全部品牌</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-2 text-sm">系列</label>
+            <select
+              value={filterSeries}
+              onChange={(e) => {
+                setFilterSeries(e.target.value);
+                setFilterProduct('');
+              }}
+              className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+              disabled={!filterBrand}
+            >
+              <option value="">全部系列</option>
+              {getAvailableSeries().map((series) => (
+                <option key={series.id} value={series.id}>
+                  {series.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-2 text-sm">商品</label>
+            <select
+              value={filterProduct}
+              onChange={(e) => setFilterProduct(e.target.value)}
+              className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">全部商品</option>
+              {getAvailableProducts().map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* 新增/編輯表單 */}
@@ -200,10 +365,16 @@ export default function VariantsPage() {
                 className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 disabled:opacity-50"
               >
                 <option value="">請選擇商品</option>
-                {products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name}
-                  </option>
+                {brands.map((brand) => (
+                  <optgroup key={brand.id} label={brand.name}>
+                    {products
+                      .filter((p) => p.series?.brand?.id === brand.id)
+                      .map((product) => (
+                        <option key={product.id} value={product.id}>
+                          [{product.series?.name || '未知系列'}] {product.name}
+                        </option>
+                      ))}
+                  </optgroup>
                 ))}
               </select>
               {editingId && (
@@ -340,7 +511,7 @@ export default function VariantsPage() {
                   稀有度
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
-                  庫存
+                  抽取狀況
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
                   狀態
@@ -351,14 +522,14 @@ export default function VariantsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
-              {variants.length === 0 ? (
+              {filteredVariants.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
-                    目前沒有獎項
+                    {variants.length === 0 ? '目前沒有獎項' : '沒有符合條件的獎項'}
                   </td>
                 </tr>
               ) : (
-                variants.map((variant) => (
+                filteredVariants.map((variant) => (
                   <tr key={variant.id} className="hover:bg-slate-700/50">
                     <td className="px-6 py-4 text-slate-300">{variant.id}</td>
                     <td className="px-6 py-4">
@@ -380,15 +551,43 @@ export default function VariantsPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-300">
-                      {variant.product.name}
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <div className="font-medium text-white">
+                          {variant.product.name}
+                        </div>
+                        {variant.product.series && (
+                          <div className="text-xs text-slate-400">
+                            {variant.product.series.brand?.name || '未知品牌'} •{' '}
+                            {variant.product.series.name}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={getRarityColor(variant.rarity)}>
                         {variant.rarity || '-'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-300">{variant.stock}</td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-red-400 font-bold">已抽: {variant._count?.lotteryDraws || 0}</span>
+                          <span className="text-green-400 font-bold">剩餘: {variant.stock}</span>
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          總數: {variant.stock + (variant._count?.lotteryDraws || 0)}
+                        </div>
+                        <div className="w-24 bg-slate-600 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="bg-red-500 h-1.5 rounded-full transition-all"
+                            style={{
+                              width: `${(variant.stock + (variant._count?.lotteryDraws || 0)) > 0 ? ((variant._count?.lotteryDraws || 0) / (variant.stock + (variant._count?.lotteryDraws || 0))) * 100 : 0}%`
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
                     <td className="px-6 py-4">
                       {variant.isActive ? (
                         <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">
@@ -402,6 +601,12 @@ export default function VariantsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
+                        <Link
+                          href={`/admin/products/${variant.product.id}/variants`}
+                          className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                        >
+                          管理
+                        </Link>
                         <button
                           onClick={() => handleEdit(variant)}
                           className="text-orange-400 hover:text-orange-300 text-sm transition-colors"
@@ -409,7 +614,12 @@ export default function VariantsPage() {
                           編輯
                         </button>
                         <button
-                          onClick={() => handleDelete(variant.id, `${variant.prize} ${variant.name}`)}
+                          onClick={() =>
+                            handleDelete(
+                              variant.id,
+                              `${variant.prize} ${variant.name}`
+                            )
+                          }
                           className="text-red-400 hover:text-red-300 text-sm transition-colors"
                         >
                           刪除

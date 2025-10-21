@@ -20,6 +20,7 @@ interface LotterySystemProps {
   productPrice: number;
   variants?: Variant[];
   totalTickets: number;
+  onVariantsUpdate?: (variants: Variant[]) => void;
 }
 
 interface DrawnTicket {
@@ -37,7 +38,8 @@ export default function LotterySystem({
   productName,
   productPrice,
   variants,
-  totalTickets
+  totalTickets,
+  onVariantsUpdate
 }: LotterySystemProps) {
   const router = useRouter();
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -90,6 +92,25 @@ export default function LotterySystem({
       }
     } catch (error) {
       console.error('Failed to load user points:', error);
+    }
+  };
+
+  const loadLatestVariants = async () => {
+    try {
+      const response = await fetch(`/api/lottery/variants?productId=${productId}`);
+      if (response.ok) {
+        const data = await response.json();
+        // 觸發父組件的更新回調
+        if (onVariantsUpdate) {
+          onVariantsUpdate(data.variants);
+        }
+        // 觸發自定義事件讓頁面知道需要重新載入
+        window.dispatchEvent(new CustomEvent('variantsUpdated', {
+          detail: { productId, variants: data.variants }
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load latest variants:', error);
     }
   };
 
@@ -182,6 +203,9 @@ export default function LotterySystem({
       // 更新已抽號碼列表
       setDrawnTickets(prev => [...prev, ...newResults]);
       setSelectedNumbers([]);
+
+      // 重新載入最新的獎項資料
+      await loadLatestVariants();
 
       await new Promise(resolve => setTimeout(resolve, 1500));
       setIsDrawing(false);

@@ -9,11 +9,14 @@ export const dynamic = 'force-dynamic';
 export default async function BrandPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  // Next.js 15: await params before using
+  const { slug } = await params;
+
   const brand = await prisma.brand.findUnique({
     where: {
-      slug: params.slug,
+      slug,
     },
     include: {
       series: {

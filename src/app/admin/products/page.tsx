@@ -17,6 +17,7 @@ interface Product {
     id: number;
     name: string;
     brand: {
+      id: number;
       name: string;
     };
   };
@@ -30,10 +31,17 @@ interface Brand {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // 篩選狀態
+  const [filterBrand, setFilterBrand] = useState<string>('');
+  const [filterSeries, setFilterSeries] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('');
+
   const [formData, setFormData] = useState({
     seriesId: '',
     name: '',
@@ -50,6 +58,28 @@ export default function ProductsPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    applyFilters();
+  }, [products, filterBrand, filterSeries, filterStatus]);
+
+  function applyFilters() {
+    let filtered = [...products];
+
+    if (filterBrand) {
+      filtered = filtered.filter(p => p.series.brand.id.toString() === filterBrand);
+    }
+
+    if (filterSeries) {
+      filtered = filtered.filter(p => p.series.id.toString() === filterSeries);
+    }
+
+    if (filterStatus) {
+      filtered = filtered.filter(p => p.status === filterStatus);
+    }
+
+    setFilteredProducts(filtered);
+  }
+
   async function fetchData() {
     try {
       const [productsRes, brandsRes] = await Promise.all([
@@ -61,6 +91,7 @@ export default function ProductsPage() {
       const brandsData = await brandsRes.json();
 
       setProducts(productsData.products);
+      setFilteredProducts(productsData.products);
       setBrands(brandsData.brands);
     } catch (error) {
       console.error('載入資料失敗:', error);
@@ -169,6 +200,18 @@ export default function ProductsPage() {
     });
   }
 
+  function getAvailableSeries() {
+    if (!filterBrand) return [];
+    const brand = brands.find(b => b.id.toString() === filterBrand);
+    return brand?.series || [];
+  }
+
+  function clearFilters() {
+    setFilterBrand('');
+    setFilterSeries('');
+    setFilterStatus('');
+  }
+
   if (loading) {
     return <div className="text-white">載入中...</div>;
   }
@@ -179,7 +222,7 @@ export default function ProductsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">商品管理</h1>
-          <p className="text-slate-400">管理所有一番賞商品</p>
+          <p className="text-slate-400">管理所有一番賞商品（共 {filteredProducts.length} 件）</p>
         </div>
         <button
           onClick={() => {
@@ -193,6 +236,73 @@ export default function ProductsPage() {
         >
           {showForm ? '取消' : '+ 新增商品'}
         </button>
+      </div>
+
+      {/* 篩選器 */}
+      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium text-white">篩選條件</h3>
+          {(filterBrand || filterSeries || filterStatus) && (
+            <button
+              onClick={clearFilters}
+              className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
+            >
+              清除篩選
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-slate-300 mb-2 text-sm">品牌</label>
+            <select
+              value={filterBrand}
+              onChange={(e) => {
+                setFilterBrand(e.target.value);
+                setFilterSeries(''); // 切換品牌時清除系列篩選
+              }}
+              className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">全部品牌</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-2 text-sm">系列</label>
+            <select
+              value={filterSeries}
+              onChange={(e) => setFilterSeries(e.target.value)}
+              className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+              disabled={!filterBrand}
+            >
+              <option value="">全部系列</option>
+              {getAvailableSeries().map((series) => (
+                <option key={series.id} value={series.id}>
+                  {series.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-2 text-sm">狀態</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+            >
+              <option value="">全部狀態</option>
+              <option value="draft">草稿</option>
+              <option value="active">進行中</option>
+              <option value="sold_out">已完售</option>
+              <option value="archived">已結束</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* 新增/編輯表單 */}
@@ -346,20 +456,20 @@ export default function ProductsPage() {
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">商品名稱</th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">品牌/系列</th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">價格</th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">進度</th>
+                <th className="text-left px-6 py-4 text-slate-300 font-medium">抽取進度</th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">狀態</th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
-              {products.length === 0 ? (
+              {filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
-                    目前沒有商品
+                    {products.length === 0 ? '目前沒有商品' : '沒有符合條件的商品'}
                   </td>
                 </tr>
               ) : (
-                products.map((product) => {
+                filteredProducts.map((product) => {
                   const progress = Math.round(
                     (product.soldTickets / product.totalTickets) * 100
                   );
@@ -372,21 +482,29 @@ export default function ProductsPage() {
                         <div className="text-sm text-slate-400">{product.slug}</div>
                       </td>
                       <td className="px-6 py-4 text-slate-300">
-                        <div className="text-sm">{product.series.brand.name}</div>
+                        <div className="text-sm font-medium">{product.series.brand.name}</div>
                         <div className="text-xs text-slate-500">{product.series.name}</div>
                       </td>
                       <td className="px-6 py-4 text-orange-400 font-medium">
                         NT$ {product.price}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-slate-300">
-                          {product.soldTickets} / {product.totalTickets}
-                        </div>
-                        <div className="w-24 bg-slate-600 rounded-full h-1.5 mt-1">
-                          <div
-                            className="bg-orange-500 h-1.5 rounded-full"
-                            style={{ width: `${progress}%` }}
-                          ></div>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-orange-400 font-bold">已抽: {product.soldTickets}</span>
+                            <span className="text-green-400 font-bold">剩餘: {product.totalTickets - product.soldTickets}</span>
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            總數: {product.totalTickets} ({progress}%)
+                          </div>
+                          <div className="w-32 bg-slate-600 rounded-full h-2 overflow-hidden">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                progress === 100 ? 'bg-red-500' : 'bg-gradient-to-r from-orange-500 to-pink-500'
+                              }`}
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -426,18 +544,18 @@ export default function ProductsPage() {
                           >
                             編輯
                           </button>
-                          <Link
-                            href={`/admin/products/${product.id}/variants`}
-                            className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
-                          >
-                            獎項
-                          </Link>
                           <button
                             onClick={() => handleDelete(product.id, product.name)}
                             className="text-red-400 hover:text-red-300 text-sm transition-colors"
                           >
                             刪除
                           </button>
+                          <Link
+                            href={`/admin/products/${product.id}/variants`}
+                            className="bg-purple-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-purple-700 transition-colors"
+                          >
+                            獎項管理
+                          </Link>
                         </div>
                       </td>
                     </tr>

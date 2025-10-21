@@ -10,11 +10,14 @@ export const dynamic = 'force-dynamic';
 export default async function SeriesPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  // Next.js 15: await params before using
+  const { slug } = await params;
+
   const series = await prisma.series.findFirst({
     where: {
-      slug: params.slug,
+      slug,
     },
     include: {
       brand: true,

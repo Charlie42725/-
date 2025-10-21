@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/db';
 import { calculateProgress, statusText, statusColor } from '@/types';
 import LotterySystem from '@/components/LotterySystem';
+import ProductDetailClient from '@/components/ProductDetailClient';
 
 // 優化：使用 ISR (Incremental Static Regeneration) 提升性能
 export const revalidate = 60; // 每 60 秒重新驗證一次
@@ -11,12 +12,15 @@ export const revalidate = 60; // 每 60 秒重新驗證一次
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  // Next.js 15: await params before using
+  const { slug } = await params;
+
   // 優化：使用 select 只取需要的欄位，減少資料傳輸
   const product = await prisma.product.findFirst({
     where: {
-      slug: params.slug,
+      slug,
     },
     select: {
       id: true,
@@ -52,6 +56,11 @@ export default async function ProductDetailPage({
           rarity: true,
           stock: true,
           imageUrl: true,
+          _count: {
+            select: {
+              lotteryDraws: true,
+            },
+          },
         },
         orderBy: { name: 'asc' },
       },
@@ -227,56 +236,12 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
-            {/* 獎項列表 - 優化：增加內邊距與明確的分隔 */}
+            {/* 獎項列表 - 使用客戶端組件支援即時更新 */}
             {product.variants.length > 0 && (
-              <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
-                <h2 className="text-2xl font-bold mb-6 flex items-center">
-                  <span className="text-2xl mr-3">🏆</span>
-                  獎項內容
-                </h2>
-                <div className="space-y-4">
-                  {product.variants.map((variant, index) => (
-                    <div key={variant.id}>
-                      <div
-                        className="group flex items-center justify-between p-5 bg-slate-900/50 rounded-2xl hover:bg-slate-800/60 transition-all duration-300 border border-slate-700/30 hover:border-orange-400/40"
-                      >
-                        <div className="flex items-center space-x-4">
-                          {variant.imageUrl && (
-                            <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-                              <Image
-                                src={variant.imageUrl}
-                                alt={variant.name}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <p className="font-bold text-base text-white group-hover:text-orange-400 transition-colors mb-1.5">
-                              {variant.name}
-                            </p>
-                            {variant.rarity && (
-                              <div className="flex items-center space-x-2">
-                                <span className="text-xs bg-gradient-to-r from-orange-400 to-pink-400 text-white px-2.5 py-0.5 rounded-full font-semibold">
-                                  {variant.rarity}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-right ml-4">
-                          <div className="text-slate-400 text-sm font-normal mb-0.5">剩餘</div>
-                          <div className="text-green-400 text-xl font-bold">{variant.stock}</div>
-                        </div>
-                      </div>
-                      {/* 淡淡的分隔線 */}
-                      {index < product.variants.length - 1 && (
-                        <div className="h-px bg-slate-700/30 my-3 mx-4"></div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <ProductDetailClient
+                initialVariants={product.variants}
+                productId={product.id}
+              />
             )}
 
             {/* 詳細描述 - 響應式內邊距 */}
