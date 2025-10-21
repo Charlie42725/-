@@ -121,6 +121,11 @@ export default function LotterySystem({
       if (prev.includes(number)) {
         return prev.filter(n => n !== number);
       } else {
+        // 限制最多選擇 10 個號碼
+        if (prev.length >= 10) {
+          alert('一次最多只能選擇 10 個號碼');
+          return prev;
+        }
         return [...prev, number];
       }
     });
@@ -334,45 +339,49 @@ export default function LotterySystem({
                   <div
                     key={result.ticketNumber}
                     className={`
-                      relative aspect-[3/4] rounded-xl overflow-hidden transition-all duration-300
+                      flip-container relative aspect-[3/4] transition-all duration-300
                       ${isRevealed ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}
                     `}
                   >
-                    {!isRevealed ? (
-                      // 未翻開：顯示號碼
-                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
-                        <div className="text-white text-6xl font-bold">
-                          {result.ticketNumber}
+                    <div className={`flip-card ${isRevealed ? 'flipped' : ''} rounded-xl overflow-hidden shadow-xl`}>
+                      {/* 正面：號碼 */}
+                      <div className="flip-card-front">
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center rounded-xl">
+                          <div className="text-white text-6xl font-bold drop-shadow-lg">
+                            {result.ticketNumber}
+                          </div>
                         </div>
                       </div>
-                    ) : (
-                      // 已翻開：顯示獎品
-                      <div className="absolute inset-0 bg-slate-800 flex flex-col">
-                        <div className="relative flex-1">
-                          {result.variant.imageUrl ? (
-                            <Image
-                              src={result.variant.imageUrl}
-                              alt={result.variant.name}
-                              fill
-                              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-                              <span className="text-slate-500 text-4xl">🎁</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="bg-slate-900 px-3 py-4 flex flex-col justify-center gap-1">
-                          <p className="text-orange-400 font-bold text-center text-sm leading-tight">
-                            {result.ticketNumber} - {result.variant.prize}
-                          </p>
-                          <p className="text-white text-center text-xs leading-tight line-clamp-2">
-                            {result.variant.name}
-                          </p>
+
+                      {/* 背面：獎品 */}
+                      <div className="flip-card-back">
+                        <div className="absolute inset-0 bg-slate-800 flex flex-col rounded-xl overflow-hidden">
+                          <div className="relative flex-1">
+                            {result.variant.imageUrl ? (
+                              <Image
+                                src={result.variant.imageUrl}
+                                alt={result.variant.name}
+                                fill
+                                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                                <span className="text-slate-500 text-4xl">🎁</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-slate-900 px-3 py-4 flex flex-col justify-center gap-1">
+                            <p className="text-orange-400 font-bold text-center text-sm leading-tight">
+                              {result.ticketNumber} - {result.variant.prize}
+                            </p>
+                            <p className="text-white text-center text-xs leading-tight line-clamp-2">
+                              {result.variant.name}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 );
               })}
@@ -428,7 +437,7 @@ export default function LotterySystem({
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">抽獎號碼池</h2>
           <div className="text-sm text-slate-400">
-            已選擇 <span className="text-orange-400 font-bold">{selectedNumbers.length}</span> 個號碼
+            已選擇 <span className="text-orange-400 font-bold">{selectedNumbers.length}</span> / 10 個號碼
           </div>
         </div>
 
