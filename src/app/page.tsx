@@ -1,10 +1,13 @@
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import Banner from '@/components/Banner';
 import FilterSection from '@/components/FilterSection';
 import ProductGrid from '@/components/ProductGrid';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white w-full">
+    <div className="min-h-screen bg-gray-900 text-white w-full flex flex-col">
+      <Header />
       {/* 主要 Banner */}
       <Banner />
       
@@ -111,6 +114,7 @@ export default function Home() {
         </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
