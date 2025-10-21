@@ -16,7 +16,8 @@
       "Bash(getent:*)",
       "Bash(curl:*)",
       "Bash(echo:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

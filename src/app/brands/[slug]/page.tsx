@@ -131,15 +131,19 @@ export default async function BrandPage({
                               className="object-cover"
                             />
                           </div>
-                          <div className="p-4">
-                            <h3 className="text-white font-bold mb-2 line-clamp-2 group-hover:text-orange-400 transition-colors">
-                              {product.name}
-                            </h3>
-                            <div className="flex items-center justify-between">
-                              <span className="text-orange-400 font-bold">NT$ {product.price}</span>
-                              <span className="text-slate-400 text-sm">
-                                剩餘 {product.totalTickets - product.soldTickets}
-                              </span>
+                          <div className="p-4 h-[80px] flex flex-col justify-between">
+                            <div className="flex-none">
+                              <h3 className="text-white font-bold line-clamp-2 h-12 flex items-center group-hover:text-orange-400 transition-colors">
+                                {product.name}
+                              </h3>
+                            </div>
+                            <div className="flex-none">
+                              <div className="flex items-center justify-between">
+                                <span className="text-orange-400 font-bold">NT$ {product.price}</span>
+                                <span className="text-slate-400 text-sm">
+                                  剩餘 {product.totalTickets - product.soldTickets}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>

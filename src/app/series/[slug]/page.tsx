@@ -130,19 +130,27 @@ export default async function SeriesPage({
                     </div>
 
                     {/* 商品資訊 */}
-                    <div className="p-4">
-                      <h3 className="text-white font-bold text-base mb-2 line-clamp-2 min-h-[3rem]">
-                        {product.name}
-                      </h3>
+                    <div className="p-4 flex flex-col h-[200px]">
+                      {/* 標題區域 - 固定高度 */}
+                      <div className="flex-none mb-3">
+                        <h3 className="text-white font-bold text-base line-clamp-2 h-12 flex items-center">
+                          {product.name}
+                        </h3>
+                      </div>
 
-                      {product.shortDescription && (
-                        <p className="text-slate-300 text-sm mb-3 line-clamp-2">
-                          {product.shortDescription}
-                        </p>
-                      )}
+                      {/* 描述區域 - 固定高度 */}
+                      <div className="flex-none mb-3">
+                        {product.shortDescription ? (
+                          <p className="text-slate-300 text-sm line-clamp-2 h-10">
+                            {product.shortDescription}
+                          </p>
+                        ) : (
+                          <div className="h-10"></div>
+                        )}
+                      </div>
 
-                      {/* 進度條 */}
-                      <div className="mb-3">
+                      {/* 進度條區域 */}
+                      <div className="flex-1 mb-3">
                         <div className="flex justify-between text-xs text-slate-400 mb-1">
                           <span>已售 {product.soldTickets}</span>
                           <span>剩餘 {remaining}</span>
@@ -155,13 +163,15 @@ export default async function SeriesPage({
                         </div>
                       </div>
 
-                      {/* 價格 */}
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-700">
-                        <div className="text-orange-400 font-bold text-lg">
-                          NT$ {product.price}
-                        </div>
-                        <div className="text-slate-400 text-sm">
-                          共 {product.totalTickets} 抽
+                      {/* 價格區域 - 固定在底部 */}
+                      <div className="flex-none">
+                        <div className="flex items-center justify-between pt-3 border-t border-slate-700">
+                          <div className="text-orange-400 font-bold text-lg">
+                            NT$ {product.price}
+                          </div>
+                          <div className="text-slate-400 text-sm">
+                            共 {product.totalTickets} 抽
+                          </div>
                         </div>
                       </div>
                     </div>

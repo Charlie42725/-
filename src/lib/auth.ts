@@ -1,18 +1,27 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+// JWT_SECRET 環境變數（在運行時驗證）
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export interface JWTPayload {
   userId: number;
   email: string;
   nickname: string;
+  role?: 'user' | 'admin';  // 新增角色欄位
 }
 
 // 驗證 JWT token
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
-    return decoded;
+    if (!JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined');
+    }
+    const decoded = jwt.verify(token, JWT_SECRET);
+    // 確保 decoded 是有效的對象且包含必要屬性
+    if (typeof decoded === 'object' && decoded !== null && 'userId' in decoded) {
+      return decoded as JWTPayload;
+    }
+    return null;
   } catch (error) {
     return null;
   }
@@ -78,4 +87,43 @@ export function logout() {
 
   // 清除 cookie
   document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+}
+
+// 服務端：驗證管理員權限
+export async function verifyAdmin(headers: Headers): Promise<{ success: boolean; payload?: JWTPayload; error?: string }> {
+  const token = getTokenFromHeaders(headers);
+
+  if (!token) {
+    return { success: false, error: 'No authentication token provided' };
+  }
+
+  const payload = verifyToken(token);
+
+  if (!payload) {
+    return { success: false, error: 'Invalid or expired token' };
+  }
+
+  // 檢查是否為管理員（這裡先檢查 role，後續可以查詢資料庫）
+  if (payload.role !== 'admin') {
+    return { success: false, error: 'Insufficient permissions' };
+  }
+
+  return { success: true, payload };
+}
+
+// 服務端：驗證用戶身份（不需要管理員權限）
+export async function verifyUser(headers: Headers): Promise<{ success: boolean; payload?: JWTPayload; error?: string }> {
+  const token = getTokenFromHeaders(headers);
+
+  if (!token) {
+    return { success: false, error: 'No authentication token provided' };
+  }
+
+  const payload = verifyToken(token);
+
+  if (!payload) {
+    return { success: false, error: 'Invalid or expired token' };
+  }
+
+  return { success: true, payload };
 }

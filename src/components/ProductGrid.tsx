@@ -72,7 +72,7 @@ export default function ProductGrid() {
             href={`/products/${product.slug}`}
             className="block"
           >
-            <div className="bg-slate-800/90 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl border border-slate-600/50 hover:border-orange-400/60 h-full">
+            <div className="bg-slate-800/90 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl border border-slate-600/50 hover:border-orange-400/60 h-full flex flex-col">
               {/* 狀態標籤 */}
               <div className="absolute top-2 right-2 z-10">
                 <div className={`${statusColor[product.status]} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
@@ -81,7 +81,7 @@ export default function ProductGrid() {
               </div>
 
               {/* 圖片區域 */}
-              <div className="relative h-48">
+              <div className="relative h-48 flex-shrink-0">
                 <Image
                   src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}
                   alt={product.name}
@@ -101,45 +101,41 @@ export default function ProductGrid() {
               </div>
 
               {/* 商品資訊 */}
-              <div className="p-4">
+              <div className="p-4 flex flex-col flex-grow">
                 {/* 標題 */}
-                <h3 className="text-white font-bold text-base mb-2 line-clamp-2 min-h-[3rem]">
+                <h3 className="text-white font-bold text-base mb-3 line-clamp-2 h-12">
                   {product.name}
                 </h3>
 
-                {/* 系列名稱 */}
-                <p className="text-slate-400 text-sm mb-3">
-                  {product.series.name}
+                {/* 簡短描述 - 固定 3 行高度 */}
+                <p className="text-slate-300 text-sm mb-4 line-clamp-3 h-16">
+                  {product.shortDescription || '暫無商品描述'}
                 </p>
 
-                {/* 簡短描述 */}
-                {product.shortDescription && (
-                  <p className="text-slate-300 text-sm mb-3 line-clamp-2">
-                    {product.shortDescription}
-                  </p>
-                )}
+                {/* 底部固定區塊 */}
+                <div className="mt-auto">
+                  {/* 進度條 */}
+                  <div className="mb-3">
+                    <div className="flex justify-between text-xs text-slate-400 mb-1">
+                      <span>已售 {product.soldTickets}</span>
+                      <span>剩餘 {remaining}</span>
+                    </div>
+                    <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-orange-400 to-pink-500 transition-all duration-500"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
 
-                {/* 進度條 */}
-                <div className="mb-3">
-                  <div className="flex justify-between text-xs text-slate-400 mb-1">
-                    <span>已售 {product.soldTickets}</span>
-                    <span>剩餘 {remaining}</span>
-                  </div>
-                  <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-orange-400 to-pink-500 transition-all duration-500"
-                      style={{ width: `${progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* 價格和數量 */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-700">
-                  <div className="text-orange-400 font-bold text-lg">
-                    NT$ {product.price}
-                  </div>
-                  <div className="text-slate-400 text-sm">
-                    共 {product.totalTickets} 抽
+                  {/* 價格和數量 */}
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-700">
+                    <div className="text-orange-400 font-bold text-lg">
+                      NT$ {product.price}
+                    </div>
+                    <div className="text-slate-400 text-sm">
+                      共 {product.totalTickets} 抽
+                    </div>
                   </div>
                 </div>
               </div>

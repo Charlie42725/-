@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifyAdmin } from '@/lib/auth';
+import { validateId } from '@/lib/validation';
 
 // 取得單一商品
 export async function GET(
@@ -7,10 +9,25 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await context.params;
+    // 驗證管理員權限
+    const authResult = await verifyAdmin(request.headers);
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+      );
+    }
+
+    const { id: idStr } = await context.params;
+
+    // 驗證 ID 格式
+    const idValidation = validateId(idStr);
+    if (!idValidation.valid) {
+      return NextResponse.json({ error: idValidation.error }, { status: 400 });
+    }
 
     const product = await prisma.product.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: idValidation.id },
       include: {
         series: {
           include: {
@@ -39,8 +56,46 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 驗證管理員權限
+    const authResult = await verifyAdmin(request.headers);
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+      );
+    }
+
     const { id: idStr } = await context.params;
-    const id = parseInt(idStr);
+
+    // 驗證 ID 格式
+    const idValidation = validateId(idStr);
+    if (!idValidation.valid) {
+      return NextResponse.json({ error: idValidation.error }, { status: 400 });
+    }
+
+    const id = idValidation.id!;
+
+    // 檢查商品是否存在
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { variants: true }
+        }
+      }
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 });
+    }
+
+    // 檢查是否有獎項關聯
+    if (product._count.variants > 0) {
+      return NextResponse.json(
+        { error: '無法刪除：該商品還有關聯的獎項，請先刪除所有獎項' },
+        { status: 400 }
+      );
+    }
 
     // 先刪除關聯的圖片記錄
     await prisma.image.deleteMany({
@@ -65,8 +120,24 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 驗證管理員權限
+    const authResult = await verifyAdmin(request.headers);
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.error === 'No authentication token provided' ? 401 : 403 }
+      );
+    }
+
     const { id: idStr } = await context.params;
-    const id = parseInt(idStr);
+
+    // 驗證 ID 格式
+    const idValidation = validateId(idStr);
+    if (!idValidation.valid) {
+      return NextResponse.json({ error: idValidation.error }, { status: 400 });
+    }
+
+    const id = idValidation.id!;
     const body = await request.json();
     const {
       seriesId,
@@ -86,6 +157,15 @@ export async function PUT(
         { error: '必填欄位不完整' },
         { status: 400 }
       );
+    }
+
+    // 驗證數值範圍
+    if (parseInt(price) <= 0) {
+      return NextResponse.json({ error: '價格必須大於 0' }, { status: 400 });
+    }
+
+    if (parseInt(totalTickets) <= 0) {
+      return NextResponse.json({ error: '總票數必須大於 0' }, { status: 400 });
     }
 
     // 先刪除現有的畫廊圖片

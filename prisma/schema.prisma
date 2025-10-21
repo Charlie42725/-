@@ -93,9 +93,13 @@ model ProductVariant {
   stock        Int           @default(0)
   imageUrl     String?
   isActive     Boolean       @default(true)
+  isLastPrize  Boolean       @default(false)  // 標記為 Last 賞
+  probability  Float?        // 自定義抽中機率 (0-1)
   createdAt    DateTime      @default(now())
 
   lotteryDraws LotteryDraw[]
+
+  @@index([productId])
 }
 
 // -----------------------------
@@ -234,10 +238,13 @@ model LotteryDraw {
   variantId       Int
   ticketNumber    Int             // 抽到的號碼
   pointsUsed      Int             // 消耗的點數
+  triggeredPity   Boolean         @default(false)  // 是否觸發保底
+  isLastPrize     Boolean         @default(false)  // 是否為 Last 賞
   createdAt       DateTime        @default(now())
 
   @@index([userId])
   @@index([productId])
+  @@index([variantId])
   @@index([createdAt])
   @@unique([productId, ticketNumber]) // 每個商品的每個號碼只能被抽一次
 }
