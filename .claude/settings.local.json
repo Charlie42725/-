@@ -26,7 +26,10 @@
       "Bash(fi)",
       "Bash(done)",
       "Bash(git diff:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(pgrep:*)",
+      "Bash(xargs kill:*)",
+      "Bash(npx next -v)"
     ],
     "deny": [],
     "ask": []
