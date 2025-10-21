@@ -79,8 +79,8 @@ export async function DELETE(
     const product = await prisma.product.findUnique({
       where: { id },
       include: {
-        _count: {
-          select: { variants: true }
+        variants: {
+          select: { id: true }
         }
       }
     });
@@ -90,7 +90,7 @@ export async function DELETE(
     }
 
     // 檢查是否有獎項關聯
-    if (product._count.variants > 0) {
+    if (product.variants.length > 0) {
       return NextResponse.json(
         { error: '無法刪除：該商品還有關聯的獎項，請先刪除所有獎項' },
         { status: 400 }

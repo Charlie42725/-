@@ -13,15 +13,22 @@ export async function GET() {
             name: true,
           },
         },
-        _count: {
-          select: {
-            products: true,
-          },
+        products: {
+          select: { id: true }
         },
       },
     });
 
-    return NextResponse.json({ series });
+    // 手動計算產品數量
+    const seriesWithCount = series.map(s => ({
+      ...s,
+      _count: {
+        products: s.products.length
+      },
+      products: undefined, // 移除完整產品資料
+    }));
+
+    return NextResponse.json({ series: seriesWithCount });
   } catch (error) {
     console.error('獲取系列失敗:', error);
     return NextResponse.json({ error: '獲取系列失敗' }, { status: 500 });

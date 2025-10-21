@@ -56,10 +56,8 @@ export default async function ProductDetailPage({
           rarity: true,
           stock: true,
           imageUrl: true,
-          _count: {
-            select: {
-              lotteryDraws: true,
-            },
+          lotteryDraws: {
+            select: { id: true }
           },
         },
         orderBy: { name: 'asc' },
@@ -79,6 +77,18 @@ export default async function ProductDetailPage({
   if (!product) {
     notFound();
   }
+
+  // 手動添加抽獎計數到variants
+  const productData = {
+    ...product,
+    variants: product.variants.map(variant => ({
+      ...variant,
+      _count: {
+        lotteryDraws: variant.lotteryDraws.length
+      },
+      lotteryDraws: undefined
+    }))
+  };
 
   const progress = calculateProgress(product.soldTickets, product.totalTickets);
   const remaining = product.totalTickets - product.soldTickets;
@@ -237,9 +247,9 @@ export default async function ProductDetailPage({
             </div>
 
             {/* 獎項列表 - 使用客戶端組件支援即時更新 */}
-            {product.variants.length > 0 && (
+            {productData.variants.length > 0 && (
               <ProductDetailClient
-                initialVariants={product.variants}
+                initialVariants={productData.variants}
                 productId={product.id}
               />
             )}

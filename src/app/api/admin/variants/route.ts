@@ -12,16 +12,21 @@ export async function GET(request: Request) {
       const variants = await prisma.productVariant.findMany({
         where: { productId: parseInt(productId) },
         include: {
-          _count: {
-            select: {
-              lotteryDraws: true,
-            },
-          },
+          lotteryDraws: {
+            select: { id: true }
+          }
         },
         orderBy: { id: 'asc' },
       });
 
-      return NextResponse.json({ variants });
+      // 手動計算已抽數量
+      const variantsWithCount = variants.map(variant => ({
+        ...variant,
+        drawnCount: variant.lotteryDraws.length,
+        lotteryDraws: undefined, // 移除不必要的完整 lotteryDraws 資料
+      }));
+
+      return NextResponse.json({ variants: variantsWithCount });
     }
 
     // 查詢所有獎項（包含完整關聯資料用於篩選和已抽數量）
@@ -36,16 +41,21 @@ export async function GET(request: Request) {
             },
           },
         },
-        _count: {
-          select: {
-            lotteryDraws: true, // 統計被抽走的數量
-          },
-        },
+        lotteryDraws: {
+          select: { id: true }
+        }
       },
       orderBy: { id: 'desc' },
     });
 
-    return NextResponse.json({ variants });
+    // 手動計算已抽數量
+    const variantsWithCount = variants.map(variant => ({
+      ...variant,
+      drawnCount: variant.lotteryDraws.length,
+      lotteryDraws: undefined, // 移除不必要的完整 lotteryDraws 資料
+    }));
+
+    return NextResponse.json({ variants: variantsWithCount });
   } catch (error) {
     console.error('查詢獎項失敗:', error);
     return NextResponse.json({ error: '查詢獎項失敗' }, { status: 500 });

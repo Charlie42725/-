@@ -28,16 +28,6 @@ export default async function BrandPage({
             where: {
               status: 'active',
             },
-            take: 8,
-          },
-          _count: {
-            select: {
-              products: {
-                where: {
-                  status: 'active',
-                },
-              },
-            },
           },
         },
         orderBy: {
@@ -50,6 +40,18 @@ export default async function BrandPage({
   if (!brand) {
     notFound();
   }
+
+  // 手動計算每個系列的產品數量
+  const brandWithCounts = {
+    ...brand,
+    series: brand.series.map(series => ({
+      ...series,
+      _count: {
+        products: series.products.length
+      },
+      products: series.products.slice(0, 8) // 只保留前8個產品用於顯示
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -104,7 +106,7 @@ export default async function BrandPage({
                     href={`/series/${series.slug}`}
                     className="text-orange-400 hover:text-orange-300 transition-colors flex items-center space-x-1"
                   >
-                    <span>查看全部 ({series._count.products})</span>
+                    <span>查看全部 ({series.products.length})</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
