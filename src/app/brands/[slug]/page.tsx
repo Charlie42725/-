@@ -41,14 +41,11 @@ export default async function BrandPage({
     notFound();
   }
 
-  // 手動計算每個系列的產品數量
-  const brandWithCounts = {
+  // 限制每個系列只顯示前8個產品
+  const brandWithLimitedProducts = {
     ...brand,
     series: brand.series.map(series => ({
       ...series,
-      _count: {
-        products: series.products.length
-      },
       products: series.products.slice(0, 8) // 只保留前8個產品用於顯示
     }))
   };
@@ -86,13 +83,13 @@ export default async function BrandPage({
 
       {/* 系列列表 */}
       <div className="max-w-screen-xl mx-auto px-4 py-12">
-        {brand.series.length === 0 ? (
+        {brandWithLimitedProducts.series.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-slate-400">此品牌目前沒有系列</p>
           </div>
         ) : (
           <div className="space-y-16">
-            {brand.series.map((series) => (
+            {brandWithLimitedProducts.series.map((series) => (
               <div key={series.id}>
                 {/* 系列標題 */}
                 <div className="flex items-center justify-between mb-6">
