@@ -84,12 +84,11 @@ export default async function ProductDetailPage({
   // 手動添加抽獎計數到variants
   const productData = {
     ...product,
-    variants: product.variants.map(variant => ({
+    variants: product.variants.map(({ lotteryDraws, ...variant }) => ({
       ...variant,
       _count: {
-        lotteryDraws: variant.lotteryDraws.length
-      },
-      lotteryDraws: undefined
+        lotteryDraws: lotteryDraws.length
+      }
     }))
   };
 

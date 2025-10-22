@@ -103,7 +103,7 @@ export default function ProductDetailClient({
                     )}
                     {/* 價值標籤 */}
                     <span className="text-xs bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-2.5 py-0.5 rounded-full font-semibold">
-                      ¥{variant.value.toLocaleString()}
+                      ${Number(variant?.value ?? 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
