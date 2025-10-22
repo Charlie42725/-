@@ -112,6 +112,14 @@ export default function Header() {
             <Link href="/" className="text-white hover:text-orange-400 transition-colors">
               全部一番賞
             </Link>
+            {loggedIn && (
+              <Link href="/member/prizes" className="text-white hover:text-orange-400 transition-colors flex items-center">
+                <svg className="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                獎品包包
+              </Link>
+            )}
           </div>
 
           {/* 右側按鈕 */}
@@ -158,6 +166,16 @@ export default function Header() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                           基本設定
+                        </Link>
+                        <Link
+                          href="/member/prizes"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors"
+                        >
+                          <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                          </svg>
+                          獎品包包
                         </Link>
                         <Link
                           href="/member/points"
@@ -234,6 +252,11 @@ export default function Header() {
               <Link href="/" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                 全部一番賞
               </Link>
+              {loggedIn && (
+                <Link href="/member/prizes" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+                  獎品包包
+                </Link>
+              )}
               <hr className="border-gray-600 my-2" />
               {loggedIn && user ? (
                 <>
@@ -255,6 +278,9 @@ export default function Header() {
                   </div>
                   <Link href="/member/profile" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                     基本設定
+                  </Link>
+                  <Link href="/member/prizes" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
+                    獎品包包
                   </Link>
                   <Link href="/member/points" className="text-white hover:text-orange-400 transition-colors px-4 py-2">
                     點數購買

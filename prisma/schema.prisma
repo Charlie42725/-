@@ -136,6 +136,7 @@ model User {
   orders            Order[]
   pointTransactions PointTransaction[]
   lotteryDraws      LotteryDraw[]
+  prizeRedemptions  PrizeRedemption[]
 
   @@index([email])
   @@index([phone])
@@ -231,24 +232,45 @@ model PointTransaction {
 // 🔹 抽獎記錄
 // -----------------------------
 model LotteryDraw {
-  id              Int             @id @default(autoincrement())
-  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id              Int              @id @default(autoincrement())
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          Int
-  product         Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product         Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId       Int
-  variant         ProductVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variant         ProductVariant   @relation(fields: [variantId], references: [id], onDelete: Cascade)
   variantId       Int
-  ticketNumber    Int             // 抽到的號碼
-  pointsUsed      Int             // 消耗的點數
-  triggeredPity   Boolean         @default(false)  // 是否觸發保底
-  isLastPrize     Boolean         @default(false)  // 是否為 Last 賞
-  createdAt       DateTime        @default(now())
+  ticketNumber    Int              // 抽到的號碼
+  pointsUsed      Int              // 消耗的點數
+  triggeredPity   Boolean          @default(false)  // 是否觸發保底
+  isLastPrize     Boolean          @default(false)  // 是否為 Last 賞
+  isRedeemed      Boolean          @default(false)  // 是否已兌換成點數
+  createdAt       DateTime         @default(now())
+
+  redemption      PrizeRedemption?
 
   @@index([userId])
   @@index([productId])
   @@index([variantId])
   @@index([createdAt])
+  @@index([isRedeemed])
   @@unique([productId, ticketNumber]) // 每個商品的每個號碼只能被抽一次
+}
+
+// -----------------------------
+// 🔹 獎品兌換記錄
+// -----------------------------
+model PrizeRedemption {
+  id              Int          @id @default(autoincrement())
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          Int
+  lotteryDraw     LotteryDraw  @relation(fields: [lotteryDrawId], references: [id], onDelete: Cascade)
+  lotteryDrawId   Int          @unique
+  prizeValue      Int          // 獎品原始價值
+  pointsReceived  Int          // 實際獲得點數
+  createdAt       DateTime     @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 // -----------------------------
@@ -301,5 +323,6 @@ enum PointTransactionType {
   bonus         // 贈送
   lottery       // 抽獎消耗
   refund        // 退款
+  redemption    // 獎品兌換
   admin_adjust  // 管理員調整
 }
