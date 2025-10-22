@@ -24,13 +24,34 @@ export default function ProductDetailClient({
   initialVariants,
   productId
 }: ProductDetailClientProps) {
-  const [variants, setVariants] = useState<Variant[]>(initialVariants);
+  // 獎項排序函數：A賞 -> Z賞 -> Last賞 -> 其他
+  const sortVariants = (variants: Variant[]) => {
+    return [...variants].sort((a, b) => {
+      const getPrizeOrder = (prize: string) => {
+        // Last賞排在最後
+        if (prize.toLowerCase().includes('last')) return 999;
+
+        // 提取賞級字母（A、B、C等）
+        const match = prize.match(/([A-Z])/i);
+        if (match) {
+          return match[1].toUpperCase().charCodeAt(0);
+        }
+
+        // 無法識別的放在最後
+        return 1000;
+      };
+
+      return getPrizeOrder(a.prize) - getPrizeOrder(b.prize);
+    });
+  };
+
+  const [variants, setVariants] = useState<Variant[]>(sortVariants(initialVariants));
 
   useEffect(() => {
     // 監聽獎項更新事件
     const handleVariantsUpdated = (event: CustomEvent) => {
       if (event.detail.productId === productId) {
-        setVariants(event.detail.variants);
+        setVariants(sortVariants(event.detail.variants));
       }
     };
 
