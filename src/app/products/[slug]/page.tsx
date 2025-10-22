@@ -56,6 +56,7 @@ export default async function ProductDetailPage({
           prize: true,
           name: true,
           rarity: true,
+          value: true,
           stock: true,
           imageUrl: true,
           lotteryDraws: {

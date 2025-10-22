@@ -12,6 +12,8 @@ interface Variant {
   name: string;
   imageUrl: string | null;
   stock: number;
+  value: number;
+  rarity: string | null;
 }
 
 interface LotterySystemProps {

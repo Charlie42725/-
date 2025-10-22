@@ -66,7 +66,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { productId, prize, name, rarity, stock, imageUrl, isActive } = body;
+    const { productId, prize, name, rarity, value, stock, imageUrl, isActive } = body;
 
     // 驗證必填欄位
     if (!productId || !prize || !name) {
@@ -92,6 +92,7 @@ export async function POST(request: Request) {
         prize,
         name,
         rarity: rarity || null,
+        value: value ? parseInt(value) : 3000,
         stock: parseInt(stock) || 0,
         imageUrl: imageUrl || null,
         isActive: isActive !== undefined ? isActive : true,

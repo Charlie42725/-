@@ -24,6 +24,7 @@ interface Variant {
   prize: string;
   name: string;
   rarity: string | null;
+  value: number;
   stock: number;
   imageUrl: string | null;
   isActive: boolean;
@@ -66,6 +67,7 @@ export default function VariantsPage() {
     prize: '',
     name: '',
     rarity: '',
+    value: '3000',
     stock: '',
     imageUrl: '',
     isActive: true,
@@ -161,6 +163,7 @@ export default function VariantsPage() {
       prize: variant.prize,
       name: variant.name,
       rarity: variant.rarity || '',
+      value: variant.value.toString(),
       stock: variant.stock.toString(),
       imageUrl: variant.imageUrl || '',
       isActive: variant.isActive,
@@ -196,6 +199,7 @@ export default function VariantsPage() {
       prize: '',
       name: '',
       rarity: '',
+      value: '3000',
       stock: '',
       imageUrl: '',
       isActive: true,
@@ -415,7 +419,7 @@ export default function VariantsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-slate-300 mb-2">稀有度</label>
                 <select
@@ -432,6 +436,22 @@ export default function VariantsPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 mb-2">獎項價值 (¥) *</label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="100"
+                  value={formData.value}
+                  onChange={(e) =>
+                    setFormData({ ...formData, value: e.target.value })
+                  }
+                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+                  placeholder="例如：3000"
+                />
               </div>
 
               <div>
@@ -512,6 +532,9 @@ export default function VariantsPage() {
                   稀有度
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                  價值
+                </th>
+                <th className="text-left px-6 py-4 text-slate-300 font-medium">
                   抽取狀況
                 </th>
                 <th className="text-left px-6 py-4 text-slate-300 font-medium">
@@ -525,7 +548,7 @@ export default function VariantsPage() {
             <tbody className="divide-y divide-slate-700">
               {filteredVariants.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={9} className="px-6 py-12 text-center text-slate-400">
                     {variants.length === 0 ? '目前沒有獎項' : '沒有符合條件的獎項'}
                   </td>
                 </tr>
@@ -570,6 +593,11 @@ export default function VariantsPage() {
                     <td className="px-6 py-4">
                       <span className={getRarityColor(variant.rarity)}>
                         {variant.rarity || '-'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-yellow-400 font-semibold">
+                        ¥{variant.value.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-4">
