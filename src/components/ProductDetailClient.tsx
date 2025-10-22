@@ -68,13 +68,18 @@ export default function ProductDetailClient({
                   <p className="font-bold text-base text-white group-hover:text-orange-400 transition-colors mb-1.5">
                     {variant.name}
                   </p>
-                  {variant.rarity && (
-                    <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
+                    {/* 賞級標籤 */}
+                    <span className="text-xs bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full font-semibold">
+                      {variant.prize}
+                    </span>
+                    {/* 稀有度標籤 */}
+                    {variant.rarity && (
                       <span className="text-xs bg-gradient-to-r from-orange-400 to-pink-400 text-white px-2.5 py-0.5 rounded-full font-semibold">
                         {variant.rarity}
                       </span>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="text-right ml-4">

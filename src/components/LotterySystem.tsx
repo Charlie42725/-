@@ -225,8 +225,8 @@ export default function LotterySystem({
   const handleCloseResults = () => {
     setResults([]);
     document.body.style.overflow = '';
-    // 重新載入已抽號碼（確保同步）
-    loadDrawnTickets();
+    // 重新整理頁面以確保所有資料同步
+    window.location.reload();
   };
 
   const isNumberDrawn = (number: number) => {

@@ -40,7 +40,7 @@ export default function FilterSection() {
   const availableSeries = selectedBrandData?.series || [];
 
   return (
-    <section className="w-full py-8 mt-8 mb-12">
+    <section className="w-full py-2 mt-2 mb-4">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="p-6">
           <div className="flex items-center justify-between">
