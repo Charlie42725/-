@@ -5,6 +5,8 @@ import { prisma } from '@/lib/db';
 import { calculateProgress, statusText, statusColor } from '@/types';
 import LotterySystem from '@/components/LotterySystem';
 import ProductDetailClient from '@/components/ProductDetailClient';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 // 優化：使用 ISR (Incremental Static Regeneration) 提升性能
 export const revalidate = 60; // 每 60 秒重新驗證一次
@@ -95,6 +97,8 @@ export default async function ProductDetailPage({
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      <Header />
+
       {/* 麵包屑導航 */}
       <div className="max-w-screen-xl mx-auto px-4 py-6">
         <nav className="flex items-center space-x-2 text-sm text-slate-400">
@@ -329,6 +333,8 @@ export default async function ProductDetailPage({
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

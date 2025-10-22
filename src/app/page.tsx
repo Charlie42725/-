@@ -32,15 +32,15 @@ export default function Home() {
           <div className="text-center mb-20">
             <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
             <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
-              萬物皆可抽
+              想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在我們的網站上參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！萬物皆可抽
             </p>
           </div>
 
           <hr className="border-slate-600 mb-20 opacity-50" />
           
-          {/* 第二區塊 */}
+          \{/* 第二區塊 */}
           <div className="text-center mb-20">
-            <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">什麼是獵人賞任務？</h3>
+            <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">XXXX？</h3>
             <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
               萬物皆可抽
             </p>
