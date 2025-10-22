@@ -20,8 +20,10 @@ export async function GET(request: Request) {
     if (status) {
       where.status = status;
     } else {
-      // 默認只顯示 active 狀態
-      where.status = 'active';
+      // 默認顯示 active 和 sold_out 狀態
+      where.status = {
+        in: ['active', 'sold_out']
+      };
     }
 
     if (brandSlug) {

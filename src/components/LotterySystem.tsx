@@ -335,14 +335,15 @@ export default function LotterySystem({
                   <div
                     key={result.ticketNumber}
                     className={`
-                      flip-container relative aspect-[3/4] transition-all duration-300
+                      relative aspect-[3/4] transition-all duration-300
                       ${isRevealed ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}
                     `}
+                    style={{ perspective: '1000px' }}
                   >
-                    <div className={`flip-card ${isRevealed ? 'flipped' : ''} rounded-xl overflow-hidden shadow-xl`}>
+                    <div className={`flip-card ${isRevealed ? 'flipped' : ''}`}>
                       {/* 正面：號碼 */}
-                      <div className="flip-card-front">
-                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center rounded-xl">
+                      <div className="flip-card-front rounded-xl overflow-hidden shadow-xl">
+                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
                           <div className="text-white text-6xl font-bold drop-shadow-lg">
                             {result.ticketNumber}
                           </div>
@@ -350,8 +351,8 @@ export default function LotterySystem({
                       </div>
 
                       {/* 背面：獎品 */}
-                      <div className="flip-card-back">
-                        <div className="absolute inset-0 bg-slate-800 flex flex-col rounded-xl overflow-hidden">
+                      <div className="flip-card-back rounded-xl overflow-hidden shadow-xl">
+                        <div className="absolute inset-0 bg-slate-800 flex flex-col">
                           <div className="relative flex-1">
                             {result.variant.imageUrl ? (
                               <Image
@@ -362,12 +363,12 @@ export default function LotterySystem({
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
                                 <span className="text-slate-500 text-4xl">🎁</span>
                               </div>
                             )}
                           </div>
-                          <div className="bg-slate-900 px-3 py-4 flex flex-col justify-center gap-1">
+                          <div className="bg-slate-900 px-3 py-4 flex flex-col justify-center gap-1 flex-shrink-0">
                             <p className="text-orange-400 font-bold text-center text-sm leading-tight">
                               {result.ticketNumber} - {result.variant.prize}
                             </p>

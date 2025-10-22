@@ -272,27 +272,60 @@ export default async function ProductDetailPage({
         {/* 抽獎系統區域 - 移除包裝容器，讓組件自由布局 */}
         {product.variants.length > 0 && product.totalTickets > 0 && (
           <div className="mt-12 lg:mt-16 mb-40 lg:mb-56">
-            {/* 抽獎區標題 */}
-            <div className="text-center mb-8 lg:mb-10">
-              <h3 className="text-slate-200 text-2xl font-bold mb-6">點選號碼開始您的幸運抽獎之旅</h3>
-              <div className="flex justify-center items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 bg-slate-600 rounded shadow-inner"></div>
-                  <span className="text-slate-400 text-sm">未抽取</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 bg-gradient-to-r from-orange-400 to-pink-400 rounded shadow-lg"></div>
-                  <span className="text-slate-400 text-sm">已抽取</span>
+            {/* 根據商品狀態顯示不同內容 */}
+            {product.status === 'sold_out' ? (
+              // 已完抽狀態
+              <div className="text-center py-16 px-4">
+                <div className="bg-slate-800/50 rounded-3xl p-12 backdrop-blur-sm border border-slate-700/50 max-w-2xl mx-auto">
+                  <div className="text-6xl mb-6">🎉</div>
+                  <h3 className="text-3xl font-bold text-white mb-4">本商品已完抽</h3>
+                  <p className="text-slate-400 text-lg mb-8">
+                    所有號碼都已被抽取完畢，感謝您的參與！
+                  </p>
+                  <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-2xl p-6 border border-orange-400/30">
+                    <p className="text-slate-300 text-sm mb-2">本期統計</p>
+                    <p className="text-orange-400 font-bold text-xl">
+                      已售出 {product.soldTickets} / {product.totalTickets} 抽
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : product.status === 'active' ? (
+              // 進行中狀態 - 顯示抽獎系統
+              <>
+                <div className="text-center mb-8 lg:mb-10">
+                  <h3 className="text-slate-200 text-2xl font-bold mb-6">點選號碼開始您的幸運抽獎之旅</h3>
+                  <div className="flex justify-center items-center space-x-6">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-slate-600 rounded shadow-inner"></div>
+                      <span className="text-slate-400 text-sm">未抽取</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 bg-gradient-to-r from-orange-400 to-pink-400 rounded shadow-lg"></div>
+                      <span className="text-slate-400 text-sm">已抽取</span>
+                    </div>
+                  </div>
+                </div>
 
-            {/* 抽獎系統組件 - 直接渲染，不添加額外容器 */}
-            <LotterySystem
-              productId={product.id}
-              productPrice={product.price}
-              totalTickets={product.totalTickets}
-            />
+                <LotterySystem
+                  productId={product.id}
+                  productPrice={product.price}
+                  totalTickets={product.totalTickets}
+                />
+              </>
+            ) : (
+              // 其他狀態（準備中、已結束）
+              <div className="text-center py-16 px-4">
+                <div className="bg-slate-800/50 rounded-3xl p-12 backdrop-blur-sm border border-slate-700/50 max-w-2xl mx-auto">
+                  <div className="text-6xl mb-6">⏳</div>
+                  <h3 className="text-3xl font-bold text-white mb-4">{statusText[product.status]}</h3>
+                  <p className="text-slate-400 text-lg">
+                    {product.status === 'draft' && '此商品尚未開放抽獎，請稍後再來。'}
+                    {product.status === 'archived' && '此商品抽獎活動已結束。'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

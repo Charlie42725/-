@@ -114,31 +114,37 @@ export async function POST(req: NextRequest) {
         throw new Error('所有獎項已全部抽完');
       }
 
-      // 建立獎項池（根據剩餘數量）
-      const variantsPool: typeof variantsWithRemaining = [...variantsWithRemaining];
+      // 檢查是否有足夠的總庫存
+      const totalRemaining = variantsWithRemaining.reduce((sum, v) => sum + v.remaining, 0);
+      if (totalRemaining < ticketNumbers.length) {
+        throw new Error(`獎項庫存不足，目前僅剩 ${totalRemaining} 個獎項`);
+      }
 
-      for (const ticketNumber of ticketNumbers) {
-        // 隨機選擇一個還有庫存的獎項
-        if (variantsPool.length === 0) {
-          throw new Error('獎項已全部抽完');
+      // 建立獎項池（根據剩餘數量，為每個獎項創建對應數量的條目）
+      const variantsPool: Array<typeof variantsWithRemaining[0]> = [];
+      for (const variant of variantsWithRemaining) {
+        for (let i = 0; i < variant.remaining; i++) {
+          variantsPool.push(variant);
         }
+      }
 
-        const randomIndex = Math.floor(Math.random() * variantsPool.length);
-        const selectedVariant = variantsPool[randomIndex];
+      // Fisher-Yates 洗牌算法打亂獎項池
+      for (let i = variantsPool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [variantsPool[i], variantsPool[j]] = [variantsPool[j], variantsPool[i]];
+      }
+
+      // 從打亂的獎項池中依序抽取
+      for (let i = 0; i < ticketNumbers.length; i++) {
+        const selectedVariant = variantsPool[i];
 
         draws.push({
           userId: payload.userId,
           productId,
           variantId: selectedVariant.id,
-          ticketNumber,
+          ticketNumber: ticketNumbers[i],
           pointsUsed: product.price
         });
-
-        // 減少該獎項的剩餘數量（僅在記憶體中）
-        selectedVariant.remaining--;
-        if (selectedVariant.remaining === 0) {
-          variantsPool.splice(randomIndex, 1);
-        }
       }
 
       // 8. 創建抽獎記錄（不再更新 stock 欄位）

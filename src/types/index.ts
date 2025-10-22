@@ -72,7 +72,7 @@ export function calculateProgress(soldTickets: number, totalTickets: number): nu
 export const statusText: Record<ProductStatus, string> = {
   draft: '準備中',
   active: '進行中',
-  sold_out: '已完售',
+  sold_out: '已完抽',
   archived: '已結束',
 };
 
