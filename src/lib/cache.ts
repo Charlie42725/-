@@ -8,7 +8,7 @@ interface CacheEntry<T> {
 class SimpleCache {
   private cache: Map<string, CacheEntry<unknown>> = new Map();
 
-  set<T>(key: string, data: T, ttl: number = 5000): void {
+  set<T>(key: string, data: T, ttl: number = 30000): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -34,11 +34,30 @@ class SimpleCache {
     return entry.data;
   }
 
+  // 取快取或執行查詢並快取結果
+  async getOrSet<T>(key: string, fn: () => Promise<T>, ttl?: number): Promise<T> {
+    const cached = this.get<T>(key);
+    if (cached !== null) return cached;
+
+    const data = await fn();
+    this.set(key, data, ttl);
+    return data;
+  }
+
   clear(key?: string): void {
     if (key) {
       this.cache.delete(key);
     } else {
       this.cache.clear();
+    }
+  }
+
+  // 清除符合前綴的快取
+  clearByPrefix(prefix: string): void {
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(prefix)) {
+        this.cache.delete(key);
+      }
     }
   }
 

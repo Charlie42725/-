@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { ProductStatus, Prisma } from '@prisma/client';
+import { cache } from '@/lib/cache';
 
 export async function GET(request: Request) {
   try {
@@ -14,77 +15,78 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // 構建 where 條件
-    const where: Prisma.ProductWhereInput = {};
+    // 用查詢參數生成快取 key
+    const cacheKey = `products:${brandSlug || ''}:${seriesSlug || ''}:${status || ''}:${sortBy}:${limit}:${offset}`;
 
-    if (status) {
-      where.status = status;
-    } else {
-      // 默認顯示 active 和 sold_out 狀態
-      where.status = {
-        in: ['active', 'sold_out']
-      };
-    }
+    const result = await cache.getOrSet(cacheKey, async () => {
+      // 構建 where 條件
+      const where: Prisma.ProductWhereInput = {};
 
-    if (brandSlug) {
-      where.series = {
-        brand: {
-          slug: brandSlug,
-        },
-      };
-    }
+      if (status) {
+        where.status = status;
+      } else {
+        where.status = {
+          in: ['active', 'sold_out']
+        };
+      }
 
-    if (seriesSlug) {
-      where.series = {
-        slug: seriesSlug,
-      };
-    }
-
-    // 構建 orderBy 條件
-    let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' }; // 默認最新
-
-    switch (sortBy) {
-      case 'price_low':
-        orderBy = { price: 'asc' };
-        break;
-      case 'price_high':
-        orderBy = { price: 'desc' };
-        break;
-      case 'popular':
-        orderBy = { soldTickets: 'desc' };
-        break;
-    }
-
-    // 查詢商品
-    const products = await prisma.product.findMany({
-      where,
-      orderBy,
-      take: limit,
-      skip: offset,
-      include: {
-        series: {
-          include: {
-            brand: true,
+      if (brandSlug) {
+        where.series = {
+          brand: {
+            slug: brandSlug,
           },
-        },
-        variants: {
-          where: { isActive: true },
-        },
-        images: {
-          orderBy: { sortOrder: 'asc' },
-        },
-      },
-    });
+        };
+      }
 
-    // 獲取總數
-    const total = await prisma.product.count({ where });
+      if (seriesSlug) {
+        where.series = {
+          slug: seriesSlug,
+        };
+      }
 
-    return NextResponse.json({
-      products,
-      total,
-      limit,
-      offset,
-    });
+      // 構建 orderBy 條件
+      let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: 'desc' };
+
+      switch (sortBy) {
+        case 'price_low':
+          orderBy = { price: 'asc' };
+          break;
+        case 'price_high':
+          orderBy = { price: 'desc' };
+          break;
+        case 'popular':
+          orderBy = { soldTickets: 'desc' };
+          break;
+      }
+
+      // 同時查詢商品和總數
+      const [products, total] = await Promise.all([
+        prisma.product.findMany({
+          where,
+          orderBy,
+          take: limit,
+          skip: offset,
+          include: {
+            series: {
+              include: {
+                brand: true,
+              },
+            },
+            variants: {
+              where: { isActive: true },
+            },
+            images: {
+              orderBy: { sortOrder: 'asc' },
+            },
+          },
+        }),
+        prisma.product.count({ where }),
+      ]);
+
+      return { products, total, limit, offset };
+    }, 30000); // 快取 30 秒
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json(

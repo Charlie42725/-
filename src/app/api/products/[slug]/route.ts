@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { cache } from '@/lib/cache';
 
 export async function GET(
   request: Request,
@@ -7,25 +8,29 @@ export async function GET(
 ) {
   try {
     const { slug } = await context.params;
-    const product = await prisma.product.findFirst({
-      where: {
-        slug,
-      },
-      include: {
-        series: {
-          include: {
-            brand: true,
+
+    const product = await cache.getOrSet(`product:${slug}`, () =>
+      prisma.product.findFirst({
+        where: {
+          slug,
+        },
+        include: {
+          series: {
+            include: {
+              brand: true,
+            },
+          },
+          variants: {
+            where: { isActive: true },
+            orderBy: { name: 'asc' },
+          },
+          images: {
+            orderBy: { sortOrder: 'asc' },
           },
         },
-        variants: {
-          where: { isActive: true },
-          orderBy: { name: 'asc' },
-        },
-        images: {
-          orderBy: { sortOrder: 'asc' },
-        },
-      },
-    });
+      }),
+      30000 // 快取 30 秒
+    );
 
     if (!product) {
       return NextResponse.json(

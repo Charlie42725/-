@@ -5,12 +5,19 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ProductCard, calculateProgress, statusText, statusColor } from '@/types';
 
-export default function ProductGrid() {
-  const [products, setProducts] = useState<ProductCard[]>([]);
-  const [loading, setLoading] = useState(true);
+interface ProductGridProps {
+  initialProducts?: ProductCard[];
+}
+
+export default function ProductGrid({ initialProducts }: ProductGridProps) {
+  const [products, setProducts] = useState<ProductCard[]>(initialProducts || []);
+  const [loading, setLoading] = useState(!initialProducts);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // 如果有預取資料，跳過 API 請求
+    if (initialProducts) return;
+
     async function fetchProducts() {
       try {
         const response = await fetch('/api/products?limit=12');
@@ -26,7 +33,7 @@ export default function ProductGrid() {
     }
 
     fetchProducts();
-  }, []);
+  }, [initialProducts]);
 
   if (loading) {
     return (

@@ -3,17 +3,45 @@ import Footer from '@/components/Footer';
 import Banner from '@/components/Banner';
 import FilterSection from '@/components/FilterSection';
 import ProductGrid from '@/components/ProductGrid';
+import { prisma } from '@/lib/db';
 
-export default function Home() {
+// ISR: 每 30 秒重新生成頁面
+export const revalidate = 30;
+
+export default async function Home() {
+  // Server 端預取資料，避免客戶端 API 請求延遲
+  const [productsData, brandsData] = await Promise.all([
+    prisma.product.findMany({
+      where: { status: { in: ['active', 'sold_out'] } },
+      orderBy: { createdAt: 'desc' },
+      take: 12,
+      include: {
+        series: { include: { brand: true } },
+        variants: { where: { isActive: true } },
+        images: { orderBy: { sortOrder: 'asc' } },
+      },
+    }),
+    prisma.brand.findMany({
+      where: { isActive: true },
+      include: {
+        series: {
+          where: { isActive: true },
+          include: { _count: { select: { products: { where: { status: 'active' } } } } },
+        },
+      },
+      orderBy: { name: 'asc' },
+    }),
+  ]);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white w-full flex flex-col">
       <Header />
       {/* 主要 Banner */}
       <Banner />
-      
+
       {/* 篩選區域 */}
-      <FilterSection />
-      
+      <FilterSection initialBrands={brandsData} />
+
       {/* 最新一番賞區域 */}
       <main className="w-full">
         <div className="max-w-screen-xl mx-auto px-4 py-12">
@@ -22,8 +50,8 @@ export default function Home() {
               <span className="text-orange-400 mr-4 text-3xl">≫</span>
               <h2 className="text-3xl font-bold text-white">最新一番賞</h2>
             </div>
-          
-          <ProductGrid />
+
+          <ProductGrid initialProducts={productsData} />
         </section>
         
         {/* 說明區域 */}

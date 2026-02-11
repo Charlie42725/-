@@ -16,13 +16,20 @@ interface Brand {
   }[];
 }
 
-export default function FilterSection() {
+interface FilterSectionProps {
+  initialBrands?: Brand[];
+}
+
+export default function FilterSection({ initialBrands }: FilterSectionProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brands, setBrands] = useState<Brand[]>(initialBrands || []);
   const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [selectedSeries, setSelectedSeries] = useState<string>('');
 
   useEffect(() => {
+    // 如果有預取資料，跳過 API 請求
+    if (initialBrands) return;
+
     async function fetchBrands() {
       try {
         const response = await fetch('/api/brands');
@@ -34,7 +41,7 @@ export default function FilterSection() {
     }
 
     fetchBrands();
-  }, []);
+  }, [initialBrands]);
 
   const selectedBrandData = brands?.find((b) => b.slug === selectedBrand);
   const availableSeries = selectedBrandData?.series || [];
