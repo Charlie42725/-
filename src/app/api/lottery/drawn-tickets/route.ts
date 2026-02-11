@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { cache } from '@/lib/cache';
 
 // 獲取商品的已抽號碼
 export async function GET(req: NextRequest) {
@@ -14,24 +15,27 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 查詢該商品的所有已抽號碼
-    const drawnTickets = await prisma.lotteryDraw.findMany({
-      where: {
-        productId: parseInt(productId)
-      },
-      include: {
-        variant: true,
-        user: {
-          select: {
-            id: true,
-            nickname: true
+    const drawnTickets = await cache.getOrSet(
+      `drawn-tickets:${productId}`,
+      () => prisma.lotteryDraw.findMany({
+        where: {
+          productId: parseInt(productId)
+        },
+        include: {
+          variant: true,
+          user: {
+            select: {
+              id: true,
+              nickname: true
+            }
           }
+        },
+        orderBy: {
+          ticketNumber: 'asc'
         }
-      },
-      orderBy: {
-        ticketNumber: 'asc'
-      }
-    });
+      }),
+      10000 // 10 秒快取（抽獎資料需要較即時）
+    );
 
     return NextResponse.json({
       drawnTickets

@@ -4,34 +4,41 @@ import Banner from '@/components/Banner';
 import FilterSection from '@/components/FilterSection';
 import ProductGrid from '@/components/ProductGrid';
 import { prisma } from '@/lib/db';
+import { unstable_cache } from 'next/cache';
 
-// ISR: 每 30 秒重新生成頁面
-export const revalidate = 30;
+// 快取首頁資料，30 秒內不重複查 DB
+const getHomeData = unstable_cache(
+  async () => {
+    const [products, brands] = await Promise.all([
+      prisma.product.findMany({
+        where: { status: { in: ['active', 'sold_out'] } },
+        orderBy: { createdAt: 'desc' },
+        take: 12,
+        include: {
+          series: { include: { brand: true } },
+          variants: { where: { isActive: true } },
+          images: { orderBy: { sortOrder: 'asc' } },
+        },
+      }),
+      prisma.brand.findMany({
+        where: { isActive: true },
+        include: {
+          series: {
+            where: { isActive: true },
+            include: { _count: { select: { products: { where: { status: 'active' } } } } },
+          },
+        },
+        orderBy: { name: 'asc' },
+      }),
+    ]);
+    return { products, brands };
+  },
+  ['home-data'],
+  { revalidate: 30 }
+);
 
 export default async function Home() {
-  // Server 端預取資料，避免客戶端 API 請求延遲
-  const [productsData, brandsData] = await Promise.all([
-    prisma.product.findMany({
-      where: { status: { in: ['active', 'sold_out'] } },
-      orderBy: { createdAt: 'desc' },
-      take: 12,
-      include: {
-        series: { include: { brand: true } },
-        variants: { where: { isActive: true } },
-        images: { orderBy: { sortOrder: 'asc' } },
-      },
-    }),
-    prisma.brand.findMany({
-      where: { isActive: true },
-      include: {
-        series: {
-          where: { isActive: true },
-          include: { _count: { select: { products: { where: { status: 'active' } } } } },
-        },
-      },
-      orderBy: { name: 'asc' },
-    }),
-  ]);
+  const { products: productsData, brands: brandsData } = await getHomeData();
 
   return (
     <div className="min-h-screen bg-gray-900 text-white w-full flex flex-col">
@@ -44,102 +51,104 @@ export default async function Home() {
 
       {/* 最新一番賞區域 */}
       <main className="w-full">
-        <div className="max-w-screen-xl mx-auto px-4 py-12">
-          <section className="mb-16">
-            <div className="flex items-center mb-8 p-6">
-              <span className="text-orange-400 mr-4 text-3xl">≫</span>
-              <h2 className="text-3xl font-bold text-white">最新一番賞</h2>
+        <div className="max-w-screen-xl mx-auto px-4 py-16">
+          <section className="mb-20">
+            <div className="flex items-center mb-10">
+              <span className="w-2 h-10 bg-orange-400 rounded-full mr-4 shadow-[0_0_15px_rgba(251,146,60,0.6)]"></span>
+              <h2 className="text-4xl font-black text-white anime-glow-text tracking-tight">
+                最新一番賞 <span className="text-orange-500 text-lg ml-2 font-bold tracking-widest uppercase">New Arrivals</span>
+              </h2>
             </div>
 
-          <ProductGrid initialProducts={productsData} />
-        </section>
-        
-        {/* 說明區域 */}
-        <section className="mt-24 mb-16 bg-gradient-to-b from-slate-800/50 to-slate-900/50 rounded-3xl p-12 backdrop-blur-sm border border-slate-700 shadow-2xl">
-          {/* 第一區塊 */}
-          <div className="text-center mb-20">
-            <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
-            <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
-              想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在我們的網站上參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！萬物皆可抽
-            </p>
-          </div>
+            <ProductGrid initialProducts={productsData} />
+          </section>
 
-          <hr className="border-slate-600 mb-20 opacity-50" />
-          
-          \{/* 第二區塊 */}
-          <div className="text-center mb-20">
-            <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">XXXX？</h3>
-            <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
-              萬物皆可抽
-            </p>
-          </div>
+          {/* 說明區域 */}
+          <section className="mt-24 mb-16 bg-gradient-to-b from-slate-800/50 to-slate-900/50 rounded-3xl p-12 backdrop-blur-sm border border-slate-700 shadow-2xl">
+            {/* 第一區塊 */}
+            <div className="text-center mb-20">
+              <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
+              <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
+                想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在我們的網站上參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！萬物皆可抽
+              </p>
+            </div>
 
-          <hr className="border-slate-600 mb-20 opacity-50" />
-          
-          {/* 特色區塊 */}
-          <div className="text-center">
-            <h3 className="text-4xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">萬物皆可抽特色</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-              <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-cyan-400 transition-all transform hover:scale-105 shadow-lg">
-                <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
+            <hr className="border-slate-600 mb-20 opacity-50" />
+
+            \{/* 第二區塊 */}
+            <div className="text-center mb-20">
+              <h3 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">XXXX？</h3>
+              <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
+                萬物皆可抽
+              </p>
+            </div>
+
+            <hr className="border-slate-600 mb-20 opacity-50" />
+
+            {/* 特色區塊 */}
+            <div className="text-center">
+              <h3 className="text-4xl font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">萬物皆可抽特色</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-cyan-400 transition-all transform hover:scale-105 shadow-lg">
+                  <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-bold text-white mb-6 text-xl">一筒賞GK免費修復</h4>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    紫昇躁一提供免費保修服務，若良路線收件
+                    時拐一筒賞GK破損，符合條件即可享
+                    受免費的修復服務！
+                  </p>
                 </div>
-                <h4 className="font-bold text-white mb-6 text-xl">一筒賞GK免費修復</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  紫昇躁一提供免費保修服務，若良路線收件
-                  時拐一筒賞GK破損，符合條件即可享
-                  受免費的修復服務！
-                </p>
-              </div>
-              
-              <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-purple-400 transition-all transform hover:scale-105 shadow-lg">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
+
+                <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-purple-400 transition-all transform hover:scale-105 shadow-lg">
+                  <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-bold text-white mb-6 text-xl">Hash驗證</h4>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    紫昇躁一透過區塊鏈 Hash 值提供大賞號碼
+                    抽選，透過 Hash 值路徑不可修改、皇牌，
+                    讓違守人講定型態，哈通無人能夠作弊，
+                    任一完成系統能行驗證
+                  </p>
                 </div>
-                <h4 className="font-bold text-white mb-6 text-xl">Hash驗證</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  紫昇躁一透過區塊鏈 Hash 值提供大賞號碼
-                  抽選，透過 Hash 值路徑不可修改、皇牌，
-                  讓違守人講定型態，哈通無人能夠作弊，
-                  任一完成系統能行驗證
-                </p>
-              </div>
-              
-              <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-yellow-400 transition-all transform hover:scale-105 shadow-lg">
-                <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                  </svg>
+
+                <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-yellow-400 transition-all transform hover:scale-105 shadow-lg">
+                  <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </div>
+                  <h4 className="font-bold text-white mb-6 text-xl">實體店面</h4>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    紫昇躁一旦有實體店面的線上一當獎品帥，
+                    其程序夜店商昆兄，用固版版，訊觀完以
+                    及完的更方便的享受一筒賞的樂趣！
+                  </p>
                 </div>
-                <h4 className="font-bold text-white mb-6 text-xl">實體店面</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  紫昇躁一旦有實體店面的線上一當獎品帥，
-                  其程序夜店商昆兄，用固版版，訊觀完以
-                  及完的更方便的享受一筒賞的樂趣！
-                </p>
-              </div>
-              
-              <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-green-400 transition-all transform hover:scale-105 shadow-lg">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
+
+                <div className="text-center p-8 bg-slate-800/50 rounded-2xl border border-slate-600 hover:border-green-400 transition-all transform hover:scale-105 shadow-lg">
+                  <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
+                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="font-bold text-white mb-6 text-xl">任務回饋</h4>
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    紫昇躁首任務回饋，完成任務回獲得獎賞
+                    幣輔助，可究優多優惠券，讓你收以出喜
+                    動的享受一當獎的樂趣！
+                  </p>
                 </div>
-                <h4 className="font-bold text-white mb-6 text-xl">任務回饋</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  紫昇躁首任務回饋，完成任務回獲得獎賞
-                  幣輔助，可究優多優惠券，讓你收以出喜
-                  動的享受一當獎的樂趣！
-                </p>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </div>
       </main>
       <Footer />

@@ -73,6 +73,7 @@ model Product {
   images           Image[]
   logs             ProductLog[]
   lotteryDraws     LotteryDraw[]
+  drawQueues       DrawQueue[]
 
   @@unique([seriesId, slug])
   @@index([slug])
@@ -137,6 +138,7 @@ model User {
   pointTransactions PointTransaction[]
   lotteryDraws      LotteryDraw[]
   prizeRedemptions  PrizeRedemption[]
+  drawQueues        DrawQueue[]
 
   @@index([email])
   @@index([phone])
@@ -325,4 +327,38 @@ enum PointTransactionType {
   refund        // 退款
   redemption    // 獎品兌換
   admin_adjust  // 管理員調整
+}
+
+// -----------------------------
+// 🔹 排隊狀態
+// -----------------------------
+enum QueueStatus {
+  waiting
+  active
+  completed
+  expired
+  left
+}
+
+// -----------------------------
+// 🔹 抽賞排隊
+// -----------------------------
+model DrawQueue {
+  id            Int          @id @default(autoincrement())
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  product       Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId     Int
+  status        QueueStatus  @default(waiting)
+  position      Int          // 排隊順序（遞增，用於排序）
+  joinedAt      DateTime     @default(now())
+  activatedAt   DateTime?    // 輪到時的時間
+  expiresAt     DateTime?    // activatedAt + 3 分鐘
+  completedAt   DateTime?    // 完成或離開時間
+  lastHeartbeat DateTime     @default(now())
+
+  @@index([productId, status])
+  @@index([productId, position])
+  @@index([userId])
+  @@index([expiresAt])
 }

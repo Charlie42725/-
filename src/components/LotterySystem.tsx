@@ -21,6 +21,8 @@ interface LotterySystemProps {
   productPrice: number;
   totalTickets: number;
   onVariantsUpdate?: (variants: Variant[]) => void;
+  onDrawComplete?: () => void;
+  onRequireQueue?: () => void;
 }
 
 interface DrawnTicket {
@@ -37,7 +39,9 @@ export default function LotterySystem({
   productId,
   productPrice,
   totalTickets,
-  onVariantsUpdate
+  onVariantsUpdate,
+  onDrawComplete,
+  onRequireQueue
 }: LotterySystemProps) {
   const router = useRouter();
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -177,6 +181,15 @@ export default function LotterySystem({
       const data = await response.json();
 
       if (!response.ok) {
+        // 如果需要排隊，通知父組件啟動排隊流程
+        if (data.requireQueue && onRequireQueue) {
+          setIsDrawing(false);
+          setResults([]);
+          setCurrentRevealIndex(-1);
+          document.body.style.overflow = '';
+          onRequireQueue();
+          return;
+        }
         throw new Error(data.error || '抽獎失敗');
       }
 
@@ -227,8 +240,12 @@ export default function LotterySystem({
   const handleCloseResults = () => {
     setResults([]);
     document.body.style.overflow = '';
-    // 重新整理頁面以確保所有資料同步
-    window.location.reload();
+    if (onDrawComplete) {
+      onDrawComplete();
+    } else {
+      // 沒有 callback 時，重新整理頁面以確保所有資料同步
+      window.location.reload();
+    }
   };
 
   const isNumberDrawn = (number: number) => {

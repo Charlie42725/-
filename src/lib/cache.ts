@@ -1,12 +1,18 @@
 // 簡單的記憶體快取系統
+// 使用 globalThis 確保 dev 模式下 HMR 不會清掉快取
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
   ttl: number; // Time to live in milliseconds
 }
 
+const globalForCache = globalThis as unknown as { __cache_store: Map<string, CacheEntry<unknown>> };
+if (!globalForCache.__cache_store) {
+  globalForCache.__cache_store = new Map();
+}
+
 class SimpleCache {
-  private cache: Map<string, CacheEntry<unknown>> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = globalForCache.__cache_store;
 
   set<T>(key: string, data: T, ttl: number = 30000): void {
     this.cache.set(key, {

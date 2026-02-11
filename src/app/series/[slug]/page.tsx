@@ -40,138 +40,143 @@ export default async function SeriesPage({
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* 系列 Banner */}
-      <div className="relative h-80 bg-gradient-to-r from-purple-600 to-blue-600">
-        {series.coverImage && (
+      {/* Immersive Series Banner */}
+      <div className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
+        {series.coverImage ? (
           <div className="absolute inset-0">
             <Image
               src={series.coverImage}
               alt={series.name}
               fill
-              className="object-cover opacity-30"
+              className="object-cover opacity-60 blur-sm scale-105"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-transparent"></div>
           </div>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-blue-900 opacity-50"></div>
         )}
-        <div className="relative max-w-screen-xl mx-auto px-4 h-full flex flex-col justify-center">
-          <div className="flex items-center space-x-2 text-sm mb-4">
-            <Link href="/" className="text-white/80 hover:text-white transition-colors">
-              首頁
-            </Link>
-            <span className="text-white/60">/</span>
-            <Link
-              href={`/brands/${series.brand.slug}`}
-              className="text-white/80 hover:text-white transition-colors"
-            >
+
+        <div className="relative max-w-screen-xl mx-auto px-4 w-full z-10 pt-20">
+          <div className="flex items-center space-x-2 text-sm mb-6 text-slate-300 font-medium">
+            <Link href="/" className="hover:text-white transition-colors">首頁</Link>
+            <span>/</span>
+            <Link href={`/brands/${series.brand.slug}`} className="hover:text-white transition-colors">
               {series.brand.name}
             </Link>
-            <span className="text-white/60">/</span>
-            <span className="text-white font-medium">{series.name}</span>
+            <span>/</span>
+            <span className="text-white">{series.name}</span>
           </div>
 
-          <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full text-sm mb-4 w-fit">
+          <div className="inline-block bg-orange-500/20 text-orange-400 border border-orange-500/50 px-4 py-1.5 rounded-full text-sm font-bold mb-6 backdrop-blur-md">
             {series.brand.name}
           </div>
 
-          <h1 className="text-5xl font-bold text-white mb-4">{series.name}</h1>
+          <h1 className="text-5xl lg:text-7xl font-black text-white mb-6 anime-glow-text leading-tight max-w-4xl">
+            {series.name}
+          </h1>
 
           {series.description && (
-            <p className="text-white/90 text-lg max-w-3xl">{series.description}</p>
+            <p className="text-slate-200 text-lg lg:text-xl max-w-2xl leading-relaxed mb-10 border-l-4 border-purple-500 pl-6 bg-black/30 p-4 rounded-r-xl backdrop-blur-sm">
+              {series.description}
+            </p>
           )}
 
-          <div className="mt-6 flex items-center space-x-6 text-white/80">
-            <div>
-              <span className="text-2xl font-bold text-white">{series.products.length}</span>
-              <span className="ml-2">個商品</span>
+          <div className="flex items-center space-x-10 text-white">
+            <div className="flex items-baseline">
+              <span className="text-4xl font-black">{series.products.length}</span>
+              <span className="ml-2 text-slate-400 font-bold uppercase text-sm tracking-wider">Total Items</span>
             </div>
-            <div>
-              <span className="text-2xl font-bold text-white">
+            <div className="flex items-baseline">
+              <span className="text-4xl font-black text-green-400">
                 {series.products.filter((p) => p.status === 'active').length}
               </span>
-              <span className="ml-2">進行中</span>
+              <span className="ml-2 text-slate-400 font-bold uppercase text-sm tracking-wider">Live Now</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 商品列表 */}
-      <div className="max-w-screen-xl mx-auto px-4 py-12">
+      {/* Product List Grid */}
+      <div className="max-w-screen-xl mx-auto px-4 py-20">
+        <div className="flex items-center justify-between mb-12">
+          <h2 className="text-3xl font-bold flex items-center">
+            <span className="w-2 h-8 bg-orange-500 mr-4 rounded-full"></span>
+            系列商品
+          </h2>
+        </div>
+
         {series.products.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-slate-400">此系列目前沒有商品</p>
+          <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/10">
+            <p className="text-slate-400 text-xl">此系列目前沒有商品</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {series.products.map((product) => {
               const progress = calculateProgress(product.soldTickets, product.totalTickets);
               const remaining = product.totalTickets - product.soldTickets;
+              const isSoldOut = product.status === 'sold_out';
 
               return (
                 <Link
                   key={product.id}
                   href={`/products/${product.slug}`}
-                  className="block"
+                  className="group block"
                 >
-                  <div className="bg-slate-800/90 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl border border-slate-600/50 hover:border-orange-400/60 h-full">
-                    {/* 狀態標籤 */}
-                    <div className="absolute top-2 right-2 z-10">
-                      <div className={`${statusColor[product.status]} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg`}>
+                  <div className="relative bg-[#0f0f0f] rounded-2xl overflow-hidden border border-white/5 hover:border-orange-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] h-full flex flex-col">
+                    {/* Status Badge */}
+                    <div className="absolute top-3 right-3 z-10">
+                      <div className={`${statusColor[product.status]} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-md`}>
                         {statusText[product.status]}
                       </div>
                     </div>
 
-                    {/* 圖片 */}
-                    <div className="relative h-48">
+                    {/* Image Area */}
+                    <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
                         src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}
                         alt={product.name}
                         fill
-                        className="object-cover"
+                        className={`object-cover transition-transform duration-700 group-hover:scale-110 ${isSoldOut ? 'grayscale opacity-50' : ''}`}
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-80"></div>
+
+                      {/* Price Tag Overlay */}
+                      <div className="absolute bottom-4 left-4">
+                        <p className="text-orange-400 font-black text-2xl drop-shadow-lg">
+                          NT$ <span className="text-3xl">{product.price}</span>
+                        </p>
+                      </div>
                     </div>
 
-                    {/* 商品資訊 */}
-                    <div className="p-4 flex flex-col h-[200px]">
-                      {/* 標題區域 - 固定高度 */}
-                      <div className="flex-none mb-3">
-                        <h3 className="text-white font-bold text-base line-clamp-2 h-12 flex items-center">
-                          {product.name}
-                        </h3>
-                      </div>
+                    {/* Card Content */}
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="text-white font-bold text-lg mb-3 line-clamp-2 group-hover:text-orange-400 transition-colors">
+                        {product.name}
+                      </h3>
 
-                      {/* 描述區域 - 固定高度 */}
-                      <div className="flex-none mb-3">
-                        {product.shortDescription ? (
-                          <p className="text-slate-300 text-sm line-clamp-2 h-10">
-                            {product.shortDescription}
-                          </p>
-                        ) : (
-                          <div className="h-10"></div>
-                        )}
-                      </div>
-
-                      {/* 進度條區域 */}
-                      <div className="flex-1 mb-3">
-                        <div className="flex justify-between text-xs text-slate-400 mb-1">
-                          <span>已售 {product.soldTickets}</span>
-                          <span>剩餘 {remaining}</span>
-                        </div>
-                        <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-orange-400 to-pink-500 transition-all duration-500"
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      {/* 價格區域 - 固定在底部 */}
-                      <div className="flex-none">
-                        <div className="flex items-center justify-between pt-3 border-t border-slate-700">
-                          <div className="text-orange-400 font-bold text-lg">
-                            NT$ {product.price}
+                      <div className="mt-auto space-y-4">
+                        {/* Progress Bar */}
+                        <div>
+                          <div className="flex justify-between text-xs text-slate-400 mb-1.5 font-bold">
+                            <span>
+                              <span className={isSoldOut ? 'text-red-500' : 'text-green-400'}>
+                                {remaining}
+                              </span> / {product.totalTickets} 抽
+                            </span>
+                            <span>{progress}%</span>
                           </div>
-                          <div className="text-slate-400 text-sm">
-                            共 {product.totalTickets} 抽
+                          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-slate-600' : 'bg-gradient-to-r from-orange-400 to-pink-500'}`}
+                              style={{ width: `${progress}%` }}
+                            ></div>
                           </div>
+                        </div>
+
+                        {/* CTA Button Mock */}
+                        <div className="w-full py-3 bg-white/5 rounded-xl text-center text-sm font-bold text-slate-300 group-hover:bg-orange-500 group-hover:text-white transition-all">
+                          {isSoldOut ? '查看結果' : '立即開抽'}
                         </div>
                       </div>
                     </div>

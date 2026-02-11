@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
 import { cache } from '@/lib/cache';
+import { completeSession } from '@/lib/queue-manager';
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +31,32 @@ export async function POST(req: NextRequest) {
         { error: '參數錯誤' },
         { status: 400 }
       );
+    }
+
+    // 排隊驗證：檢查是否有排隊中的人
+    const queueCount = await prisma.drawQueue.count({
+      where: { productId, status: { in: ['waiting', 'active'] } },
+    });
+
+    if (queueCount > 0) {
+      // 有排隊 → 檢查當前使用者是否是 active 的那位
+      const activeEntry = await prisma.drawQueue.findFirst({
+        where: { productId, userId: payload.userId, status: 'active' },
+      });
+
+      if (!activeEntry) {
+        return NextResponse.json(
+          { error: '請先排隊等待您的回合', requireQueue: true },
+          { status: 403 }
+        );
+      }
+
+      if (activeEntry.expiresAt && activeEntry.expiresAt < new Date()) {
+        return NextResponse.json(
+          { error: '您的抽獎時間已過期', sessionExpired: true },
+          { status: 403 }
+        );
+      }
     }
 
     // 使用交易確保數據一致性
@@ -205,8 +232,20 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // 清除用戶快取，確保下次請求時取得最新點數
+    // 抽獎成功後，如果使用者在排隊中，完成 session 並啟動下一位
+    try {
+      await completeSession(productId, payload.userId);
+    } catch (e) {
+      // 如果沒有排隊記錄，忽略錯誤（向下相容）
+      console.warn('completeSession skipped:', e);
+    }
+
+    // 清除相關快取
     cache.clear(`user:profile:${payload.userId}`);
+    cache.clear(`drawn-tickets:${productId}`);
+    cache.clear(`variants:${productId}`);
+    cache.clearByPrefix(`products:`);
+    cache.clear(`product:${productId}`);
 
     return NextResponse.json({
       success: true,

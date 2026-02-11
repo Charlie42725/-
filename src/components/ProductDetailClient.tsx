@@ -63,64 +63,99 @@ export default function ProductDetailClient({
     };
   }, [productId]);
 
+  // 取得稀有度背景色
+  const getRarityClass = (rarity: string | null) => {
+    const r = rarity?.toUpperCase() || '';
+    if (r === 'SSR') return 'rarity-bg-ssr';
+    if (r === 'SR') return 'rarity-bg-sr';
+    if (r === 'R') return 'rarity-bg-r';
+    return 'bg-slate-800';
+  };
+
   return (
     <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
-      <h2 className="text-2xl font-bold mb-6 flex items-center">
-        <span className="text-2xl mr-3">🏆</span>
-        獎項內容
-      </h2>
-      <div className="space-y-4">
-        {variants.map((variant, index) => (
-          <div key={variant.id}>
+      <div className="space-y-3">
+        {variants.map((variant) => {
+          const remaining = variant.stock - (variant._count?.lotteryDraws || 0);
+          const isSoldOut = remaining <= 0;
+          const progress = variant.stock > 0 ? (remaining / variant.stock) * 100 : 0;
+
+          return (
             <div
-              className="group flex items-center justify-between p-5 bg-slate-900/50 rounded-2xl hover:bg-slate-800/60 transition-all duration-300 border border-slate-700/30 hover:border-orange-400/40"
+              key={variant.id}
+              className={`
+                group relative flex items-center p-3 rounded-lg overflow-hidden 
+                ${isSoldOut ? 'bg-[#1a1a1a] opacity-60' : 'bg-[#151515] hover:bg-[#1f1f1f]'} 
+                border border-white/5 hover:border-white/10 transition-all duration-200
+              `}
             >
-              <div className="flex items-center space-x-4">
-                {variant.imageUrl && (
-                  <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-                    <Image
-                      src={variant.imageUrl}
-                      alt={variant.name}
-                      fill
-                      className="object-cover"
-                    />
+              {/* Left: Image & Grade */}
+              <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0 mr-4 bg-black/50">
+                {variant.imageUrl ? (
+                  <Image
+                    src={variant.imageUrl}
+                    alt={variant.name}
+                    fill
+                    className={`object-cover ${isSoldOut ? 'grayscale' : ''}`}
+                  />
+                ) : null}
+
+                {/* Grade Badge */}
+                <div className="absolute top-0 left-0">
+                  <span className={`
+                      text-[10px] font-black px-1.5 py-0.5 rounded-br-md shadow-sm
+                      ${variant.prize.toLowerCase().includes('last')
+                      ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white'
+                      : 'bg-black/80 text-white backdrop-blur-sm'}
+                    `}>
+                    {variant.prize}
+                  </span>
+                </div>
+              </div>
+
+              {/* Center: Info */}
+              <div className="flex-1 min-w-0 mr-4">
+                <div className="flex items-center mb-1">
+                  <h3 className={`text-sm font-bold truncate ${isSoldOut ? 'text-slate-500' : 'text-slate-200 group-hover:text-white'}`}>
+                    {variant.name}
+                  </h3>
+                  {variant.rarity && (
+                    <span className={`ml-2 text-[9px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ${getRarityClass(variant.rarity).replace('bg-', 'bg-gradient-to-r from-').replace('to-', 'to-')} text-white`}>
+                      {variant.rarity}
+                    </span>
+                  )}
+                </div>
+
+                {/* Stock Bar */}
+                <div className="flex items-center space-x-3">
+                  <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${isSoldOut ? 'bg-slate-600' : 'bg-gradient-to-r from-orange-400 to-pink-500'}`}
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs font-mono font-bold text-slate-400">
+                    <span className={isSoldOut ? 'text-red-500' : 'text-green-400'}>{remaining}</span>
+                    <span className="opacity-50">/{variant.stock}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Status Icon / Value */}
+              <div className="text-right flex-shrink-0">
+                {isSoldOut ? (
+                  <span className="text-xs font-bold text-red-500 border border-red-500/30 px-2 py-1 rounded bg-red-500/10 uppercase tracking-wider">
+                    SOLD
+                  </span>
+                ) : (
+                  <div className="text-slate-500 text-xs">
+                    ${Number(variant?.value ?? 0).toLocaleString()}
                   </div>
                 )}
-                <div className="flex-1">
-                  <p className="font-bold text-base text-white group-hover:text-orange-400 transition-colors mb-1.5">
-                    {variant.name}
-                  </p>
-                  <div className="flex items-center flex-wrap gap-2">
-                    {/* 賞級標籤 */}
-                    <span className="text-xs bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-full font-semibold">
-                      {variant.prize}
-                    </span>
-                    {/* 稀有度標籤 */}
-                    {variant.rarity && (
-                      <span className="text-xs bg-gradient-to-r from-orange-400 to-pink-400 text-white px-2.5 py-0.5 rounded-full font-semibold">
-                        {variant.rarity}
-                      </span>
-                    )}
-                    {/* 價值標籤 */}
-                    <span className="text-xs bg-gradient-to-r from-yellow-500 to-amber-500 text-white px-2.5 py-0.5 rounded-full font-semibold">
-                      ${Number(variant?.value ?? 0).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-right ml-4">
-                <div className="text-slate-400 text-sm font-normal mb-0.5">剩餘</div>
-                <div className="text-green-400 text-xl font-bold">
-                  {variant.stock - (variant._count?.lotteryDraws || 0)}
-                </div>
               </div>
             </div>
-            {/* 淡淡的分隔線 */}
-            {index < variants.length - 1 && (
-              <div className="h-px bg-slate-700/30 my-3 mx-4"></div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

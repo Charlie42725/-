@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 🚫 關掉 Turbopack，避免 build / 部署錯誤
-  turbo: false,
+
 
   // ✅ 嚴格模式開啟，有助於提早發現問題（可選）
   reactStrictMode: true,
