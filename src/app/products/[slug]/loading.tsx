@@ -1,6 +1,6 @@
 export default function ProductLoading() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-[#050505] text-white">
       {/* 麵包屑骨架 */}
       <div className="max-w-screen-xl mx-auto px-4 py-6">
         <div className="flex items-center space-x-2">

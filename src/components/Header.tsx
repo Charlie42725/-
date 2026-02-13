@@ -114,11 +114,11 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Image
-                src="/assets/images/logos/logo.png"
-                alt="萬物皆可抽"
-                width={150}
-                height={50}
-                className="h-12 w-auto"
+                src="/assets/images/logos/logo.jpg"
+                alt="失控抽抽"
+                width={180}
+                height={60}
+                className="h-14 w-auto"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const textLogo = e.currentTarget.nextElementSibling as HTMLElement;
@@ -126,7 +126,7 @@ export default function Header() {
                 }}
               />
               <div className="text-3xl font-heading font-bold text-orange-400" style={{ display: 'none' }}>
-                萬物皆可抽
+                失控抽抽
               </div>
             </Link>
           </div>

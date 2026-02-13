@@ -31,7 +31,11 @@
       "Bash(xargs kill:*)",
       "Bash(npx next -v)",
       "Bash(npx prisma migrate dev:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx next build:*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "Bash(npx fix-react2shell-next:*)"
     ],
     "deny": [],
     "ask": []

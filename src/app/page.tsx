@@ -66,7 +66,7 @@ export default async function Home() {
             <div className="text-center mb-20">
               <h3 className="text-4xl font-heading font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
               <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
-                想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在我們的網站上參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！萬物皆可抽
+                想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在失控抽抽參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！
               </p>
             </div>
 
@@ -84,7 +84,7 @@ export default async function Home() {
 
             {/* 特色區塊 */}
             <div className="text-center">
-              <h3 className="text-4xl font-heading font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">萬物皆可抽特色</h3>
+              <h3 className="text-4xl font-heading font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">失控抽抽特色</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                 <div className="text-center p-8 glass-panel rounded-2xl hover:border-cyan-400 transition-all duration-200 hover:-translate-y-1 shadow-lg">

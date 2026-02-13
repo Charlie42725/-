@@ -477,7 +477,7 @@ export default function LotterySystem({
           </div>
         </div>
 
-        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3">
+        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-[repeat(14,minmax(0,1fr))] xl:grid-cols-[repeat(16,minmax(0,1fr))] gap-2 md:gap-3">
           {Array.from({ length: totalTickets }, (_, i) => i + 1).map(number => {
             const drawn = isNumberDrawn(number);
             const selected = isNumberSelected(number);
@@ -515,12 +515,12 @@ export default function LotterySystem({
         </div>
       </div>
 
-      <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
-        <div className="flex gap-4">
+      <div className="sticky bottom-0 bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/10 -mx-4 px-4 py-4 mt-6 md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:mx-0 md:px-0 md:py-0 md:mt-0">
+        <div className="flex gap-4 max-w-2xl mx-auto md:max-w-none">
           <button
             onClick={handleConfirmDraw}
             disabled={selectedNumbers.length === 0 || isDrawing}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg"
           >
             {isDrawing ? '抽獎中...' : `開始抽獎 (${selectedNumbers.length} 抽 = ${productPrice * selectedNumbers.length} 點)`}
           </button>

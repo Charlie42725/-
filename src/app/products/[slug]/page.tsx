@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { prisma } from '@/lib/db';
-import { calculateProgress, statusText, statusColor } from '@/types';
+import { calculateProgress } from '@/types';
 import DrawQueueManager from '@/components/DrawQueueManager';
 import ProductDetailClient from '@/components/ProductDetailClient';
+import ProductImageGallery from '@/components/ProductImageGallery';
 import { unstable_cache } from 'next/cache';
 
 const getProduct = unstable_cache(
@@ -84,7 +84,6 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  // 手動添加抽獎計數到variants
   const productData = {
     ...product,
     variants: product.variants.map(({ lotteryDraws, ...variant }) => ({
@@ -99,88 +98,146 @@ export default async function ProductDetailPage({
   const remaining = product.totalTickets - product.soldTickets;
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-[#050505] text-white overflow-hidden flex flex-col lg:flex-row">
-      {/* LEFT COLUMN: Immersive Visuals (Sticky/Fixed) */}
-      <div className="relative w-full lg:w-[60%] xl:w-[65%] h-[50vh] lg:h-[calc(100vh-80px)] lg:sticky lg:top-20 overflow-hidden group">
-        <Image
-          src={product.coverImage || `https://picsum.photos/1080/1080?random=${product.id}`}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-1000 group-hover:scale-105"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-[#050505]/80"></div>
+    <div className="min-h-[calc(100vh-80px)] bg-[#050505] text-white">
 
-        {/* Live Badge */}
-        <div className="absolute top-6 left-6 z-20">
-          <div className="live-badge text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase shadow-lg backdrop-blur-md border border-red-500/30 flex items-center">
-            <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
-            Live Now
-          </div>
-        </div>
+      {/* === SECTION 1: Product Info (Image + Details side by side) === */}
+      <div className="max-w-screen-xl mx-auto px-4 py-6 md:py-10">
 
-        {/* Series/Brand Info Overlay */}
-        <div className="absolute bottom-8 left-8 z-20 max-w-2xl hidden lg:block">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className="bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 rounded text-xs font-bold text-orange-400">
-              {product.series.brand.name}
-            </span>
-            <span className="text-slate-300 text-sm border-l border-white/20 pl-3">
-              {product.series.name}
-            </span>
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6">
+          <Link href="/" className="hover:text-slate-300 transition-colors">首頁</Link>
+          <span>/</span>
+          <Link href={`/brands/${product.series.brand.slug}`} className="hover:text-slate-300 transition-colors">
+            {product.series.brand.name}
+          </Link>
+          <span>/</span>
+          <Link href={`/series/${product.series.slug}`} className="hover:text-slate-300 transition-colors">
+            {product.series.name}
+          </Link>
+          <span>/</span>
+          <span className="text-slate-300 truncate max-w-[200px]">{product.name}</span>
+        </nav>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+          {/* LEFT: Image Gallery */}
+          <div>
+            <ProductImageGallery
+              coverImage={product.coverImage}
+              images={product.images}
+              productName={product.name}
+              productId={product.id}
+            />
           </div>
-          <h1 className="text-4xl xl:text-5xl font-heading font-black text-white leading-tight anime-glow-text shadow-black drop-shadow-2xl">
-            {product.name}
-          </h1>
+
+          {/* RIGHT: Product Info */}
+          <div className="flex flex-col">
+
+            {/* Status Badge */}
+            {product.status === 'active' && (
+              <div className="mb-4">
+                <span className="live-badge text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase shadow-lg inline-flex items-center">
+                  <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                  Live Now
+                </span>
+              </div>
+            )}
+
+            {/* Brand & Series */}
+            <div className="flex items-center gap-3 mb-3">
+              <Link
+                href={`/brands/${product.series.brand.slug}`}
+                className="bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1 rounded text-xs font-bold text-orange-400 hover:bg-white/20 transition-colors"
+              >
+                {product.series.brand.name}
+              </Link>
+              <Link
+                href={`/series/${product.series.slug}`}
+                className="text-slate-400 text-sm hover:text-slate-200 transition-colors"
+              >
+                {product.series.name}
+              </Link>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-heading font-black text-white leading-tight mb-4">
+              {product.name}
+            </h1>
+
+            {/* Description */}
+            {product.shortDescription && (
+              <p className="text-slate-400 text-sm leading-relaxed mb-6">
+                {product.shortDescription}
+              </p>
+            )}
+
+            {/* Price & Remaining */}
+            <div className="flex justify-between items-end mb-4 bg-[#111]/80 rounded-xl p-5 border border-white/5">
+              <div>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">每抽價格</p>
+                <div className="text-orange-400 font-black text-3xl">
+                  NT$ {product.price}
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">剩餘數量</p>
+                <div className="text-green-400 font-black text-3xl">
+                  {remaining} <span className="text-base text-slate-600 font-bold">/ {product.totalTickets}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mb-6">
+              <div className="flex justify-between text-xs text-slate-400 mb-1.5 font-bold">
+                <span>已售出 {product.soldTickets} 抽</span>
+                <span className="text-orange-400">{progress}%</span>
+              </div>
+              <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-white/5">
+                <div
+                  className="h-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full shadow-[0_0_15px_rgba(255,165,0,0.5)] relative overflow-hidden transition-all duration-1000"
+                  style={{ width: `${progress}%` }}
+                >
+                  <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Prize List (獎項一覽) */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-heading font-bold flex items-center">
+                  <svg className="w-5 h-5 mr-2 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.003 6.003 0 01-2.27.853 6.003 6.003 0 01-2.27-.853" />
+                  </svg>
+                  獎項一覽
+                </h2>
+                <span className="text-xs text-slate-500">
+                  共 {productData.variants.length} 種獎項
+                </span>
+              </div>
+              <ProductDetailClient
+                initialVariants={productData.variants}
+                productId={product.id}
+              />
+            </div>
+
+            {/* Long Description */}
+            {product.longDescription && (
+              <div className="border-t border-white/5 pt-5">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">商品說明</h3>
+                <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-line">
+                  {product.longDescription}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Action & Data (Scrollable) */}
-      <div className="w-full lg:w-[40%] xl:w-[35%] h-auto lg:h-[calc(100vh-80px)] overflow-y-auto bg-black/80 backdrop-blur-3xl border-l border-white/10 relative flex flex-col shadow-[-20px_0_50px_rgba(0,0,0,0.5)]">
-
-        {/* 1. Mobile Title (Visible only on mobile) */}
-        <div className="lg:hidden p-6 pb-0">
-          <h1 className="text-2xl font-heading font-black text-white leading-tight mb-2">
-            {product.name}
-          </h1>
-        </div>
-
-        {/* 2. Data Header (Sticky on Mobile?) */}
-        <div className="p-6 border-b border-white/5 bg-[#0a0a0a]/95 backdrop-blur z-30 sticky top-0">
-          <div className="flex justify-between items-end mb-4">
-            <div>
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Price Per Ticket</p>
-              <div className="text-orange-400 font-black text-4xl">
-                NT$ {product.price}
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Remaining</p>
-              <div className="text-green-400 font-black text-4xl">
-                {remaining} <span className="text-lg text-slate-500 font-bold">/ {product.totalTickets}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="flex justify-between text-xs text-slate-400 mb-1.5 font-bold">
-              <span>
-                已售出 {product.soldTickets} 抽
-              </span>
-              <span className="text-orange-400">{progress}%</span>
-            </div>
-            <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-white/5">
-              <div
-                className="h-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full shadow-[0_0_15px_rgba(255,165,0,0.5)] relative overflow-hidden transition-all duration-1000"
-                style={{ width: `${progress}%` }}
-              >
-                <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Draw Queue Manager (CTA) */}
+      {/* === SECTION 2: Lottery System (Full Width) === */}
+      <div className="border-t border-white/5 bg-[#0a0a0a]">
+        <div className="max-w-screen-xl mx-auto px-4 py-8 md:py-12">
           <DrawQueueManager
             productId={product.id}
             productPrice={product.price}
@@ -188,38 +245,8 @@ export default async function ProductDetailPage({
             productStatus={product.status}
           />
         </div>
-
-        {/* 3. Prize List (Scrollable Content) */}
-        <div className="flex-1 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-heading font-bold flex items-center">
-              <svg className="w-5 h-5 mr-2 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.003 6.003 0 01-2.27.853 6.003 6.003 0 01-2.27-.853" />
-              </svg>
-              獎項一覽
-            </h2>
-            <span className="text-xs text-slate-500">
-              {product.series._count.products} Items included
-            </span>
-          </div>
-
-          {/* Client Component for List View */}
-          <ProductDetailClient
-            initialVariants={productData.variants}
-            productId={product.id}
-          />
-        </div>
-
-        {/* 4. History / Social Proof */}
-        <div className="p-6 border-t border-white/5 bg-[#050505]">
-          <h3 className="text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">Recent Winners</h3>
-          {/* Placeholder for Ticker */}
-          <div className="text-xs text-slate-600 italic">
-            Waiting for latest draw results...
-          </div>
-        </div>
-
       </div>
+
     </div>
   );
 }

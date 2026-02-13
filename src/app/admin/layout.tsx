@@ -27,7 +27,7 @@ export default function AdminLayout({
             <div className="flex items-center space-x-8">
               <Link href="/admin" className="flex items-center space-x-2">
                 <span className="text-xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                   後台管理系統
+                  失控抽抽 後台管理系統
                 </span>
               </Link>
 
@@ -81,7 +81,7 @@ export default function AdminLayout({
       <footer className="border-t border-slate-800 mt-16">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <p className="text-center text-slate-500 text-sm">
-            良級懸賞 後台管理系統 © 2025
+            失控抽抽 後台管理系統 © 2025
           </p>
         </div>
       </footer>

@@ -90,7 +90,7 @@ export default function LoginPage() {
           {/* 標題 */}
           <div className="text-center mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">會員登入</h1>
-            <p className="text-slate-400">歡迎回到一番賞抽賞平台</p>
+            <p className="text-slate-400">歡迎回到失控抽抽</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -17,8 +17,8 @@ const chakraPetch = Chakra_Petch({
 });
 
 export const metadata: Metadata = {
-  title: "萬物皆可抽 - 一番賞抽賞平台",
-  description: "萬物皆可抽專營一番賞抽賞的線上平台，提供最公平、公正、公開的抽賞體驗。",
+  title: "失控抽抽 - GK.盲盒.一番賞",
+  description: "失控抽抽 — 失控事務所線上抽賞平台，GK、盲盒、一番賞，提供最公平、公正、公開的抽賞體驗。",
 };
 
 import Header from "@/components/Header";
