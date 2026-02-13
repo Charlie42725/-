@@ -123,7 +123,7 @@ export default function OrdersPage() {
             <p className="text-slate-400 mb-6">快去購買點數吧！</p>
             <button
               onClick={() => router.push('/member/points')}
-              className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-8 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
+              className="bg-orange-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-orange-600 transition-all shadow-lg"
             >
               前往購買點數
             </button>

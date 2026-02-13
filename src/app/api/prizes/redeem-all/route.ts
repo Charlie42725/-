@@ -18,21 +18,19 @@ export async function POST(request: NextRequest) {
 
     // 使用 transaction 確保資料一致性
     const result = await prisma.$transaction(async (tx) => {
-      // 1. 獲取所有未兌換的獎品
+      // 1. 獲取所有未兌換的獎品（只取需要的欄位）
       const unredeemedPrizes = await tx.lotteryDraw.findMany({
         where: {
           userId,
           isRedeemed: false,
         },
-        include: {
-          variant: true,
-          product: {
-            include: {
-              series: {
-                include: {
-                  brand: true,
-                },
-              },
+        select: {
+          id: true,
+          variant: {
+            select: {
+              prize: true,
+              name: true,
+              value: true,
             },
           },
         },
@@ -81,29 +79,20 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // 6. 批量創建兌換記錄
-      const redemptions = await Promise.all(
-        unredeemedPrizes.map((prize) =>
-          tx.prizeRedemption.create({
-            data: {
-              userId,
-              lotteryDrawId: prize.id,
-              prizeValue: prize.variant.value,
-              pointsReceived: prize.variant.value,
-            },
-          })
-        )
-      );
+      // 6. 批量創建兌換記錄（使用 createMany 取代逐一 create）
+      await tx.prizeRedemption.createMany({
+        data: unredeemedPrizes.map((prize) => ({
+          userId,
+          lotteryDrawId: prize.id,
+          prizeValue: prize.variant.value,
+          pointsReceived: prize.variant.value,
+        })),
+      });
 
       return {
         count: unredeemedPrizes.length,
         totalPoints,
         newBalance: updatedUser.points,
-        redemptions,
-        prizes: unredeemedPrizes.map((prize) => ({
-          variant: prize.variant,
-          product: prize.product,
-        })),
       };
     });
 

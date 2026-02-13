@@ -298,7 +298,7 @@ export default function LotterySystem({
             </p>
             <div className="flex flex-wrap gap-2 justify-center">
               {selectedNumbers.sort((a, b) => a - b).map(num => (
-                <span key={num} className="bg-gradient-to-br from-orange-500 to-pink-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                <span key={num} className="bg-orange-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
                   {num}
                 </span>
               ))}
@@ -324,7 +324,7 @@ export default function LotterySystem({
             </button>
             <button
               onClick={handleStartDraw}
-              className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg"
+              className="flex-1 bg-orange-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-lg"
             >
               確認抽獎
             </button>
@@ -382,7 +382,7 @@ export default function LotterySystem({
                     <div className={`flip-card ${isRevealed ? 'flipped' : ''}`}>
                       {/* 正面：號碼 */}
                       <div className="flip-card-front rounded-xl overflow-hidden shadow-xl">
-                        <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-orange-500 flex items-center justify-center">
                           <div className="text-white text-6xl font-bold drop-shadow-lg">
                             {result.ticketNumber}
                           </div>
@@ -402,7 +402,7 @@ export default function LotterySystem({
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-slate-800 flex items-center justify-center">
                                 <svg className="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                                 </svg>
@@ -430,7 +430,7 @@ export default function LotterySystem({
             <div className="text-center mt-4 flex-shrink-0">
               <button
                 onClick={handleCloseResults}
-                className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg"
+                className="bg-orange-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all duration-200 shadow-lg"
               >
                 關閉結果
               </button>
@@ -457,7 +457,7 @@ export default function LotterySystem({
 
       {/* 用戶點數顯示 */}
       {isAuthenticated() && (
-        <div className="mb-6 bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-xl p-4 border border-orange-400/30">
+        <div className="mb-6 bg-orange-500/12 rounded-xl p-4 border border-orange-500/20">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-slate-300 text-sm">目前點數餘額</p>
@@ -495,7 +495,7 @@ export default function LotterySystem({
                   ${drawn
                     ? 'bg-slate-700/50 text-slate-500'
                     : selected
-                    ? 'bg-gradient-to-br from-orange-500 to-pink-500 text-white shadow-lg ring-2 ring-orange-400/50'
+                    ? 'bg-orange-500 text-white shadow-lg ring-2 ring-orange-500/30'
                     : 'bg-slate-700 text-white hover:bg-slate-600 hover:-translate-y-0.5'
                   }
                 `}
@@ -522,7 +522,7 @@ export default function LotterySystem({
           <button
             onClick={handleConfirmDraw}
             disabled={selectedNumbers.length === 0 || isDrawing}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+            className="flex-1 bg-orange-500 text-white font-bold py-4 px-6 rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-lg"
           >
             {isDrawing ? '抽獎中...' : `開始抽獎 (${selectedNumbers.length} 抽 = ${productPrice * selectedNumbers.length} 點)`}
           </button>

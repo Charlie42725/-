@@ -13,6 +13,7 @@ if (!globalForCache.__cache_store) {
 
 class SimpleCache {
   private cache: Map<string, CacheEntry<unknown>> = globalForCache.__cache_store;
+  private pending = new Map<string, Promise<unknown>>();
 
   set<T>(key: string, data: T, ttl: number = 30000): void {
     this.cache.set(key, {
@@ -40,14 +41,26 @@ class SimpleCache {
     return entry.data;
   }
 
-  // 取快取或執行查詢並快取結果
+  // 取快取或執行查詢並快取結果（含 stampede 防護）
   async getOrSet<T>(key: string, fn: () => Promise<T>, ttl?: number): Promise<T> {
     const cached = this.get<T>(key);
     if (cached !== null) return cached;
 
-    const data = await fn();
-    this.set(key, data, ttl);
-    return data;
+    // 如果已有相同 key 的請求進行中，直接共用結果
+    const inflight = this.pending.get(key);
+    if (inflight) return inflight as Promise<T>;
+
+    const promise = fn().then(data => {
+      this.set(key, data, ttl);
+      this.pending.delete(key);
+      return data;
+    }).catch(err => {
+      this.pending.delete(key);
+      throw err;
+    });
+
+    this.pending.set(key, promise);
+    return promise;
   }
 
   clear(key?: string): void {

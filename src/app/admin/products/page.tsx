@@ -232,7 +232,7 @@ export default function ProductsPage() {
               setShowForm(true);
             }
           }}
-          className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-pink-600 transition-all"
+          className="bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-all"
         >
           {showForm ? '取消' : '+ 新增商品'}
         </button>
@@ -500,7 +500,7 @@ export default function ProductsPage() {
                           <div className="w-32 bg-slate-600 rounded-full h-2 overflow-hidden">
                             <div
                               className={`h-2 rounded-full transition-all ${
-                                progress === 100 ? 'bg-red-500' : 'bg-gradient-to-r from-orange-500 to-pink-500'
+                                progress === 100 ? 'bg-red-500' : 'bg-orange-500'
                               }`}
                               style={{ width: `${progress}%` }}
                             ></div>

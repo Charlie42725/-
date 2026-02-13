@@ -122,7 +122,7 @@ export default function ProductDetailClient({
                 <div className="flex items-center space-x-2">
                   <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${isSoldOut ? 'bg-slate-600' : 'bg-gradient-to-r from-orange-400 to-pink-500'}`}
+                      className={`h-full rounded-full ${isSoldOut ? 'bg-slate-600' : 'bg-orange-500'}`}
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>

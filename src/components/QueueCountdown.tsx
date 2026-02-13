@@ -61,7 +61,7 @@ export default function QueueCountdown({ expiresAt, onExpired }: QueueCountdownP
           className={`h-full transition-all duration-1000 rounded-full ${
             isWarning
               ? 'bg-gradient-to-r from-red-500 to-red-400'
-              : 'bg-gradient-to-r from-orange-400 to-pink-400'
+              : 'bg-orange-500'
           }`}
           style={{ width: `${progress}%` }}
         />

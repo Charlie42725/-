@@ -95,7 +95,7 @@ export default function Banner() {
               <div className="px-8 md:px-12">
                 <div className="max-w-md">
                   {/* 主標題 - 更大更醒目 */}
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-yellow-400 mb-4 tracking-wider anime-glow-text">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-yellow-400 mb-4 tracking-wider">
                     {banner.title}
                   </h1>
                   <div className="space-y-3">

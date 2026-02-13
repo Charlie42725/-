@@ -49,8 +49,8 @@ const getProduct = unstable_cache(
             value: true,
             stock: true,
             imageUrl: true,
-            lotteryDraws: {
-              select: { id: true }
+            _count: {
+              select: { lotteryDraws: true }
             },
           },
           orderBy: { name: 'asc' },
@@ -84,15 +84,7 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const productData = {
-    ...product,
-    variants: product.variants.map(({ lotteryDraws, ...variant }) => ({
-      ...variant,
-      _count: {
-        lotteryDraws: lotteryDraws.length
-      }
-    }))
-  };
+  const productData = product;
 
   const progress = calculateProgress(product.soldTickets, product.totalTickets);
   const remaining = product.totalTickets - product.soldTickets;
@@ -195,11 +187,9 @@ export default async function ProductDetailPage({
               </div>
               <div className="w-full bg-slate-800 rounded-full h-3 overflow-hidden border border-white/5">
                 <div
-                  className="h-full bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 rounded-full shadow-[0_0_15px_rgba(255,165,0,0.5)] relative overflow-hidden transition-all duration-1000"
+                  className="h-full bg-orange-500 rounded-full transition-all duration-1000"
                   style={{ width: `${progress}%` }}
-                >
-                  <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
-                </div>
+                />
               </div>
             </div>
 

@@ -247,7 +247,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-orange-500 text-white font-bold py-4 px-6 rounded-xl hover:bg-orange-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? '更新中...' : '儲存變更'}
               </button>

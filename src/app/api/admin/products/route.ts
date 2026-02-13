@@ -12,27 +12,13 @@ export async function GET() {
             brand: true,
           },
         },
-        variants: {
-          select: { id: true }
-        },
-        images: {
-          select: { id: true }
+        _count: {
+          select: { variants: true, images: true },
         },
       },
     });
 
-    // 手動計算數量
-    const productsWithCount = products.map(product => ({
-      ...product,
-      _count: {
-        variants: product.variants.length,
-        images: product.images.length
-      },
-      variants: undefined, // 移除完整資料
-      images: undefined,
-    }));
-
-    return NextResponse.json({ products: productsWithCount });
+    return NextResponse.json({ products });
   } catch (error) {
     console.error('獲取商品失敗:', error);
     return NextResponse.json({ error: '獲取商品失敗' }, { status: 500 });

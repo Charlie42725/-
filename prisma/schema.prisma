@@ -255,6 +255,7 @@ model LotteryDraw {
   @@index([variantId])
   @@index([createdAt])
   @@index([isRedeemed])
+  @@index([userId, isRedeemed])  // 複合索引：加速 prizes API 查詢
   @@unique([productId, ticketNumber]) // 每個商品的每個號碼只能被抽一次
 }
 

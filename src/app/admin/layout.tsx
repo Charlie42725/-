@@ -26,7 +26,7 @@ export default function AdminLayout({
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <Link href="/admin" className="flex items-center space-x-2">
-                <span className="text-xl font-bold bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
+                <span className="text-xl font-bold text-orange-400">
                   失控抽抽 後台管理系統
                 </span>
               </Link>
@@ -41,7 +41,7 @@ export default function AdminLayout({
                       className={`
                         px-4 py-2 rounded-lg text-sm font-medium transition-all
                         ${isActive
-                          ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/30'
+                          ? 'bg-orange-500 text-white shadow-lg'
                           : 'text-slate-300 hover:text-white hover:bg-slate-800'
                         }
                       `}

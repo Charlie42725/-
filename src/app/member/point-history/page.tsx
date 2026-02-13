@@ -127,7 +127,7 @@ export default function PointHistoryPage() {
 
         {/* 目前點數餘額 */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-3xl p-8 backdrop-blur-sm border border-orange-400/30 shadow-2xl text-center">
+          <div className="bg-orange-500/12 rounded-3xl p-8 backdrop-blur-sm border border-orange-500/20 shadow-2xl text-center">
             <p className="text-slate-300 text-lg mb-2">目前點數餘額</p>
             <p className="text-5xl font-black text-orange-400">
               {user.points.toLocaleString()}
@@ -205,7 +205,7 @@ export default function PointHistoryPage() {
             {filterType === 'all' && (
               <button
                 onClick={() => router.push('/member/points')}
-                className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-8 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
+                className="bg-orange-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-orange-600 transition-all shadow-lg"
               >
                 前往購買點數
               </button>

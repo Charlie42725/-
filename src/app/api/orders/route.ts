@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
 import { Prisma, OrderStatus } from '@prisma/client';
+import { cache } from '@/lib/cache';
 
 // 獲取用戶訂單列表
 export async function GET(req: NextRequest) {
@@ -35,23 +36,22 @@ export async function GET(req: NextRequest) {
       where.status = status as OrderStatus;
     }
 
-    // 查詢訂單
-    const [orders, total] = await Promise.all([
-      prisma.order.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset
-      }),
-      prisma.order.count({ where })
-    ]);
+    const cacheKey = `orders:${payload.userId}:${status || 'all'}:${limit}:${offset}`;
+    const result = await cache.getOrSet(cacheKey, async () => {
+      // 查詢訂單
+      const [orders, total] = await Promise.all([
+        prisma.order.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          skip: offset
+        }),
+        prisma.order.count({ where })
+      ]);
+      return { orders, total, limit, offset };
+    }, 10000); // 快取 10 秒
 
-    return NextResponse.json({
-      orders,
-      total,
-      limit,
-      offset
-    });
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Get orders error:', error);

@@ -305,7 +305,7 @@ export default function DrawQueueManager({
         <div className="text-center">
           <button
             onClick={handleJoinQueue}
-            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-12 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all transform hover:scale-[1.02] shadow-lg text-lg"
+            className="bg-orange-500 text-white font-bold py-4 px-12 rounded-xl hover:bg-orange-600 transition-all transform hover:scale-[1.02] shadow-lg text-lg"
           >
             開始抽獎
           </button>
@@ -368,7 +368,7 @@ export default function DrawQueueManager({
           </p>
           <button
             onClick={handleJoinQueue}
-            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-8 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
+            className="bg-orange-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-orange-600 transition-all shadow-lg"
           >
             重新排隊
           </button>

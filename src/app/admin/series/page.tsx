@@ -112,7 +112,7 @@ export default function SeriesPage() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-pink-600 transition-all"
+          className="bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-all"
         >
           {showForm ? '取消' : '+ 新增系列'}
         </button>

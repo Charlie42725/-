@@ -153,7 +153,7 @@ export default function Header() {
                 {/* 點數餘額顯示 */}
                 <Link
                   href="/member/points"
-                  className="flex items-center space-x-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-400/30 px-4 py-2 rounded-xl hover:from-orange-500/30 hover:to-pink-500/30 transition-all duration-200 group"
+                  className="flex items-center space-x-2 bg-orange-500/12 border border-orange-500/20 px-4 py-2 rounded-xl hover:bg-orange-500/20 transition-all duration-200 group"
                 >
                   <svg className="w-5 h-5 text-orange-400 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
@@ -170,7 +170,7 @@ export default function Header() {
                     aria-haspopup="true"
                     className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center font-bold">
                       {user.nickname?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <span>{user.nickname}</span>
@@ -300,7 +300,7 @@ export default function Header() {
                     </div>
                     <Link
                       href="/member/points"
-                      className="flex items-center space-x-2 bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-400/30 px-4 py-2 rounded-xl hover:from-orange-500/30 hover:to-pink-500/30 transition-all duration-200"
+                      className="flex items-center space-x-2 bg-orange-500/12 border border-orange-500/20 px-4 py-2 rounded-xl hover:bg-orange-500/20 transition-all duration-200"
                     >
                       <svg className="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />

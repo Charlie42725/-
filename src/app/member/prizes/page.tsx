@@ -195,7 +195,7 @@ export default function PrizesPage() {
       case 'SSR':
         return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30';
       case 'SR':
-        return 'text-purple-400 bg-purple-400/10 border-purple-400/30';
+        return 'text-purple-400 bg-purple-400/10 border-white/10';
       case 'R':
         return 'text-blue-400 bg-blue-400/10 border-blue-400/30';
       case 'N':
@@ -224,11 +224,11 @@ export default function PrizesPage() {
 
         {/* 統計資訊 */}
         <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-3xl p-6 backdrop-blur-sm border border-orange-400/30 shadow-2xl">
+          <div className="bg-orange-500/12 rounded-3xl p-6 backdrop-blur-sm border border-orange-500/20 shadow-2xl">
             <p className="text-slate-300 text-sm mb-2">獎品總數</p>
             <p className="text-4xl font-black text-orange-400">{prizes.length}</p>
           </div>
-          <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-3xl p-6 backdrop-blur-sm border border-purple-400/30 shadow-2xl">
+          <div className="bg-slate-700/50 rounded-3xl p-6 backdrop-blur-sm border border-white/10 shadow-2xl">
             <p className="text-slate-300 text-sm mb-2">總價值</p>
             <p className="text-4xl font-black text-purple-400">{totalValue.toLocaleString()}</p>
             <p className="text-slate-400 text-xs mt-1">可兌換點數</p>
@@ -261,7 +261,7 @@ export default function PrizesPage() {
             <p className="text-slate-500 mb-6">快去抽獎贏取精美獎品吧！</p>
             <button
               onClick={() => router.push('/')}
-              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold rounded-xl transition-all shadow-lg"
+              className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg"
             >
               前往抽獎
             </button>
@@ -340,7 +340,7 @@ export default function PrizesPage() {
                 <button
                   onClick={() => handleRedeem(prize.id)}
                   disabled={redeeming === prize.id}
-                  className="w-full py-3 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {redeeming === prize.id ? '兌換中...' : '兌換成點數'}
                 </button>

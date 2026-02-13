@@ -51,8 +51,8 @@ export default async function Home() {
         <div className="max-w-screen-xl mx-auto px-4 py-16">
           <section className="mb-20">
             <div className="flex items-center mb-10">
-              <span className="w-2 h-10 bg-orange-400 rounded-full mr-4 shadow-[0_0_15px_rgba(251,146,60,0.6)]"></span>
-              <h2 className="text-4xl font-heading font-black text-white anime-glow-text tracking-tight">
+              <span className="w-2 h-10 bg-orange-400 rounded-full mr-4"></span>
+              <h2 className="text-4xl font-heading font-black text-white tracking-tight">
                 最新一番賞 <span className="text-orange-500 text-lg ml-2 font-bold tracking-widest uppercase">New Arrivals</span>
               </h2>
             </div>
@@ -61,10 +61,10 @@ export default async function Home() {
           </section>
 
           {/* 說明區域 */}
-          <section className="mt-24 mb-16 glass-panel rounded-3xl p-12 shadow-2xl">
+          <section className="mt-24 mb-16 bg-[#141414] border border-white/8 rounded-3xl p-12">
             {/* 第一區塊 */}
             <div className="text-center mb-20">
-              <h3 className="text-4xl font-heading font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-pink-400">一番賞怎麼玩？</h3>
+              <h3 className="text-4xl font-heading font-bold mb-8 text-orange-400">一番賞怎麼玩？</h3>
               <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
                 想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在失控抽抽參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！
               </p>
@@ -74,7 +74,7 @@ export default async function Home() {
 
             {/* 第二區塊 */}
             <div className="text-center mb-20">
-              <h3 className="text-4xl font-heading font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">為什麼選擇我們？</h3>
+              <h3 className="text-4xl font-heading font-bold mb-8 text-slate-200">為什麼選擇我們？</h3>
               <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
                 我們致力於提供最公平、最透明的一番賞抽獎體驗。透過區塊鏈 Hash 驗證技術，確保每一次抽獎結果公正無法竄改。無論是收藏家還是初次嘗試的新手，都能在這裡享受安心又刺激的抽賞樂趣！
               </p>
@@ -84,12 +84,12 @@ export default async function Home() {
 
             {/* 特色區塊 */}
             <div className="text-center">
-              <h3 className="text-4xl font-heading font-bold mb-16 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-cyan-400">失控抽抽特色</h3>
+              <h3 className="text-4xl font-heading font-bold mb-16 text-orange-400">失控抽抽特色</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-                <div className="text-center p-8 glass-panel rounded-2xl hover:border-cyan-400 transition-all duration-200 hover:-translate-y-1 shadow-lg">
-                  <div className="w-24 h-24 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="text-center p-8 bg-[#1c1c1c] border border-white/8 rounded-2xl hover:border-orange-500/30 transition-all duration-200 hover:-translate-y-1">
+                  <div className="w-24 h-24 bg-orange-500/15 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <svg className="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                     </svg>
                   </div>
@@ -99,9 +99,9 @@ export default async function Home() {
                   </p>
                 </div>
 
-                <div className="text-center p-8 glass-panel rounded-2xl hover:border-purple-400 transition-all duration-200 hover:-translate-y-1 shadow-lg">
-                  <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="text-center p-8 bg-[#1c1c1c] border border-white/8 rounded-2xl hover:border-orange-500/30 transition-all duration-200 hover:-translate-y-1">
+                  <div className="w-24 h-24 bg-orange-500/15 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <svg className="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a48.667 48.667 0 00-1.242 8.008M4.5 10.5a48.662 48.662 0 017.374-1.83M12 3v1.5M18.364 5.636l-1.06 1.06M21 12h-1.5" />
                     </svg>
                   </div>
@@ -111,9 +111,9 @@ export default async function Home() {
                   </p>
                 </div>
 
-                <div className="text-center p-8 glass-panel rounded-2xl hover:border-yellow-400 transition-all duration-200 hover:-translate-y-1 shadow-lg">
-                  <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="text-center p-8 bg-[#1c1c1c] border border-white/8 rounded-2xl hover:border-orange-500/30 transition-all duration-200 hover:-translate-y-1">
+                  <div className="w-24 h-24 bg-orange-500/15 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <svg className="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016A3.001 3.001 0 0021 9.349m-18 0a2.998 2.998 0 00.75-1.976V5.25A2.25 2.25 0 016 3h12a2.25 2.25 0 012.25 2.25v2.123a3 3 0 01-.75 1.976" />
                     </svg>
                   </div>
@@ -123,9 +123,9 @@ export default async function Home() {
                   </p>
                 </div>
 
-                <div className="text-center p-8 glass-panel rounded-2xl hover:border-green-400 transition-all duration-200 hover:-translate-y-1 shadow-lg">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl">
-                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <div className="text-center p-8 bg-[#1c1c1c] border border-white/8 rounded-2xl hover:border-orange-500/30 transition-all duration-200 hover:-translate-y-1">
+                  <div className="w-24 h-24 bg-orange-500/15 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <svg className="w-12 h-12 text-orange-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                     </svg>
                   </div>

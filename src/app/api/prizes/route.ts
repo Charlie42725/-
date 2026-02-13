@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyUser } from '@/lib/auth';
 import prisma from '@/lib/db';
+import { cache } from '@/lib/cache';
 
 // GET /api/prizes - 獲取當前用戶的所有獎品（未兌換的）
 export async function GET(request: NextRequest) {
@@ -16,59 +17,73 @@ export async function GET(request: NextRequest) {
 
     const userId = authResult.payload.userId;
 
-    // 查詢用戶所有未兌換的獎品
-    const prizes = await prisma.lotteryDraw.findMany({
-      where: {
-        userId,
-        isRedeemed: false,
-      },
-      include: {
-        product: {
-          include: {
-            series: {
-              include: {
-                brand: true,
+    const cacheKey = `prizes:${userId}`;
+    const result = await cache.getOrSet(cacheKey, async () => {
+      // 查詢用戶所有未兌換的獎品
+      const prizes = await prisma.lotteryDraw.findMany({
+        where: {
+          userId,
+          isRedeemed: false,
+        },
+        select: {
+          id: true,
+          ticketNumber: true,
+          isLastPrize: true,
+          triggeredPity: true,
+          createdAt: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              coverImage: true,
+              series: {
+                select: {
+                  id: true,
+                  name: true,
+                  brand: {
+                    select: { id: true, name: true },
+                  },
+                },
               },
             },
           },
+          variant: {
+            select: {
+              id: true,
+              prize: true,
+              name: true,
+              rarity: true,
+              value: true,
+              imageUrl: true,
+              isLastPrize: true,
+            },
+          },
         },
-        variant: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
 
-    // 計算總價值
-    const totalValue = prizes.reduce((sum, prize) => sum + prize.variant.value, 0);
+      // 計算總價值
+      const totalValue = prizes.reduce((sum, prize) => sum + prize.variant.value, 0);
 
-    return NextResponse.json({
-      prizes: prizes.map(prize => ({
-        id: prize.id,
-        ticketNumber: prize.ticketNumber,
-        createdAt: prize.createdAt,
-        product: {
-          id: prize.product.id,
-          name: prize.product.name,
-          slug: prize.product.slug,
-          coverImage: prize.product.coverImage,
-          series: prize.product.series,
-        },
-        variant: {
-          id: prize.variant.id,
-          prize: prize.variant.prize,
-          name: prize.variant.name,
-          rarity: prize.variant.rarity,
-          value: prize.variant.value,
-          imageUrl: prize.variant.imageUrl,
-          isLastPrize: prize.variant.isLastPrize,
-        },
-        isLastPrize: prize.isLastPrize,
-        triggeredPity: prize.triggeredPity,
-      })),
-      totalValue,
-      count: prizes.length,
-    });
+      return {
+        prizes: prizes.map(prize => ({
+          id: prize.id,
+          ticketNumber: prize.ticketNumber,
+          createdAt: prize.createdAt,
+          product: prize.product,
+          variant: prize.variant,
+          isLastPrize: prize.isLastPrize,
+          triggeredPity: prize.triggeredPity,
+        })),
+        totalValue,
+        count: prizes.length,
+      };
+    }, 10000); // 快取 10 秒
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching prizes:', error);
     return NextResponse.json(

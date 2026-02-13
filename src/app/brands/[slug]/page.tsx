@@ -2,58 +2,57 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { prisma } from '@/lib/db';
+import { unstable_cache } from 'next/cache';
 
-// 強制動態渲染，避免構建時連接資料庫
-export const dynamic = 'force-dynamic';
+const getBrandData = unstable_cache(
+  async (slug: string) => {
+    return prisma.brand.findUnique({
+      where: { slug },
+      include: {
+        series: {
+          where: { isActive: true },
+          include: {
+            products: {
+              where: { status: 'active' },
+              take: 8,
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                price: true,
+                totalTickets: true,
+                soldTickets: true,
+                coverImage: true,
+              },
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+  },
+  ['brand-detail'],
+  { revalidate: 60 }
+);
 
 export default async function BrandPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  // Next.js 15: await params before using
   const { slug } = await params;
 
-  const brand = await prisma.brand.findUnique({
-    where: {
-      slug,
-    },
-    include: {
-      series: {
-        where: {
-          isActive: true,
-        },
-        include: {
-          products: {
-            where: {
-              status: 'active',
-            },
-          },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      },
-    },
-  });
+  const brand = await getBrandData(slug);
 
   if (!brand) {
     notFound();
   }
 
-  // 限制每個系列只顯示前8個產品
-  const brandWithLimitedProducts = {
-    ...brand,
-    series: brand.series.map(series => ({
-      ...series,
-      products: series.products.slice(0, 8) // 只保留前8個產品用於顯示
-    }))
-  };
-
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* 品牌 Banner */}
-      <div className="relative h-64 bg-gradient-to-r from-orange-500 to-pink-500">
+      <div className="relative h-64 bg-orange-500">
         {brand.logoUrl && (
           <div className="absolute inset-0">
             <Image
@@ -83,13 +82,13 @@ export default async function BrandPage({
 
       {/* 系列列表 */}
       <div className="max-w-screen-xl mx-auto px-4 py-12">
-        {brandWithLimitedProducts.series.length === 0 ? (
+        {brand.series.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-slate-400">此品牌目前沒有系列</p>
           </div>
         ) : (
           <div className="space-y-16">
-            {brandWithLimitedProducts.series.map((series) => (
+            {brand.series.map((series) => (
               <div key={series.id}>
                 {/* 系列標題 */}
                 <div className="flex items-center justify-between mb-6">

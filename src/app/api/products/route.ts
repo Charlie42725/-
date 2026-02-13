@@ -68,15 +68,17 @@ export async function GET(request: Request) {
           skip: offset,
           include: {
             series: {
-              include: {
-                brand: true,
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                brand: {
+                  select: { id: true, name: true, slug: true },
+                },
               },
             },
-            variants: {
-              where: { isActive: true },
-            },
-            images: {
-              orderBy: { sortOrder: 'asc' },
+            _count: {
+              select: { variants: true },
             },
           },
         }),

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
 import { Prisma, PointTransactionType } from '@prisma/client';
+import { cache } from '@/lib/cache';
 
 // 獲取用戶點數異動記錄
 export async function GET(req: NextRequest) {
@@ -35,23 +36,22 @@ export async function GET(req: NextRequest) {
       where.type = type as PointTransactionType;
     }
 
-    // 查詢點數異動記錄
-    const [transactions, total] = await Promise.all([
-      prisma.pointTransaction.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset
-      }),
-      prisma.pointTransaction.count({ where })
-    ]);
+    const cacheKey = `transactions:${payload.userId}:${type || 'all'}:${limit}:${offset}`;
+    const result = await cache.getOrSet(cacheKey, async () => {
+      // 查詢點數異動記錄
+      const [transactions, total] = await Promise.all([
+        prisma.pointTransaction.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          skip: offset
+        }),
+        prisma.pointTransaction.count({ where })
+      ]);
+      return { transactions, total, limit, offset };
+    }, 10000); // 快取 10 秒
 
-    return NextResponse.json({
-      transactions,
-      total,
-      limit,
-      offset
-    });
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Get transactions error:', error);

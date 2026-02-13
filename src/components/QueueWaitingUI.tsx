@@ -22,7 +22,7 @@ export default function QueueWaitingUI({
         <div className="relative w-32 h-32 mx-auto mb-8">
           <div className="absolute inset-0 rounded-full bg-orange-500/20 queue-pulse-ring" />
           <div className="absolute inset-3 rounded-full bg-orange-500/30 queue-pulse-ring" style={{ animationDelay: '0.5s' }} />
-          <div className="absolute inset-6 rounded-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
+          <div className="absolute inset-6 rounded-full bg-orange-500 flex items-center justify-center">
             <span className="text-white text-4xl font-black">{position}</span>
           </div>
         </div>

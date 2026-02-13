@@ -2,9 +2,8 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#050505] mt-32 lg:mt-40 py-16 border-t border-white/5 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/20 to-transparent pointer-events-none"></div>
-      <div className="max-w-screen-xl mx-auto px-4 relative z-10">
+    <footer className="w-full bg-[#050505] mt-32 lg:mt-40 py-16 border-t border-white/5">
+      <div className="max-w-screen-xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* 公司資訊 */}
           <div>

@@ -170,7 +170,7 @@ export default function PointsPage() {
 
         {/* 目前點數餘額 */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-orange-500/20 to-pink-500/20 rounded-3xl p-8 backdrop-blur-sm border border-orange-400/30 shadow-2xl text-center">
+          <div className="bg-orange-500/12 rounded-3xl p-8 backdrop-blur-sm border border-orange-500/20 shadow-2xl text-center">
             <p className="text-slate-300 text-lg mb-2">目前點數餘額</p>
             <p className="text-5xl font-black text-orange-400">{user.points.toLocaleString()}</p>
             <p className="text-slate-400 text-sm mt-2">點數可用於抽獎及兌換優惠</p>
@@ -191,7 +191,7 @@ export default function PointsPage() {
               {/* 熱門標籤 */}
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                  <div className="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
                     最熱門
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export default function PointsPage() {
                 disabled={purchasing && selectedPackage?.id === pkg.id}
                 className={`w-full font-bold py-4 px-6 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
                   pkg.popular
-                    ? 'bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white'
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
                     : 'bg-slate-700 hover:bg-slate-600 text-white'
                 }`}
               >

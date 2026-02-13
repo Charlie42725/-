@@ -154,7 +154,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
                     </div>
                     <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                       <div
-                        className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-slate-600' : 'bg-gradient-to-r from-orange-400 to-pink-500'}`}
+                        className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-slate-600' : 'bg-orange-500'}`}
                         style={{ width: `${progress}%` }}
                       ></div>
                     </div>

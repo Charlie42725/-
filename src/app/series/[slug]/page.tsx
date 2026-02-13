@@ -54,7 +54,7 @@ export default async function SeriesPage({
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-transparent"></div>
           </div>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900 to-blue-900 opacity-50"></div>
+          <div className="absolute inset-0 bg-slate-900 opacity-50"></div>
         )}
 
         <div className="relative max-w-screen-xl mx-auto px-4 w-full z-10 pt-20">
@@ -72,7 +72,7 @@ export default async function SeriesPage({
             {series.brand.name}
           </div>
 
-          <h1 className="text-5xl lg:text-7xl font-black text-white mb-6 anime-glow-text leading-tight max-w-4xl">
+          <h1 className="text-5xl lg:text-7xl font-black text-white mb-6 leading-tight max-w-4xl">
             {series.name}
           </h1>
 
@@ -168,7 +168,7 @@ export default async function SeriesPage({
                           </div>
                           <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-slate-600' : 'bg-gradient-to-r from-orange-400 to-pink-500'}`}
+                              className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-slate-600' : 'bg-orange-500'}`}
                               style={{ width: `${progress}%` }}
                             ></div>
                           </div>
