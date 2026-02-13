@@ -93,8 +93,8 @@ export default function LotterySystem({
 
   useEffect(() => {
     setMounted(true);
-    loadDrawnTickets();
-    loadUserPoints();
+    // 並行載入已抽號碼和用戶點數
+    Promise.all([loadDrawnTickets(), loadUserPoints()]);
   }, [loadDrawnTickets]);
 
   const loadLatestVariants = async () => {
@@ -203,17 +203,19 @@ export default function LotterySystem({
 
       setResults(newResults);
 
+      // 快速翻牌動畫：每張 150ms
       for (let i = 0; i < newResults.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 150));
         setCurrentRevealIndex(i);
       }
 
       setDrawnTickets(prev => [...prev, ...newResults]);
       setSelectedNumbers([]);
 
-      await loadLatestVariants();
+      // 非同步更新獎項（不阻塞 UI）
+      loadLatestVariants();
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 500));
       setIsDrawing(false);
 
     } catch (error) {

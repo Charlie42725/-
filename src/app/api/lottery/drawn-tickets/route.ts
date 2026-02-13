@@ -21,12 +21,17 @@ export async function GET(req: NextRequest) {
         where: {
           productId: parseInt(productId)
         },
-        include: {
-          variant: true,
-          user: {
+        select: {
+          ticketNumber: true,
+          variant: {
             select: {
               id: true,
-              nickname: true
+              prize: true,
+              name: true,
+              imageUrl: true,
+              stock: true,
+              value: true,
+              rarity: true,
             }
           }
         },
@@ -34,12 +39,10 @@ export async function GET(req: NextRequest) {
           ticketNumber: 'asc'
         }
       }),
-      10000 // 10 秒快取（抽獎資料需要較即時）
+      10000
     );
 
-    return NextResponse.json({
-      drawnTickets
-    });
+    return NextResponse.json({ drawnTickets });
 
   } catch (error) {
     console.error('Get drawn tickets error:', error);
