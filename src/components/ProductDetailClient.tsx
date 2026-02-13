@@ -74,7 +74,7 @@ export default function ProductDetailClient({
 
   return (
     <div className="bg-transparent rounded-none p-0 border-0 shadow-none">
-      <div className="space-y-3">
+      <div className="space-y-2">
         {variants.map((variant) => {
           const remaining = variant.stock - (variant._count?.lotteryDraws || 0);
           const isSoldOut = remaining <= 0;
@@ -84,13 +84,13 @@ export default function ProductDetailClient({
             <div
               key={variant.id}
               className={`
-                group relative flex items-center p-3 rounded-lg overflow-hidden 
-                ${isSoldOut ? 'bg-[#1a1a1a] opacity-60' : 'bg-[#151515] hover:bg-[#1f1f1f]'} 
-                border border-white/5 hover:border-white/10 transition-all duration-200
+                group relative flex items-center p-2 rounded-lg overflow-hidden 
+                ${isSoldOut ? 'bg-[#1a1a1a]/40 opacity-50' : 'bg-[#151515]/60 hover:bg-[#1f1f1f]/80'} 
+                border border-white/5 hover:border-white/10 transition-all duration-200 backdrop-blur-sm
               `}
             >
               {/* Left: Image & Grade */}
-              <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0 mr-4 bg-black/50">
+              <div className="relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0 mr-3 bg-black/40">
                 {variant.imageUrl ? (
                   <Image
                     src={variant.imageUrl}
@@ -103,10 +103,7 @@ export default function ProductDetailClient({
                 {/* Grade Badge */}
                 <div className="absolute top-0 left-0">
                   <span className={`
-                      text-[10px] font-black px-1.5 py-0.5 rounded-br-md shadow-sm
-                      ${variant.prize.toLowerCase().includes('last')
-                      ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white'
-                      : 'bg-black/80 text-white backdrop-blur-sm'}
+                      text-[9px] font-black px-1 py-0.5 rounded-br bg-black/70 text-white backdrop-blur-sm
                     `}>
                     {variant.prize}
                   </span>
@@ -114,43 +111,37 @@ export default function ProductDetailClient({
               </div>
 
               {/* Center: Info */}
-              <div className="flex-1 min-w-0 mr-4">
+              <div className="flex-1 min-w-0 mr-3">
                 <div className="flex items-center mb-1">
-                  <h3 className={`text-sm font-bold truncate ${isSoldOut ? 'text-slate-500' : 'text-slate-200 group-hover:text-white'}`}>
+                  <h3 className={`text-xs font-bold truncate ${isSoldOut ? 'text-slate-500' : 'text-slate-200 group-hover:text-white'}`}>
                     {variant.name}
                   </h3>
-                  {variant.rarity && (
-                    <span className={`ml-2 text-[9px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ${getRarityClass(variant.rarity).replace('bg-', 'bg-gradient-to-r from-').replace('to-', 'to-')} text-white`}>
-                      {variant.rarity}
-                    </span>
-                  )}
                 </div>
 
                 {/* Stock Bar */}
-                <div className="flex items-center space-x-3">
-                  <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div className="flex items-center space-x-2">
+                  <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${isSoldOut ? 'bg-slate-600' : 'bg-gradient-to-r from-orange-400 to-pink-500'}`}
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>
-                  <div className="text-xs font-mono font-bold text-slate-400">
+                  <div className="text-[10px] font-mono font-bold text-slate-400">
                     <span className={isSoldOut ? 'text-red-500' : 'text-green-400'}>{remaining}</span>
                     <span className="opacity-50">/{variant.stock}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Right: Status Icon / Value */}
+              {/* Right: Status/Rarity */}
               <div className="text-right flex-shrink-0">
-                {isSoldOut ? (
-                  <span className="text-xs font-bold text-red-500 border border-red-500/30 px-2 py-1 rounded bg-red-500/10 uppercase tracking-wider">
-                    SOLD
+                {variant.rarity && !isSoldOut && (
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ${getRarityClass(variant.rarity).replace('bg-', 'bg-gradient-to-r from-').replace('to-', 'to-')} text-white`}>
+                    {variant.rarity}
                   </span>
-                ) : (
-                  <div className="text-slate-500 text-xs">
-                    ${Number(variant?.value ?? 0).toLocaleString()}
-                  </div>
+                )}
+                {isSoldOut && (
+                  <span className="text-[10px] font-bold text-red-500 uppercase">SOLD</span>
                 )}
               </div>
             </div>

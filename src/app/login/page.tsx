@@ -105,7 +105,7 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-orange-400 transition-colors"
-                placeholder="your@email.com (測試: tttt@gmail.com)"
+                placeholder="your@email.com"
                 required
               />
               {errors.email && <p className="text-red-400 text-sm mt-2">{errors.email}</p>}

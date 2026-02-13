@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-
+  // ✅ 將 Prisma 排除在 Webpack 打包之外
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
 
   // ✅ 嚴格模式開啟，有助於提早發現問題（可選）
   reactStrictMode: true,

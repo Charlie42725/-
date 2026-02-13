@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && node scripts/fix-prisma-imports.js"
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",

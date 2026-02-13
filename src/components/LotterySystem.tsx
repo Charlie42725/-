@@ -102,11 +102,9 @@ export default function LotterySystem({
       const response = await fetch(`/api/lottery/variants?productId=${productId}`);
       if (response.ok) {
         const data = await response.json();
-        // 觸發父組件的更新回調
         if (onVariantsUpdate) {
           onVariantsUpdate(data.variants);
         }
-        // 觸發自定義事件讓頁面知道需要重新載入
         window.dispatchEvent(new CustomEvent('variantsUpdated', {
           detail: { productId, variants: data.variants }
         }));
@@ -123,7 +121,6 @@ export default function LotterySystem({
       if (prev.includes(number)) {
         return prev.filter(n => n !== number);
       } else {
-        // 限制最多選擇 10 個號碼
         if (prev.length >= 10) {
           alert('一次最多只能選擇 10 個號碼');
           return prev;
@@ -151,10 +148,10 @@ export default function LotterySystem({
     document.body.style.overflow = 'hidden';
   };
 
-  const handleCancelConfirm = () => {
+  const handleCancelConfirm = useCallback(() => {
     setShowConfirmDialog(false);
     document.body.style.overflow = '';
-  };
+  }, []);
 
   const handleStartDraw = async () => {
     if (selectedNumbers.length === 0 || isDrawing) return;
@@ -181,7 +178,6 @@ export default function LotterySystem({
       const data = await response.json();
 
       if (!response.ok) {
-        // 如果需要排隊，通知父組件啟動排隊流程
         if (data.requireQueue && onRequireQueue) {
           setIsDrawing(false);
           setResults([]);
@@ -193,16 +189,13 @@ export default function LotterySystem({
         throw new Error(data.error || '抽獎失敗');
       }
 
-      // 更新用戶點數
       setUserPoints(data.newBalance);
 
-      // 觸發 storage 事件，通知 Header 組件更新點數
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'points_updated',
         newValue: data.newBalance.toString()
       }));
 
-      // 準備結果數據
       const newResults: LotteryResult[] = data.results.map((r: { ticketNumber: number; variant: Variant }) => ({
         ticketNumber: r.ticketNumber,
         variant: r.variant
@@ -210,17 +203,14 @@ export default function LotterySystem({
 
       setResults(newResults);
 
-      // 快速連續翻牌動畫（每 300ms 翻一張）
       for (let i = 0; i < newResults.length; i++) {
         await new Promise(resolve => setTimeout(resolve, 300));
         setCurrentRevealIndex(i);
       }
 
-      // 更新已抽號碼列表
       setDrawnTickets(prev => [...prev, ...newResults]);
       setSelectedNumbers([]);
 
-      // 重新載入最新的獎項資料
       await loadLatestVariants();
 
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -237,16 +227,36 @@ export default function LotterySystem({
     }
   };
 
-  const handleCloseResults = () => {
+  const handleCloseResults = useCallback(() => {
     setResults([]);
     document.body.style.overflow = '';
     if (onDrawComplete) {
       onDrawComplete();
     } else {
-      // 沒有 callback 時，重新整理頁面以確保所有資料同步
       window.location.reload();
     }
-  };
+  }, [onDrawComplete]);
+
+  // ESC key handler for dialogs
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showConfirmDialog) {
+          handleCancelConfirm();
+        } else if (results.length > 0 && !isDrawing) {
+          handleCloseResults();
+        }
+      }
+    };
+
+    if (showConfirmDialog || results.length > 0) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showConfirmDialog, results.length, isDrawing, handleCancelConfirm, handleCloseResults]);
 
   const isNumberDrawn = (number: number) => {
     return drawnTickets.some(t => t.ticketNumber === number);
@@ -266,10 +276,15 @@ export default function LotterySystem({
     const totalCost = productPrice * selectedNumbers.length;
 
     return createPortal(
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-label="確認抽獎"
+      >
         <div className="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-slate-700 shadow-2xl">
           <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-white mb-2">確認開始抽獎？</h3>
+            <h3 className="text-2xl font-heading font-bold text-white mb-2">確認開始抽獎？</h3>
             <p className="text-slate-400">
               你已選擇 <span className="text-orange-400 font-bold text-xl">{selectedNumbers.length}</span> 個號碼
             </p>
@@ -301,13 +316,13 @@ export default function LotterySystem({
           <div className="flex gap-3">
             <button
               onClick={handleCancelConfirm}
-              className="flex-1 bg-slate-700 text-white font-medium py-3 px-6 rounded-xl hover:bg-slate-600 transition-colors"
+              className="flex-1 bg-slate-700 text-white font-medium py-3 px-6 rounded-xl hover:bg-slate-600 transition-colors duration-200"
             >
               取消
             </button>
             <button
               onClick={handleStartDraw}
-              className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
+              className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-3 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg"
             >
               確認抽獎
             </button>
@@ -318,13 +333,16 @@ export default function LotterySystem({
     );
   };
 
-  // 抽獎結果 Portal（與之前相同，省略重複代碼）
+  // 抽獎結果 Portal
   const ResultsPortal = () => {
     if (!mounted || results.length === 0) return null;
 
     return createPortal(
       <div
         className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-label="抽獎結果"
         onClick={(e) => {
           if (e.target === e.currentTarget && !isDrawing) {
             handleCloseResults();
@@ -333,7 +351,7 @@ export default function LotterySystem({
       >
         <div className="max-w-6xl w-full h-full max-h-[90vh] flex flex-col">
           <div className="text-center mb-4 flex-shrink-0">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            <h2 className="text-2xl md:text-3xl font-heading font-bold text-white mb-2">
               {isDrawing ? '抽獎中...' : '抽獎結果'}
             </h2>
             <p className="text-slate-400">
@@ -383,7 +401,9 @@ export default function LotterySystem({
                               />
                             ) : (
                               <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-                                <span className="text-slate-500 text-4xl">🎁</span>
+                                <svg className="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                                </svg>
                               </div>
                             )}
                           </div>
@@ -408,7 +428,7 @@ export default function LotterySystem({
             <div className="text-center mt-4 flex-shrink-0">
               <button
                 onClick={handleCloseResults}
-                className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:from-orange-600 hover:to-pink-600 transition-all shadow-lg"
+                className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg"
               >
                 關閉結果
               </button>
@@ -451,7 +471,7 @@ export default function LotterySystem({
 
       <div className='bg-transparent rounded-none p-0 border-0 shadow-none mb-12'>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">抽獎號碼池</h2>
+          <h2 className="text-xl font-heading font-bold text-white">抽獎號碼池</h2>
           <div className="text-sm text-slate-400">
             已選擇 <span className="text-orange-400 font-bold">{selectedNumbers.length}</span> / 10 個號碼
           </div>
@@ -469,12 +489,12 @@ export default function LotterySystem({
                 onClick={() => handleNumberClick(number)}
                 disabled={drawn || isDrawing}
                 className={`
-                  aspect-square rounded-lg font-bold text-sm transition-all relative overflow-hidden
+                  aspect-square rounded-lg font-bold text-sm transition-all duration-200 relative overflow-hidden
                   ${drawn
-                    ? 'bg-slate-700/50 text-slate-500 cursor-not-allowed'
+                    ? 'bg-slate-700/50 text-slate-500'
                     : selected
-                    ? 'bg-gradient-to-br from-orange-500 to-pink-500 text-white scale-110 shadow-lg'
-                    : 'bg-slate-700 text-white hover:bg-slate-600 hover:scale-105'
+                    ? 'bg-gradient-to-br from-orange-500 to-pink-500 text-white shadow-lg ring-2 ring-orange-400/50'
+                    : 'bg-slate-700 text-white hover:bg-slate-600 hover:-translate-y-0.5'
                   }
                 `}
                 title={drawn && variant ? `${variant.prize} - ${variant.name}` : ''}
@@ -500,7 +520,7 @@ export default function LotterySystem({
           <button
             onClick={handleConfirmDraw}
             disabled={selectedNumbers.length === 0 || isDrawing}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all transform hover:scale-[1.02] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-4 px-6 rounded-xl hover:from-orange-600 hover:to-pink-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isDrawing ? '抽獎中...' : `開始抽獎 (${selectedNumbers.length} 抽 = ${productPrice * selectedNumbers.length} 點)`}
           </button>
@@ -508,7 +528,7 @@ export default function LotterySystem({
           {selectedNumbers.length > 0 && !isDrawing && (
             <button
               onClick={() => setSelectedNumbers([])}
-              className="bg-slate-700 text-white font-medium py-4 px-6 rounded-xl hover:bg-slate-600 transition-colors"
+              className="bg-slate-700 text-white font-medium py-4 px-6 rounded-xl hover:bg-slate-600 transition-colors duration-200"
             >
               清除選擇
             </button>

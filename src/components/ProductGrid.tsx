@@ -39,12 +39,25 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-slate-800/90 rounded-2xl overflow-hidden h-[450px] animate-pulse border border-slate-700">
-            <div className="h-64 bg-slate-700/50"></div>
-            <div className="p-5 space-y-4">
-              <div className="h-6 bg-slate-700/50 rounded w-3/4"></div>
-              <div className="h-4 bg-slate-700/50 rounded w-1/2"></div>
-              <div className="h-3 bg-slate-700/50 rounded-full mt-4"></div>
+          <div key={i} className="bg-[#0f0f0f] rounded-2xl overflow-hidden animate-pulse border border-white/5 h-full flex flex-col">
+            {/* Image skeleton */}
+            <div className="relative aspect-[4/3] bg-slate-800/50"></div>
+            {/* Content skeleton */}
+            <div className="p-5 flex-1 flex flex-col">
+              <div className="h-5 bg-slate-800/50 rounded w-3/4 mb-2"></div>
+              <div className="h-5 bg-slate-800/50 rounded w-1/2 mb-6"></div>
+              <div className="mt-auto space-y-4">
+                {/* Progress bar skeleton */}
+                <div>
+                  <div className="flex justify-between mb-1.5">
+                    <div className="h-3 bg-slate-800/50 rounded w-16"></div>
+                    <div className="h-3 bg-slate-800/50 rounded w-8"></div>
+                  </div>
+                  <div className="h-2 bg-slate-800/50 rounded-full"></div>
+                </div>
+                {/* CTA skeleton */}
+                <div className="h-11 bg-slate-800/30 rounded-xl"></div>
+              </div>
             </div>
           </div>
         ))}
@@ -55,7 +68,12 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
   if (error) {
     return (
       <div className="text-center py-20 bg-slate-800/30 rounded-3xl border border-red-500/20">
-        <p className="text-red-400 text-lg">⚠️ {error}</p>
+        <p className="text-red-400 text-lg flex items-center justify-center">
+          <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+          {error}
+        </p>
       </div>
     );
   }
@@ -119,7 +137,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
 
               {/* Card Content */}
               <div className="p-5 flex-1 flex flex-col">
-                <h3 className="text-white font-bold text-lg mb-3 line-clamp-2 group-hover:text-orange-400 transition-colors min-h-[3.5rem]">
+                <h3 className="text-white font-heading font-bold text-lg mb-3 line-clamp-2 group-hover:text-orange-400 transition-colors duration-200 min-h-[3.5rem]">
                   {product.name}
                 </h3>
 
