@@ -51,9 +51,9 @@ export default async function Home() {
         <div className="max-w-screen-xl mx-auto px-3 md:px-4 py-8 md:py-16">
           <section className="mb-12 md:mb-20">
             <div className="flex items-center mb-6 md:mb-10">
-              <span className="w-1.5 md:w-2 h-8 md:h-10 bg-orange-400 rounded-full mr-3 md:mr-4"></span>
+              <span className="w-1.5 md:w-2 h-8 md:h-10 bg-amber-400 rounded-full mr-3 md:mr-4"></span>
               <h2 className="text-2xl md:text-4xl font-heading font-black text-white tracking-tight">
-                最新一番賞 <span className="text-orange-500 text-xs md:text-lg ml-1 md:ml-2 font-bold tracking-widest uppercase">New Arrivals</span>
+                最新一番賞 <span className="text-amber-500 text-xs md:text-lg ml-1 md:ml-2 font-bold tracking-widest uppercase">New Arrivals</span>
               </h2>
             </div>
 

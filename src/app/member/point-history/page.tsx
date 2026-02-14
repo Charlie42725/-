@@ -102,7 +102,7 @@ export default function PointHistoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
         <div className="text-xl">載入中...</div>
       </div>
     );
@@ -110,26 +110,26 @@ export default function PointHistoryPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
         <div className="text-xl">無法載入用戶資料</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-12 px-4">
+    <div className="min-h-screen bg-[#09090b] text-white py-12 px-4">
       <div className="max-w-5xl mx-auto">
         {/* 頁面標題 */}
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">點數異動紀錄</h1>
-          <p className="text-slate-400">查看您的點數使用明細</p>
+          <p className="text-zinc-500">查看您的點數使用明細</p>
         </div>
 
         {/* 目前點數餘額 */}
         <div className="mb-8">
-          <div className="bg-orange-500/12 rounded-3xl p-8 backdrop-blur-sm border border-orange-500/20 shadow-2xl text-center">
-            <p className="text-slate-300 text-lg mb-2">目前點數餘額</p>
-            <p className="text-5xl font-black text-orange-400">
+          <div className="bg-amber-500/10 rounded-3xl p-8 backdrop-blur-sm border border-amber-500/18 shadow-2xl text-center">
+            <p className="text-zinc-300 text-lg mb-2">目前點數餘額</p>
+            <p className="text-5xl font-black text-amber-400">
               {user.points.toLocaleString()}
             </p>
           </div>
@@ -137,14 +137,14 @@ export default function PointHistoryPage() {
 
         {/* 篩選器 */}
         <div className="mb-6">
-          <div className="bg-slate-800/50 rounded-2xl p-4 backdrop-blur-sm border border-slate-700/50">
+          <div className="bg-zinc-800/50 rounded-2xl p-4 backdrop-blur-sm border border-zinc-700/50">
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setFilterType('all')}
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'all'
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                 }`}
               >
                 全部
@@ -154,7 +154,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'purchase'
                     ? 'bg-green-500 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                 }`}
               >
                 購買
@@ -164,7 +164,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'bonus'
                     ? 'bg-purple-500 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                 }`}
               >
                 贈送
@@ -173,8 +173,8 @@ export default function PointHistoryPage() {
                 onClick={() => setFilterType('lottery')}
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'lottery'
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                 }`}
               >
                 抽獎
@@ -184,7 +184,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'refund'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
                 }`}
               >
                 退款
@@ -194,18 +194,18 @@ export default function PointHistoryPage() {
         </div>
 
         {filteredTransactions.length === 0 ? (
-          <div className="bg-slate-800/30 rounded-3xl p-12 text-center backdrop-blur-sm border border-slate-700/50">
+          <div className="bg-zinc-800/30 rounded-3xl p-12 text-center backdrop-blur-sm border border-zinc-700/50">
             <div className="text-6xl mb-4">📊</div>
             <h3 className="text-2xl font-bold text-white mb-2">
               {filterType === 'all' ? '尚無點數異動紀錄' : '無符合條件的紀錄'}
             </h3>
-            <p className="text-slate-400 mb-6">
+            <p className="text-zinc-500 mb-6">
               {filterType === 'all' ? '快去購買點數或參加抽獎吧！' : '嘗試切換其他篩選條件'}
             </p>
             {filterType === 'all' && (
               <button
                 onClick={() => router.push('/member/points')}
-                className="bg-orange-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-orange-600 transition-all shadow-lg"
+                className="bg-amber-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-amber-600 transition-all shadow-lg"
               >
                 前往購買點數
               </button>
@@ -216,7 +216,7 @@ export default function PointHistoryPage() {
             {filteredTransactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="bg-slate-800/50 rounded-2xl p-6 backdrop-blur-sm border border-slate-700/50 hover:border-slate-600/50 transition-all"
+                className="bg-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm border border-zinc-700/50 hover:border-zinc-600/50 transition-all"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 flex-1">
@@ -227,16 +227,16 @@ export default function PointHistoryPage() {
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           transaction.type === 'purchase' ? 'bg-green-500/20 text-green-400' :
                           transaction.type === 'bonus' ? 'bg-purple-500/20 text-purple-400' :
-                          transaction.type === 'lottery' ? 'bg-orange-500/20 text-orange-400' :
+                          transaction.type === 'lottery' ? 'bg-amber-500/20 text-amber-400' :
                           transaction.type === 'refund' ? 'bg-blue-500/20 text-blue-400' :
-                          'bg-slate-500/20 text-slate-400'
+                          'bg-zinc-500/20 text-zinc-500'
                         }`}>
                           {typeText[transaction.type]}
                         </span>
                       </div>
-                      <p className="text-slate-400 text-sm mb-1">{formatDate(transaction.createdAt)}</p>
+                      <p className="text-zinc-500 text-sm mb-1">{formatDate(transaction.createdAt)}</p>
                       {transaction.relatedId && (
-                        <p className="text-slate-500 text-xs">關聯編號: {transaction.relatedId}</p>
+                        <p className="text-zinc-500 text-xs">關聯編號: {transaction.relatedId}</p>
                       )}
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export default function PointHistoryPage() {
                     }`}>
                       {transaction.amount > 0 ? '+' : ''}{transaction.amount.toLocaleString()}
                     </div>
-                    <div className="text-slate-400 text-sm">
+                    <div className="text-zinc-500 text-sm">
                       餘額 {transaction.balance.toLocaleString()}
                     </div>
                   </div>
@@ -260,7 +260,7 @@ export default function PointHistoryPage() {
         <div className="mt-8 text-center">
           <button
             onClick={() => router.back()}
-            className="px-8 py-3 bg-slate-700 text-white font-medium rounded-xl hover:bg-slate-600 transition-colors"
+            className="px-8 py-3 bg-zinc-700 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
           >
             返回
           </button>

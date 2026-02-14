@@ -48,8 +48,8 @@ export default function QueueStatusBadge({ productId }: QueueStatusBadgeProps) {
   if (queueCount <= 0) return null;
 
   return (
-    <span className="inline-flex items-center gap-1.5 bg-orange-500/20 border border-orange-400/30 text-orange-400 px-3 py-1.5 rounded-full text-sm font-bold">
-      <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+    <span className="inline-flex items-center gap-1.5 bg-amber-500/18 border border-amber-400/30 text-amber-400 px-3 py-1.5 rounded-full text-sm font-bold">
+      <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
       {queueCount} 人排隊中
     </span>
   );

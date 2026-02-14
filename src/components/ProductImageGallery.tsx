@@ -52,7 +52,7 @@ export default function ProductImageGallery({
   return (
     <div className="flex flex-col gap-3">
       {/* 主圖 */}
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-900 border border-white/10">
+      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-900 border border-white/10">
         <Image
           src={currentImage.url}
           alt={`${productName} - ${currentImage.label}`}
@@ -73,7 +73,7 @@ export default function ProductImageGallery({
               className={`
                 relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all duration-200
                 ${idx === activeIndex
-                  ? 'border-orange-400 ring-2 ring-orange-400/30'
+                  ? 'border-amber-400 ring-2 ring-amber-400/30'
                   : 'border-white/10 hover:border-white/30 opacity-60 hover:opacity-100'}
               `}
             >

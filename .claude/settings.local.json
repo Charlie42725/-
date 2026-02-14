@@ -35,7 +35,9 @@
       "Bash(npx next build:*)",
       "Bash(ls:*)",
       "WebSearch",
-      "Bash(npx fix-react2shell-next:*)"
+      "Bash(npx fix-react2shell-next:*)",
+      "Bash(python scripts/search.py:*)",
+      "Bash(PYTHONIOENCODING=utf-8 python:*)"
     ],
     "deny": [],
     "ask": []

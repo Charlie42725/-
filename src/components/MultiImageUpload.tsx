@@ -86,7 +86,7 @@ export default function MultiImageUpload({
 
   return (
     <div>
-      <label className="block text-slate-300 mb-2">
+      <label className="block text-zinc-300 mb-2">
         {label} ({images.length}/{maxImages})
       </label>
 
@@ -94,7 +94,7 @@ export default function MultiImageUpload({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         {images.map((url, index) => (
           <div key={index} className="relative group">
-            <div className="relative h-32 bg-slate-700 rounded-lg overflow-hidden">
+            <div className="relative h-32 bg-zinc-700 rounded-lg overflow-hidden">
               <Image
                 src={url}
                 alt={`圖片 ${index + 1}`}
@@ -111,7 +111,7 @@ export default function MultiImageUpload({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="absolute bottom-1 left-1 bg-slate-900/80 text-white text-xs px-2 py-1 rounded">
+            <div className="absolute bottom-1 left-1 bg-zinc-900/80 text-white text-xs px-2 py-1 rounded">
               #{index + 1}
             </div>
           </div>
@@ -121,9 +121,9 @@ export default function MultiImageUpload({
         {images.length < maxImages && (
           <label
             className={`
-              h-32 border-2 border-dashed border-slate-600 rounded-lg
+              h-32 border-2 border-dashed border-zinc-600 rounded-lg
               flex flex-col items-center justify-center
-              hover:border-slate-500 transition-colors cursor-pointer
+              hover:border-zinc-500 transition-colors cursor-pointer
               ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
@@ -136,13 +136,13 @@ export default function MultiImageUpload({
               className="hidden"
             />
             {uploading ? (
-              <div className="text-slate-400 text-sm">上傳中...</div>
+              <div className="text-zinc-400 text-sm">上傳中...</div>
             ) : (
               <>
-                <svg className="w-8 h-8 text-slate-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-zinc-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                <span className="text-slate-400 text-sm">選擇圖片</span>
+                <span className="text-zinc-400 text-sm">選擇圖片</span>
               </>
             )}
           </label>
@@ -155,13 +155,13 @@ export default function MultiImageUpload({
           type="button"
           onClick={handleUrlAdd}
           disabled={images.length >= maxImages}
-          className="text-sm text-blue-400 hover:text-blue-300 disabled:text-slate-600 disabled:cursor-not-allowed"
+          className="text-sm text-blue-400 hover:text-blue-300 disabled:text-zinc-600 disabled:cursor-not-allowed"
         >
           + 添加圖片網址
         </button>
       </div>
 
-      <p className="text-xs text-slate-500 mt-2">
+      <p className="text-xs text-zinc-500 mt-2">
         支援 JPG, PNG, GIF (最大 5MB)，拖動圖片可調整順序
       </p>
     </div>

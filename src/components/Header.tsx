@@ -107,7 +107,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-slate-900/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700/50">
+    <header className="w-full bg-[#09090b]/95 backdrop-blur-md sticky top-0 z-50 border-b border-white/[0.06]">
       <div className="max-w-screen-xl mx-auto px-4">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -125,7 +125,7 @@ export default function Header() {
                   if (textLogo) textLogo.style.display = 'block';
                 }}
               />
-              <div className="text-3xl font-heading font-bold text-orange-400" style={{ display: 'none' }}>
+              <div className="text-3xl font-heading font-bold text-amber-400" style={{ display: 'none' }}>
                 失控抽抽
               </div>
             </Link>
@@ -138,14 +138,14 @@ export default function Header() {
                 {/* 點數餘額顯示 */}
                 <Link
                   href="/member/points"
-                  className="flex items-center space-x-2 bg-orange-500/12 border border-orange-500/20 px-4 py-2 rounded-xl hover:bg-orange-500/20 transition-all duration-200 group"
+                  className="flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl hover:bg-amber-500/18 transition-all duration-200 group"
                 >
-                  <svg className="w-5 h-5 text-orange-400 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform duration-200" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-orange-400 font-bold text-lg">{userPoints.toLocaleString()}</span>
-                  <span className="text-slate-400 text-sm">點</span>
+                  <span className="text-amber-400 font-bold text-lg">{userPoints.toLocaleString()}</span>
+                  <span className="text-zinc-500 text-sm">點</span>
                 </Link>
 
                 {/* 使用者下拉選單（含所有導航） */}
@@ -154,9 +154,9 @@ export default function Header() {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     aria-expanded={isUserMenuOpen}
                     aria-haspopup="true"
-                    className="flex items-center space-x-2 text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800"
+                    className="flex items-center space-x-2 text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]"
                   >
-                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center font-bold">
                       {user.nickname?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <span>{user.nickname}</span>
@@ -166,13 +166,13 @@ export default function Header() {
                   </button>
 
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden z-50 dropdown-in" role="menu">
+                    <div className="absolute right-0 mt-2 w-56 bg-[#111113] rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden z-50 dropdown-in" role="menu">
                       <div className="py-2">
                         {/* 導航連結 */}
                         <Link
                           href="/"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,7 +183,7 @@ export default function Header() {
                         <Link
                           href="/member/prizes"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,12 +191,12 @@ export default function Header() {
                           </svg>
                           獎品包包
                         </Link>
-                        <hr className="border-slate-700 my-2" />
+                        <hr className="border-white/[0.08] my-2" />
                         {/* 會員功能 */}
                         <Link
                           href="/member/profile"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,7 +207,7 @@ export default function Header() {
                         <Link
                           href="/member/points"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@ export default function Header() {
                         <Link
                           href="/member/orders"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +229,7 @@ export default function Header() {
                         <Link
                           href="/member/point-history"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,10 +237,10 @@ export default function Header() {
                           </svg>
                           點數異動紀錄
                         </Link>
-                        <hr className="border-slate-700 my-2" />
+                        <hr className="border-white/[0.08] my-2" />
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-3 text-red-400 hover:bg-slate-700 transition-colors duration-200"
+                          className="flex items-center w-full px-4 py-3 text-red-400 hover:bg-white/[0.06] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,13 +255,13 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800">
+                <Link href="/" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]">
                   全部一番賞
                 </Link>
-                <Link href="/login" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800">
+                <Link href="/login" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]">
                   登入
                 </Link>
-                <Link href="/register" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800">
+                <Link href="/register" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]">
                   註冊
                 </Link>
               </>
@@ -285,51 +285,51 @@ export default function Header() {
 
         {/* 手機版選單 */}
         {isMenuOpen && (
-          <div className="md:hidden bg-gray-800 py-4 slide-down">
+          <div className="md:hidden bg-[#111113] py-4 slide-down">
             <div className="flex flex-col space-y-2">
-              <Link href="/" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+              <Link href="/" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                 全部一番賞
               </Link>
               {loggedIn && (
-                <Link href="/member/prizes" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                <Link href="/member/prizes" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                   獎品包包
                 </Link>
               )}
-              <hr className="border-gray-600 my-2" />
+              <hr className="border-white/[0.06] my-2" />
               {loggedIn && user ? (
                 <>
                   <div className="px-4 py-2">
-                    <div className="text-orange-400 font-medium mb-2">
+                    <div className="text-amber-400 font-medium mb-2">
                       歡迎，{user.nickname}
                     </div>
                     <Link
                       href="/member/points"
-                      className="flex items-center space-x-2 bg-orange-500/12 border border-orange-500/20 px-4 py-2 rounded-xl hover:bg-orange-500/20 transition-all duration-200"
+                      className="flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl hover:bg-amber-500/18 transition-all duration-200"
                     >
-                      <svg className="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                       </svg>
-                      <span className="text-orange-400 font-bold text-lg">{userPoints.toLocaleString()}</span>
-                      <span className="text-slate-400 text-sm">點</span>
+                      <span className="text-amber-400 font-bold text-lg">{userPoints.toLocaleString()}</span>
+                      <span className="text-zinc-500 text-sm">點</span>
                     </Link>
                   </div>
-                  <Link href="/member/profile" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/profile" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     基本設定
                   </Link>
-                  <Link href="/member/prizes" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/prizes" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     獎品包包
                   </Link>
-                  <Link href="/member/points" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/points" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     點數購買
                   </Link>
-                  <Link href="/member/orders" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/orders" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     訂單紀錄
                   </Link>
-                  <Link href="/member/point-history" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/point-history" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     點數異動紀錄
                   </Link>
-                  <hr className="border-gray-600 my-2" />
+                  <hr className="border-white/[0.06] my-2" />
                   <button
                     onClick={handleLogout}
                     className="text-left text-red-400 hover:text-red-300 transition-colors duration-200 px-4 py-2 w-full"
@@ -339,10 +339,10 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/login" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     登入
                   </Link>
-                  <Link href="/register" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/register" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     註冊
                   </Link>
                 </>

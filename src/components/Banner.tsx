@@ -55,7 +55,7 @@ export default function Banner() {
 
   return (
     <section
-      className="w-full relative h-[350px] md:h-[450px] overflow-hidden bg-gray-900"
+      className="w-full relative h-[350px] md:h-[450px] overflow-hidden bg-[#09090b]"
       role="region"
       aria-label="主要輪播橫幅"
       aria-roledescription="carousel"
@@ -95,16 +95,14 @@ export default function Banner() {
               <div className="px-8 md:px-12">
                 <div className="max-w-md">
                   {/* 主標題 - 更大更醒目 */}
-                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-yellow-400 mb-4 tracking-wider">
+                  <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-black text-amber-400 mb-4 tracking-wider drop-shadow-[0_2px_12px_rgba(245,158,11,0.25)]">
                     {banner.title}
                   </h1>
                   <div className="space-y-3">
-                    {/* 副標題 - 粉色突出 */}
-                    <p className="text-lg md:text-xl lg:text-2xl text-pink-400 font-bold bg-black/40 px-3 py-1 rounded inline-block">
+                    <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded inline-block">
                       {banner.subtitle}
                     </p>
-                    {/* 描述文字 - 黃色強調 */}
-                    <p className="text-base md:text-lg lg:text-xl text-yellow-300 font-bold bg-black/40 px-3 py-1 rounded inline-block">
+                    <p className="text-base md:text-lg lg:text-xl text-amber-300 font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded inline-block">
                       {banner.description}
                     </p>
                   </div>

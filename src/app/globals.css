@@ -6,19 +6,22 @@ html {
 }
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #09090b;
+  --foreground: #fafafa;
   --font-heading: var(--font-russo-one), 'Arial Black', sans-serif;
   --font-body: var(--font-chakra-petch), 'Arial', sans-serif;
 
-  /* Design System - Clean Palette */
-  --accent: #F97316;
-  --accent-hover: #EA580C;
-  --accent-subtle: rgba(249, 115, 22, 0.12);
-  --surface-0: #0a0a0a;
-  --surface-1: #141414;
-  --surface-2: #1c1c1c;
-  --border: rgba(255, 255, 255, 0.08);
+  /* Design System - Premium Amber/Gold Palette */
+  --accent: #F59E0B;
+  --accent-hover: #D97706;
+  --accent-light: #FBBF24;
+  --accent-subtle: rgba(245, 158, 11, 0.10);
+  --surface-0: #09090b;
+  --surface-1: #111113;
+  --surface-2: #1a1a1e;
+  --surface-3: #242428;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
 }
 
 @theme inline {

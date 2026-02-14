@@ -42,10 +42,10 @@ export default function QueueCountdown({ expiresAt, onExpired }: QueueCountdownP
     <div className={`rounded-xl p-4 border ${
       isWarning
         ? 'bg-red-500/20 border-red-400/50'
-        : 'bg-orange-500/20 border-orange-400/30'
+        : 'bg-amber-500/18 border-amber-400/30'
     }`}>
       <div className="flex items-center justify-between mb-3">
-        <span className={`text-sm font-medium ${isWarning ? 'text-red-400' : 'text-orange-400'}`}>
+        <span className={`text-sm font-medium ${isWarning ? 'text-red-400' : 'text-amber-400'}`}>
           剩餘操作時間
         </span>
         <span className={`font-mono text-2xl font-bold ${
@@ -56,12 +56,12 @@ export default function QueueCountdown({ expiresAt, onExpired }: QueueCountdownP
       </div>
 
       {/* 進度條 */}
-      <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+      <div className="w-full bg-zinc-700 rounded-full h-2 overflow-hidden">
         <div
           className={`h-full transition-all duration-1000 rounded-full ${
             isWarning
               ? 'bg-gradient-to-r from-red-500 to-red-400'
-              : 'bg-orange-500'
+              : 'bg-amber-500'
           }`}
           style={{ width: `${progress}%` }}
         />

@@ -27,7 +27,7 @@ interface Product {
 
 const rarityOptions = [
   { value: 'SSR', label: 'SSR（超稀有）', color: 'text-yellow-400' },
-  { value: 'SR', label: 'SR（稀有）', color: 'text-purple-400' },
+  { value: 'SR', label: 'SR（稀有）', color: 'text-indigo-400' },
   { value: 'R', label: 'R（普通）', color: 'text-blue-400' },
   { value: 'N', label: 'N（一般）', color: 'text-gray-400' },
 ];
@@ -185,7 +185,7 @@ export default function ProductVariantsPage() {
       <div className="mb-8">
         <button
           onClick={() => router.push('/admin/products')}
-          className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
+          className="text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
         >
           <span>←</span> 返回商品列表
         </button>
@@ -194,7 +194,7 @@ export default function ProductVariantsPage() {
             <h1 className="text-3xl font-bold text-white mb-2">
               {product.name} - 獎項管理
             </h1>
-            <p className="text-slate-400">管理此商品的所有獎項（A賞、B賞等）</p>
+            <p className="text-gray-400">管理此商品的所有獎項（A賞、B賞等）</p>
           </div>
           <button
             onClick={() => {
@@ -204,7 +204,7 @@ export default function ProductVariantsPage() {
                 setShowForm(true);
               }
             }}
-            className="bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-all"
+            className="bg-indigo-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 transition-all"
           >
             {showForm ? '取消' : '+ 新增獎項'}
           </button>
@@ -213,14 +213,14 @@ export default function ProductVariantsPage() {
 
       {/* 新增/編輯表單 */}
       {showForm && (
-        <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-8">
+        <div className="bg-gray-900/60 rounded-lg p-6 border border-white/[0.06] mb-8">
           <h2 className="text-xl font-bold text-white mb-4">
             {editingId ? '編輯獎項' : '新增獎項'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-300 mb-2">賞等 *</label>
+                <label className="block text-gray-300 mb-2">賞等 *</label>
                 <input
                   type="text"
                   required
@@ -228,13 +228,13 @@ export default function ProductVariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, prize: e.target.value })
                   }
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
                   placeholder="例如：A賞、B賞、Last賞"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-2">獎項名稱 *</label>
+                <label className="block text-gray-300 mb-2">獎項名稱 *</label>
                 <input
                   type="text"
                   required
@@ -242,7 +242,7 @@ export default function ProductVariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
                   placeholder="例如：特等獎公仔、限定海報"
                 />
               </div>
@@ -250,13 +250,13 @@ export default function ProductVariantsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-300 mb-2">稀有度</label>
+                <label className="block text-gray-300 mb-2">稀有度</label>
                 <select
                   value={formData.rarity}
                   onChange={(e) =>
                     setFormData({ ...formData, rarity: e.target.value })
                   }
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">未設定</option>
                   {rarityOptions.map((option) => (
@@ -268,7 +268,7 @@ export default function ProductVariantsPage() {
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-2">庫存數量 *</label>
+                <label className="block text-gray-300 mb-2">庫存數量 *</label>
                 <input
                   type="number"
                   required
@@ -277,7 +277,7 @@ export default function ProductVariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, stock: e.target.value })
                   }
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500"
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
                   placeholder="例如：5"
                 />
               </div>
@@ -297,9 +297,9 @@ export default function ProductVariantsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, isActive: e.target.checked })
                 }
-                className="w-4 h-4 text-orange-500 bg-slate-700 border-slate-600 rounded focus:ring-orange-500"
+                className="w-4 h-4 text-indigo-500 bg-gray-800 border-gray-700 rounded focus:ring-indigo-500"
               />
-              <label htmlFor="isActive" className="ml-2 text-slate-300">
+              <label htmlFor="isActive" className="ml-2 text-gray-300">
                 啟用此獎項
               </label>
             </div>
@@ -307,14 +307,14 @@ export default function ProductVariantsPage() {
             <div className="flex space-x-4">
               <button
                 type="submit"
-                className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                className="bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
               >
                 儲存
               </button>
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-500 transition-colors"
+                className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 取消
               </button>
@@ -324,50 +324,50 @@ export default function ProductVariantsPage() {
       )}
 
       {/* 獎項列表 */}
-      <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
+      <div className="bg-gray-900/60 rounded-lg border border-white/[0.06] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-700">
+            <thead className="bg-gray-900">
               <tr>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   ID
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   賞等
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   獎項名稱
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   稀有度
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   抽取狀況
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   狀態
                 </th>
-                <th className="text-left px-6 py-4 text-slate-300 font-medium">
+                <th className="text-left px-6 py-4 text-gray-300 font-medium">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
+            <tbody className="divide-y divide-white/[0.06]">
               {variants.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-6 py-12 text-center text-slate-400"
+                    className="px-6 py-12 text-center text-gray-400"
                   >
                     此商品尚未新增任何獎項
                   </td>
                 </tr>
               ) : (
                 variants.map((variant) => (
-                  <tr key={variant.id} className="hover:bg-slate-700/50">
-                    <td className="px-6 py-4 text-slate-300">{variant.id}</td>
+                  <tr key={variant.id} className="hover:bg-white/[0.04]">
+                    <td className="px-6 py-4 text-gray-300">{variant.id}</td>
                     <td className="px-6 py-4">
-                      <span className="text-orange-400 font-bold">
+                      <span className="text-indigo-400 font-bold">
                         {variant.prize}
                       </span>
                     </td>
@@ -398,10 +398,10 @@ export default function ProductVariantsPage() {
                           <span className="text-red-400 font-bold">已抽: {variant._count?.lotteryDraws || 0}</span>
                           <span className="text-green-400 font-bold">剩餘: {variant.stock - (variant._count?.lotteryDraws || 0)}</span>
                         </div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-gray-400">
                           總數: {variant.stock}
                         </div>
-                        <div className="w-32 bg-slate-600 rounded-full h-2 overflow-hidden">
+                        <div className="w-32 bg-gray-700 rounded-full h-2 overflow-hidden">
                           <div
                             className="bg-gradient-to-r from-red-500 to-orange-500 h-2 rounded-full transition-all"
                             style={{
@@ -426,7 +426,7 @@ export default function ProductVariantsPage() {
                       <div className="flex items-center space-x-3">
                         <button
                           onClick={() => handleEdit(variant)}
-                          className="text-orange-400 hover:text-orange-300 text-sm transition-colors"
+                          className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
                         >
                           編輯
                         </button>
@@ -449,18 +449,18 @@ export default function ProductVariantsPage() {
       {/* 獎項統計 */}
       {variants.length > 0 && (
         <div className="mt-6 grid grid-cols-3 gap-4">
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-            <div className="text-slate-400 text-sm mb-1">總獎項數</div>
+          <div className="bg-gray-900/60 rounded-lg p-4 border border-white/[0.06]">
+            <div className="text-gray-400 text-sm mb-1">總獎項數</div>
             <div className="text-2xl font-bold text-white">{variants.length}</div>
           </div>
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-            <div className="text-slate-400 text-sm mb-1">總庫存</div>
-            <div className="text-2xl font-bold text-orange-400">
+          <div className="bg-gray-900/60 rounded-lg p-4 border border-white/[0.06]">
+            <div className="text-gray-400 text-sm mb-1">總庫存</div>
+            <div className="text-2xl font-bold text-indigo-400">
               {variants.reduce((sum, v) => sum + v.stock, 0)}
             </div>
           </div>
-          <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-            <div className="text-slate-400 text-sm mb-1">啟用中</div>
+          <div className="bg-gray-900/60 rounded-lg p-4 border border-white/[0.06]">
+            <div className="text-gray-400 text-sm mb-1">啟用中</div>
             <div className="text-2xl font-bold text-green-400">
               {variants.filter((v) => v.isActive).length}
             </div>

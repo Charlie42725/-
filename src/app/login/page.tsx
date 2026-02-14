@@ -84,19 +84,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
-        <div className="bg-slate-800/50 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-slate-700/50 shadow-2xl">
+        <div className="bg-zinc-800/50 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-zinc-700/50 shadow-2xl">
           {/* 標題 */}
           <div className="text-center mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">會員登入</h1>
-            <p className="text-slate-400">歡迎回到失控抽抽</p>
+            <p className="text-zinc-500">歡迎回到失控抽抽</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-zinc-300 mb-2">
                 Email 地址 <span className="text-red-400">*</span>
               </label>
               <input
@@ -104,7 +104,7 @@ export default function LoginPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-orange-400 transition-colors"
+                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                 placeholder="your@email.com"
                 required
               />
@@ -113,7 +113,7 @@ export default function LoginPage() {
 
             {/* 密碼 */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-zinc-300 mb-2">
                 密碼 <span className="text-red-400">*</span>
               </label>
               <input
@@ -121,7 +121,7 @@ export default function LoginPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-orange-400 transition-colors"
+                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                 placeholder="請輸入密碼"
                 required
               />
@@ -130,23 +130,23 @@ export default function LoginPage() {
 
             {/* 忘記密碼連結 */}
             <div className="text-right">
-              <Link href="/forgot-password" className="text-orange-400 hover:underline text-sm font-medium">
+              <Link href="/forgot-password" className="text-amber-400 hover:underline text-sm font-medium">
                 忘記密碼？
               </Link>
             </div>
 
             {/* 服務條款 */}
-            <div className="flex items-start gap-3 p-4 bg-slate-900/50 rounded-2xl">
+            <div className="flex items-start gap-3 p-4 bg-zinc-900/50 rounded-2xl">
               <input
                 type="checkbox"
                 name="agreedToTerms"
                 checked={formData.agreedToTerms}
                 onChange={handleChange}
-                className="mt-1 w-5 h-5 rounded border-slate-700 text-orange-500 focus:ring-orange-400 bg-slate-800"
+                className="mt-1 w-5 h-5 rounded border-zinc-700 text-amber-500 focus:ring-amber-400 bg-zinc-800"
                 required
               />
-              <label className="text-sm text-slate-300">
-                我已閱讀並同意 <Link href="/terms" className="text-orange-400 hover:underline">服務條款</Link> 和 <Link href="/privacy" className="text-orange-400 hover:underline">隱私政策</Link>
+              <label className="text-sm text-zinc-300">
+                我已閱讀並同意 <Link href="/terms" className="text-amber-400 hover:underline">服務條款</Link> 和 <Link href="/privacy" className="text-amber-400 hover:underline">隱私政策</Link>
                 <span className="text-red-400 ml-1">*</span>
               </label>
             </div>
@@ -165,14 +165,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-orange-500 text-white font-bold py-4 px-6 rounded-xl hover:bg-orange-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-amber-500 text-white font-bold py-4 px-6 rounded-xl hover:bg-amber-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '登入中...' : '登入'}
             </button>
 
             {/* 註冊連結 */}
-            <div className="text-center text-slate-400 text-sm">
-              還未註冊？ <Link href="/register" className="text-orange-400 hover:underline font-medium">立即註冊</Link>
+            <div className="text-center text-zinc-500 text-sm">
+              還未註冊？ <Link href="/register" className="text-amber-400 hover:underline font-medium">立即註冊</Link>
             </div>
           </form>
         </div>

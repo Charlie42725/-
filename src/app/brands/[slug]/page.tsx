@@ -50,9 +50,9 @@ export default async function BrandPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-[#09090b] text-white">
       {/* 品牌 Banner */}
-      <div className="relative h-64 bg-orange-500">
+      <div className="relative h-64 bg-amber-500">
         {brand.logoUrl && (
           <div className="absolute inset-0">
             <Image
@@ -84,7 +84,7 @@ export default async function BrandPage({
       <div className="max-w-screen-xl mx-auto px-4 py-12">
         {brand.series.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-slate-400">此品牌目前沒有系列</p>
+            <p className="text-zinc-500">此品牌目前沒有系列</p>
           </div>
         ) : (
           <div className="space-y-16">
@@ -95,12 +95,12 @@ export default async function BrandPage({
                   <div>
                     <h2 className="text-3xl font-bold mb-2">{series.name}</h2>
                     {series.description && (
-                      <p className="text-slate-400">{series.description}</p>
+                      <p className="text-zinc-500">{series.description}</p>
                     )}
                   </div>
                   <Link
                     href={`/series/${series.slug}`}
-                    className="text-orange-400 hover:text-orange-300 transition-colors flex items-center space-x-1"
+                    className="text-amber-400 hover:text-amber-300 transition-colors flex items-center space-x-1"
                   >
                     <span>查看全部 ({series.products.length})</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +111,7 @@ export default async function BrandPage({
 
                 {/* 商品預覽 */}
                 {series.products.length === 0 ? (
-                  <p className="text-slate-500 text-center py-8">此系列目前沒有商品</p>
+                  <p className="text-zinc-500 text-center py-8">此系列目前沒有商品</p>
                 ) : (
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-4">
                     {series.products.map((product) => {
@@ -122,7 +122,7 @@ export default async function BrandPage({
                           href={`/products/${product.slug}`}
                           className="block group"
                         >
-                          <div className="bg-[#1a1a1a] rounded-lg overflow-hidden border border-white/[0.06] hover:border-orange-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
+                          <div className="bg-[#1a1a1a] rounded-lg overflow-hidden border border-white/[0.06] hover:border-amber-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
                             <div className="relative aspect-[4/3]">
                               <Image
                                 src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}
@@ -132,13 +132,13 @@ export default async function BrandPage({
                               />
                             </div>
                             <div className="p-2 md:p-3 flex-1">
-                              <h3 className="text-white font-bold text-[11px] md:text-sm line-clamp-2 group-hover:text-orange-400 transition-colors">
+                              <h3 className="text-white font-bold text-[11px] md:text-sm line-clamp-2 group-hover:text-amber-400 transition-colors">
                                 {product.name}
                               </h3>
                             </div>
                             <div className="flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-[#111] border-t border-white/[0.04]">
-                              <span className="text-orange-400 font-black text-[11px] md:text-sm">NT${product.price}</span>
-                              <span className="text-slate-400 font-bold text-[11px] md:text-sm">
+                              <span className="text-amber-400 font-black text-[11px] md:text-sm">NT${product.price}</span>
+                              <span className="text-zinc-500 font-bold text-[11px] md:text-sm">
                                 {remaining}/{product.totalTickets}
                               </span>
                             </div>

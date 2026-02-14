@@ -69,7 +69,7 @@ export default function ProductDetailClient({
     if (r === 'SSR') return 'rarity-bg-ssr';
     if (r === 'SR') return 'rarity-bg-sr';
     if (r === 'R') return 'rarity-bg-r';
-    return 'bg-slate-800';
+    return 'bg-zinc-800';
   };
 
   return (
@@ -113,20 +113,20 @@ export default function ProductDetailClient({
               {/* Center: Info */}
               <div className="flex-1 min-w-0 mr-3">
                 <div className="flex items-center mb-1">
-                  <h3 className={`text-xs font-bold truncate ${isSoldOut ? 'text-slate-500' : 'text-slate-200 group-hover:text-white'}`}>
+                  <h3 className={`text-xs font-bold truncate ${isSoldOut ? 'text-zinc-500' : 'text-zinc-200 group-hover:text-white'}`}>
                     {variant.name}
                   </h3>
                 </div>
 
                 {/* Stock Bar */}
                 <div className="flex items-center space-x-2">
-                  <div className="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${isSoldOut ? 'bg-slate-600' : 'bg-orange-500'}`}
+                      className={`h-full rounded-full ${isSoldOut ? 'bg-zinc-600' : 'bg-amber-500'}`}
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>
-                  <div className="text-[10px] font-mono font-bold text-slate-400">
+                  <div className="text-[10px] font-mono font-bold text-zinc-400">
                     <span className={isSoldOut ? 'text-red-500' : 'text-green-400'}>{remaining}</span>
                     <span className="opacity-50">/{variant.stock}</span>
                   </div>

@@ -108,11 +108,11 @@ export default function SeriesPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">系列管理</h1>
-          <p className="text-slate-400">管理品牌下的商品系列</p>
+          <p className="text-gray-400">管理品牌下的商品系列</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-all"
+          className="bg-indigo-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 transition-all"
         >
           {showForm ? '取消' : '+ 新增系列'}
         </button>
@@ -120,16 +120,16 @@ export default function SeriesPage() {
 
       {/* 新增表單 */}
       {showForm && (
-        <div className="bg-slate-800 rounded-lg p-6 border border-slate-700 mb-8">
+        <div className="bg-gray-900/60 rounded-lg p-6 border border-white/[0.06] mb-8">
           <h2 className="text-xl font-bold text-white mb-4">新增系列</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-slate-300 mb-2">選擇品牌 *</label>
+              <label className="block text-gray-300 mb-2">選擇品牌 *</label>
               <select
                 required
                 value={formData.brandId}
                 onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
-                className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="">請選擇品牌</option>
                 {brands.map((brand) => (
@@ -142,36 +142,36 @@ export default function SeriesPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-slate-300 mb-2">系列名稱 *</label>
+                <label className="block text-gray-300 mb-2">系列名稱 *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="例如：原神 Ver.3.0 須彌篇"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 mb-2">Slug（網址用）*</label>
+                <label className="block text-gray-300 mb-2">Slug（網址用）*</label>
                 <input
                   type="text"
                   required
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="例如：genshin-ver-3"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">系列描述</label>
+              <label className="block text-gray-300 mb-2">系列描述</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 rows={3}
                 placeholder="系列簡介..."
               />
@@ -185,14 +185,14 @@ export default function SeriesPage() {
             <div className="flex space-x-4">
               <button
                 type="submit"
-                className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                className="bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
               >
                 儲存
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="bg-slate-600 text-white px-6 py-2 rounded-lg hover:bg-slate-500 transition-colors"
+                className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 取消
               </button>
@@ -202,34 +202,34 @@ export default function SeriesPage() {
       )}
 
       {/* 系列列表 */}
-      <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
+      <div className="bg-gray-900/60 rounded-lg border border-white/[0.06] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-slate-700">
+          <thead className="bg-gray-900">
             <tr>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">ID</th>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">系列名稱</th>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">品牌</th>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">Slug</th>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">商品數</th>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">狀態</th>
-              <th className="text-left px-6 py-4 text-slate-300 font-medium">操作</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">ID</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">系列名稱</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">品牌</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">Slug</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">商品數</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">狀態</th>
+              <th className="text-left px-6 py-4 text-gray-300 font-medium">操作</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-700">
+          <tbody className="divide-y divide-white/[0.06]">
             {series.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
+                <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
                   目前沒有系列，點擊「新增系列」開始建立
                 </td>
               </tr>
             ) : (
               series.map((s) => (
-                <tr key={s.id} className="hover:bg-slate-700/50 transition-colors">
-                  <td className="px-6 py-4 text-slate-300">{s.id}</td>
+                <tr key={s.id} className="hover:bg-white/[0.04] transition-colors">
+                  <td className="px-6 py-4 text-gray-300">{s.id}</td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-white">{s.name}</div>
                     {s.description && (
-                      <div className="text-sm text-slate-400 mt-1 max-w-xs truncate">
+                      <div className="text-sm text-gray-400 mt-1 max-w-xs truncate">
                         {s.description}
                       </div>
                     )}
@@ -240,11 +240,11 @@ export default function SeriesPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <code className="text-sm text-purple-400 bg-slate-900 px-2 py-1 rounded">
+                    <code className="text-sm text-indigo-400 bg-black/40 px-2 py-1 rounded">
                       {s.slug}
                     </code>
                   </td>
-                  <td className="px-6 py-4 text-slate-300">
+                  <td className="px-6 py-4 text-gray-300">
                     {s._count.products} 個商品
                   </td>
                   <td className="px-6 py-4">

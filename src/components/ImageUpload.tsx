@@ -68,14 +68,14 @@ export default function ImageUpload({
 
   return (
     <div>
-      <label className="block text-slate-300 mb-2">
+      <label className="block text-zinc-300 mb-2">
         {label} {required && <span className="text-red-400">*</span>}
       </label>
 
       {/* 預覽區域 */}
       {preview ? (
         <div className="mb-3">
-          <div className="relative w-full h-48 bg-slate-700 rounded-lg overflow-hidden">
+          <div className="relative w-full h-48 bg-zinc-700 rounded-lg overflow-hidden">
             <Image
               src={preview}
               alt="預覽"
@@ -92,9 +92,9 @@ export default function ImageUpload({
           </button>
         </div>
       ) : (
-        <div className="mb-3 border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-slate-500 transition-colors">
+        <div className="mb-3 border-2 border-dashed border-zinc-600 rounded-lg p-8 text-center hover:border-zinc-500 transition-colors">
           <svg
-            className="w-12 h-12 mx-auto text-slate-500 mb-3"
+            className="w-12 h-12 mx-auto text-zinc-500 mb-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -106,8 +106,8 @@ export default function ImageUpload({
               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <p className="text-slate-400 text-sm">點擊下方按鈕選擇圖片</p>
-          <p className="text-slate-500 text-xs mt-1">支援 JPG, PNG, GIF (最大 5MB)</p>
+          <p className="text-zinc-400 text-sm">點擊下方按鈕選擇圖片</p>
+          <p className="text-zinc-500 text-xs mt-1">支援 JPG, PNG, GIF (最大 5MB)</p>
         </div>
       )}
 
@@ -123,8 +123,8 @@ export default function ImageUpload({
       <label
         htmlFor={`file-${label}`}
         className={`
-          inline-block px-4 py-2 bg-slate-700 text-white rounded-lg
-          hover:bg-slate-600 transition-colors cursor-pointer
+          inline-block px-4 py-2 bg-zinc-700 text-white rounded-lg
+          hover:bg-zinc-600 transition-colors cursor-pointer
           ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
@@ -140,7 +140,7 @@ export default function ImageUpload({
             onChange(e.target.value);
             setPreview(e.target.value);
           }}
-          className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-orange-500"
+          className="w-full bg-zinc-700 text-white border border-zinc-600 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-amber-500"
           placeholder="或直接貼上圖片網址"
         />
       </div>

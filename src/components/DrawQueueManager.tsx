@@ -292,7 +292,7 @@ export default function DrawQueueManager({
   if (queueState === 'checking') {
     return (
       <div className="text-center py-12">
-        <div className="text-slate-400">載入中...</div>
+        <div className="text-zinc-500">載入中...</div>
       </div>
     );
   }
@@ -304,8 +304,8 @@ export default function DrawQueueManager({
         <div className="max-w-md mx-auto">
           {totalInQueue > 0 && (
             <div className="mb-6">
-              <div className="bg-orange-500/15 rounded-xl p-4 border border-orange-400/30">
-                <p className="text-orange-400 font-medium">
+              <div className="bg-amber-500/12 rounded-xl p-4 border border-amber-400/30">
+                <p className="text-amber-400 font-medium">
                   目前 <span className="font-bold text-lg">{totalInQueue}</span> 人排隊中
                 </p>
               </div>
@@ -313,11 +313,11 @@ export default function DrawQueueManager({
           )}
           <button
             onClick={handleJoinQueue}
-            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-5 px-16 rounded-2xl hover:from-orange-600 hover:to-pink-600 transition-all transform hover:scale-[1.03] shadow-xl text-xl"
+            className="bg-gradient-to-r from-amber-500 to-pink-500 text-white font-bold py-5 px-16 rounded-2xl hover:from-amber-600 hover:to-pink-600 transition-all transform hover:scale-[1.03] shadow-xl text-xl"
           >
             開始抽選
           </button>
-          <p className="text-slate-500 text-sm mt-4">
+          <p className="text-zinc-500 text-sm mt-4">
             點擊後將開始 5 分鐘倒數計時抽獎
           </p>
         </div>
@@ -329,7 +329,7 @@ export default function DrawQueueManager({
   if (queueState === 'joining') {
     return (
       <div className="text-center py-12">
-        <div className="text-slate-400">加入排隊中...</div>
+        <div className="text-zinc-500">加入排隊中...</div>
       </div>
     );
   }
@@ -348,15 +348,15 @@ export default function DrawQueueManager({
   if (queueState === 'expired') {
     return (
       <div className="text-center py-12 px-4">
-        <div className="bg-slate-800/50 rounded-3xl p-8 md:p-12 backdrop-blur-sm border border-slate-700/50 max-w-lg mx-auto">
+        <div className="bg-zinc-800/50 rounded-3xl p-8 md:p-12 backdrop-blur-sm border border-zinc-700/50 max-w-lg mx-auto">
           <div className="text-6xl mb-6">⏰</div>
           <h3 className="text-2xl font-bold text-white mb-4">抽獎時間已過期</h3>
-          <p className="text-slate-400 mb-8">
+          <p className="text-zinc-500 mb-8">
             您的操作時間已結束，請重新排隊。
           </p>
           <button
             onClick={handleJoinQueue}
-            className="bg-orange-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-orange-600 transition-all shadow-lg"
+            className="bg-amber-500 text-white font-bold py-3 px-8 rounded-xl hover:bg-amber-600 transition-all shadow-lg"
           >
             重新排隊
           </button>
