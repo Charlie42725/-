@@ -13,10 +13,31 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
   const [products, setProducts] = useState<ProductCard[]>(initialProducts || []);
   const [loading, setLoading] = useState(!initialProducts);
   const [error, setError] = useState<string | null>(null);
+  const [queueCounts, setQueueCounts] = useState<Record<number, number>>({});
+
+  // 批次查詢排隊人數
+  const fetchQueueCounts = async (productList: ProductCard[]) => {
+    const activeIds = productList
+      .filter((p) => p.status === 'active')
+      .map((p) => p.id);
+    if (activeIds.length === 0) return;
+
+    try {
+      const res = await fetch(`/api/queue/counts?productIds=${activeIds.join(',')}`);
+      if (res.ok) {
+        const data = await res.json();
+        setQueueCounts(data.counts || {});
+      }
+    } catch {
+      // 忽略
+    }
+  };
 
   useEffect(() => {
-    // 如果有預取資料，跳過 API 請求
-    if (initialProducts) return;
+    if (initialProducts) {
+      fetchQueueCounts(initialProducts);
+      return;
+    }
 
     async function fetchProducts() {
       try {
@@ -25,6 +46,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
 
         const data = await response.json();
         setProducts(data.products);
+        fetchQueueCounts(data.products);
       } catch (err) {
         setError(err instanceof Error ? err.message : '發生錯誤');
       } finally {
@@ -92,10 +114,16 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
             <div className="relative bg-[#1a1a1a] rounded-lg md:rounded-xl overflow-hidden border border-white/[0.06] hover:border-orange-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
 
               {/* Status Badge */}
-              <div className="absolute top-1.5 right-1.5 md:top-2.5 md:right-2.5 z-10">
+              <div className="absolute top-1.5 right-1.5 md:top-2.5 md:right-2.5 z-10 flex flex-col items-end gap-1">
                 <div className={`${statusColor[product.status]} text-white px-2 py-0.5 md:px-2.5 md:py-1 rounded text-[10px] md:text-xs font-bold shadow-lg`}>
                   {statusText[product.status]}
                 </div>
+                {(queueCounts[product.id] || 0) > 0 && (
+                  <div className="bg-orange-500 text-white px-2 py-0.5 md:px-2.5 md:py-1 rounded text-[10px] md:text-xs font-bold shadow-lg flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                    {queueCounts[product.id]} 人排隊中
+                  </div>
+                )}
               </div>
 
               {/* Image Area */}
