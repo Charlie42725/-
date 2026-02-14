@@ -1,6 +1,7 @@
 import Banner from '@/components/Banner';
 import FilterSection from '@/components/FilterSection';
 import ProductGrid from '@/components/ProductGrid';
+import ScrollReveal from '@/components/ScrollReveal';
 import { prisma } from '@/lib/db';
 import { unstable_cache } from 'next/cache';
 
@@ -48,12 +49,12 @@ export default async function Home() {
 
       {/* 最新一番賞區域 */}
       <main className="w-full">
-        <div className="max-w-screen-xl mx-auto px-4 py-16">
-          <section className="mb-20">
-            <div className="flex items-center mb-10">
-              <span className="w-2 h-10 bg-orange-400 rounded-full mr-4"></span>
-              <h2 className="text-4xl font-heading font-black text-white tracking-tight">
-                最新一番賞 <span className="text-orange-500 text-lg ml-2 font-bold tracking-widest uppercase">New Arrivals</span>
+        <div className="max-w-screen-xl mx-auto px-3 md:px-4 py-8 md:py-16">
+          <section className="mb-12 md:mb-20">
+            <div className="flex items-center mb-6 md:mb-10">
+              <span className="w-1.5 md:w-2 h-8 md:h-10 bg-orange-400 rounded-full mr-3 md:mr-4"></span>
+              <h2 className="text-2xl md:text-4xl font-heading font-black text-white tracking-tight">
+                最新一番賞 <span className="text-orange-500 text-xs md:text-lg ml-1 md:ml-2 font-bold tracking-widest uppercase">New Arrivals</span>
               </h2>
             </div>
 
@@ -63,26 +64,31 @@ export default async function Home() {
           {/* 說明區域 */}
           <section className="mt-24 mb-16 bg-[#141414] border border-white/8 rounded-3xl p-12">
             {/* 第一區塊 */}
+            <ScrollReveal>
             <div className="text-center mb-20">
               <h3 className="text-4xl font-heading font-bold mb-8 text-orange-400">一番賞怎麼玩？</h3>
               <p className="text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed text-lg">
                 想試手氣帶走夢寐以求的動漫或原創IP周邊嗎？在失控抽抽參與一番賞抽獎非常簡單！您只需要瀏覽我們豐富的一番賞系列，選擇您喜愛的款式，然後決定您想抽賞的次數。與一般抽獎不同的是，一番賞每次抽賞都有機會獲得不同等級的獎品，從可愛的小飾品到珍藏版模型應有盡有！
               </p>
             </div>
+            </ScrollReveal>
 
             <hr className="border-slate-600 mb-20 opacity-50" />
 
             {/* 第二區塊 */}
+            <ScrollReveal>
             <div className="text-center mb-20">
               <h3 className="text-4xl font-heading font-bold mb-8 text-slate-200">為什麼選擇我們？</h3>
               <p className="text-slate-300 mb-16 max-w-4xl mx-auto leading-relaxed text-lg">
                 我們致力於提供最公平、最透明的一番賞抽獎體驗。透過區塊鏈 Hash 驗證技術，確保每一次抽獎結果公正無法竄改。無論是收藏家還是初次嘗試的新手，都能在這裡享受安心又刺激的抽賞樂趣！
               </p>
             </div>
+            </ScrollReveal>
 
             <hr className="border-slate-600 mb-20 opacity-50" />
 
             {/* 特色區塊 */}
+            <ScrollReveal>
             <div className="text-center">
               <h3 className="text-4xl font-heading font-bold mb-16 text-orange-400">失控抽抽特色</h3>
 
@@ -136,6 +142,7 @@ export default async function Home() {
                 </div>
               </div>
             </div>
+            </ScrollReveal>
           </section>
         </div>
       </main>

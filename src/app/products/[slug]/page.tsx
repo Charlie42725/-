@@ -5,6 +5,7 @@ import { calculateProgress } from '@/types';
 import DrawQueueManager from '@/components/DrawQueueManager';
 import ProductDetailClient from '@/components/ProductDetailClient';
 import ProductImageGallery from '@/components/ProductImageGallery';
+import QueueStatusBadge from '@/components/QueueStatusBadge';
 import { unstable_cache } from 'next/cache';
 
 const getProduct = unstable_cache(
@@ -127,11 +128,12 @@ export default async function ProductDetailPage({
 
             {/* Status Badge */}
             {product.status === 'active' && (
-              <div className="mb-4">
+              <div className="mb-4 flex items-center gap-3 flex-wrap">
                 <span className="live-badge text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-widest uppercase shadow-lg inline-flex items-center">
                   <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
                   Live Now
                 </span>
+                <QueueStatusBadge productId={product.id} />
               </div>
             )}
 

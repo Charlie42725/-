@@ -113,40 +113,39 @@ export default async function BrandPage({
                 {series.products.length === 0 ? (
                   <p className="text-slate-500 text-center py-8">此系列目前沒有商品</p>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {series.products.map((product) => (
-                      <Link
-                        key={product.id}
-                        href={`/products/${product.slug}`}
-                        className="block group"
-                      >
-                        <div className="bg-slate-800/90 rounded-xl overflow-hidden hover:transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl border border-slate-600/50 hover:border-orange-400/60">
-                          <div className="relative h-48">
-                            <Image
-                              src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}
-                              alt={product.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="p-4 h-[80px] flex flex-col justify-between">
-                            <div className="flex-none">
-                              <h3 className="text-white font-bold line-clamp-2 h-12 flex items-center group-hover:text-orange-400 transition-colors">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-4">
+                    {series.products.map((product) => {
+                      const remaining = product.totalTickets - product.soldTickets;
+                      return (
+                        <Link
+                          key={product.id}
+                          href={`/products/${product.slug}`}
+                          className="block group"
+                        >
+                          <div className="bg-[#1a1a1a] rounded-lg overflow-hidden border border-white/[0.06] hover:border-orange-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
+                            <div className="relative aspect-[4/3]">
+                              <Image
+                                src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}
+                                alt={product.name}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              />
+                            </div>
+                            <div className="p-2 md:p-3 flex-1">
+                              <h3 className="text-white font-bold text-[11px] md:text-sm line-clamp-2 group-hover:text-orange-400 transition-colors">
                                 {product.name}
                               </h3>
                             </div>
-                            <div className="flex-none">
-                              <div className="flex items-center justify-between">
-                                <span className="text-orange-400 font-bold">NT$ {product.price}</span>
-                                <span className="text-slate-400 text-sm">
-                                  剩餘 {product.totalTickets - product.soldTickets}
-                                </span>
-                              </div>
+                            <div className="flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-[#111] border-t border-white/[0.04]">
+                              <span className="text-orange-400 font-black text-[11px] md:text-sm">NT${product.price}</span>
+                              <span className="text-slate-400 font-bold text-[11px] md:text-sm">
+                                {remaining}/{product.totalTickets}
+                              </span>
                             </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </div>

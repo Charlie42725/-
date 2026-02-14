@@ -1,7 +1,7 @@
 import prisma from '@/lib/db';
 import { sseRegistry } from '@/lib/sse-registry';
 
-const ACTIVE_SESSION_DURATION_MS = 3 * 60 * 1000; // 3 分鐘
+const ACTIVE_SESSION_DURATION_MS = 5 * 60 * 1000; // 5 分鐘
 const HEARTBEAT_TIMEOUT_ACTIVE_MS = 60 * 1000;    // active 60 秒無心跳
 const HEARTBEAT_TIMEOUT_WAITING_MS = 120 * 1000;   // waiting 120 秒無心跳
 const CHECK_INTERVAL_MS = 15 * 1000;               // 每 15 秒檢查

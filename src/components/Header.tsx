@@ -13,13 +13,13 @@ export default function Header() {
   const [user, setUser] = useState<{ id: number; email: string; nickname: string } | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userPoints, setUserPoints] = useState(0);
-  const [loadingPoints, setLoadingPoints] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const loadingPointsRef = useRef(false);
 
   const loadUserPoints = useCallback(async () => {
-    if (!isAuthenticated() || loadingPoints) return;
+    if (!isAuthenticated() || loadingPointsRef.current) return;
 
-    setLoadingPoints(true);
+    loadingPointsRef.current = true;
     try {
       const token = localStorage.getItem('auth_token');
       const response = await fetch('/api/user/profile', {
@@ -35,9 +35,9 @@ export default function Header() {
     } catch (error) {
       console.error('Failed to load user points:', error);
     } finally {
-      setLoadingPoints(false);
+      loadingPointsRef.current = false;
     }
-  }, [loadingPoints]);
+  }, []);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -181,7 +181,7 @@ export default function Header() {
 
                   {/* 會員下拉選單 */}
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden z-50" role="menu">
+                    <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden z-50 dropdown-in" role="menu">
                       <div className="py-2">
                         <Link
                           href="/member/profile"
@@ -268,20 +268,22 @@ export default function Header() {
 
           {/* 手機版選單按鈕 */}
           <button
-            className="md:hidden text-white"
+            className="md:hidden text-white p-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? '關閉選單' : '開啟選單'}
             aria-expanded={isMenuOpen}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <div className="w-6 h-5 relative flex flex-col justify-between">
+              <span className={`block h-0.5 w-6 bg-white rounded transition-all duration-300 origin-center ${isMenuOpen ? 'rotate-45 translate-y-[9px]' : ''}`}></span>
+              <span className={`block h-0.5 w-6 bg-white rounded transition-all duration-200 ${isMenuOpen ? 'opacity-0 scale-x-0' : ''}`}></span>
+              <span className={`block h-0.5 w-6 bg-white rounded transition-all duration-300 origin-center ${isMenuOpen ? '-rotate-45 -translate-y-[9px]' : ''}`}></span>
+            </div>
           </button>
         </nav>
 
         {/* 手機版選單 */}
         {isMenuOpen && (
-          <div className="md:hidden bg-gray-800 py-4">
+          <div className="md:hidden bg-gray-800 py-4 slide-down">
             <div className="flex flex-col space-y-2">
               <Link href="/" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2">
                 全部一番賞

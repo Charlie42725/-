@@ -85,7 +85,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
 
         {/* 展開的篩選面板 */}
         {isFilterOpen && (
-          <div className="mt-4 bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="mt-4 bg-gray-800 rounded-lg p-4 border border-gray-700 slide-down">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* 類別篩選 */}
               <div>

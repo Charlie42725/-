@@ -32,6 +32,12 @@ export type ProductCard = {
       slug: string;
     };
   };
+  variants?: {
+    id: number;
+    name: string;
+    prize: string;
+    rarity: string;
+  }[];
 };
 
 // ======================================

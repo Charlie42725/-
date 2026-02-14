@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { isAuthenticated } from '@/lib/auth';
@@ -22,7 +22,6 @@ interface LotterySystemProps {
   totalTickets: number;
   onVariantsUpdate?: (variants: Variant[]) => void;
   onDrawComplete?: () => void;
-  onRequireQueue?: () => void;
 }
 
 interface DrawnTicket {
@@ -41,7 +40,6 @@ export default function LotterySystem({
   totalTickets,
   onVariantsUpdate,
   onDrawComplete,
-  onRequireQueue
 }: LotterySystemProps) {
   const router = useRouter();
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -115,7 +113,7 @@ export default function LotterySystem({
   };
 
   const handleNumberClick = (number: number) => {
-    if (isDrawing || isNumberDrawn(number)) return;
+    if (isDrawing || drawnTicketMap.has(number)) return;
 
     setSelectedNumbers(prev => {
       if (prev.includes(number)) {
@@ -178,14 +176,6 @@ export default function LotterySystem({
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.requireQueue && onRequireQueue) {
-          setIsDrawing(false);
-          setResults([]);
-          setCurrentRevealIndex(-1);
-          document.body.style.overflow = '';
-          onRequireQueue();
-          return;
-        }
         throw new Error(data.error || '抽獎失敗');
       }
 
@@ -260,16 +250,17 @@ export default function LotterySystem({
     };
   }, [showConfirmDialog, results.length, isDrawing, handleCancelConfirm, handleCloseResults]);
 
-  const isNumberDrawn = (number: number) => {
-    return drawnTickets.some(t => t.ticketNumber === number);
-  };
+  // O(1) lookup map for drawn tickets instead of O(n) array scans
+  const drawnTicketMap = useMemo(() => {
+    const map = new Map<number, Variant>();
+    for (const t of drawnTickets) {
+      map.set(t.ticketNumber, t.variant);
+    }
+    return map;
+  }, [drawnTickets]);
 
-  const isNumberSelected = (number: number) => selectedNumbers.includes(number);
-
-  const getDrawnTicketVariant = (number: number): Variant | null => {
-    const ticket = drawnTickets.find(t => t.ticketNumber === number);
-    return ticket ? ticket.variant : null;
-  };
+  // O(1) lookup set for selected numbers
+  const selectedSet = useMemo(() => new Set(selectedNumbers), [selectedNumbers]);
 
   // 確認對話框 Portal
   const ConfirmDialogPortal = () => {
@@ -444,8 +435,16 @@ export default function LotterySystem({
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="text-slate-400">載入中...</div>
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div className="h-6 w-32 bg-slate-700/50 rounded animate-pulse"></div>
+          <div className="h-5 w-24 bg-slate-700/50 rounded animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-[repeat(14,minmax(0,1fr))] xl:grid-cols-[repeat(16,minmax(0,1fr))] gap-2 md:gap-3">
+          {Array.from({ length: Math.min(totalTickets, 48) }, (_, i) => (
+            <div key={i} className="aspect-square rounded-lg bg-slate-700/40 animate-pulse" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -481,9 +480,9 @@ export default function LotterySystem({
 
         <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-[repeat(14,minmax(0,1fr))] xl:grid-cols-[repeat(16,minmax(0,1fr))] gap-2 md:gap-3">
           {Array.from({ length: totalTickets }, (_, i) => i + 1).map(number => {
-            const drawn = isNumberDrawn(number);
-            const selected = isNumberSelected(number);
-            const variant = drawn ? getDrawnTicketVariant(number) : null;
+            const variant = drawnTicketMap.get(number) ?? null;
+            const drawn = variant !== null;
+            const selected = selectedSet.has(number);
 
             return (
               <button

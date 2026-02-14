@@ -15,7 +15,7 @@ export default function QueueCountdown({ expiresAt, onExpired }: QueueCountdownP
 
   const [remaining, setRemaining] = useState(calculateRemaining);
 
-  const totalDuration = 180; // 3 分鐘
+  const totalDuration = 300; // 5 分鐘
   const progress = (remaining / totalDuration) * 100;
   const isWarning = remaining <= 30;
 

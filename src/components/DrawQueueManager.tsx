@@ -8,10 +8,10 @@ import QueueCountdown from './QueueCountdown';
 
 type QueueState =
   | 'checking'
-  | 'no_queue'
+  | 'idle'
   | 'joining'
   | 'waiting'
-  | 'your_turn'
+  | 'active'
   | 'expired';
 
 interface DrawQueueManagerProps {
@@ -28,7 +28,6 @@ export default function DrawQueueManager({
   productStatus,
 }: DrawQueueManagerProps) {
   const [queueState, setQueueState] = useState<QueueState>('checking');
-  const [position, setPosition] = useState(0);
   const [totalInQueue, setTotalInQueue] = useState(0);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -46,6 +45,13 @@ export default function DrawQueueManager({
     }
   }, []);
 
+  // 通知 QueueStatusBadge 即時更新
+  const emitQueueChange = useCallback((count?: number) => {
+    window.dispatchEvent(new CustomEvent('queueChanged', {
+      detail: { productId, count },
+    }));
+  }, [productId]);
+
   // 建立 SSE 連線
   const connectSSE = useCallback(() => {
     const token = getAuthToken();
@@ -62,21 +68,23 @@ export default function DrawQueueManager({
 
         switch (data.type) {
           case 'your_turn':
-            setQueueState('your_turn');
+            setQueueState('active');
             setExpiresAt(data.expiresAt);
             break;
 
           case 'queue_update':
-            setPosition(data.position);
             setTotalInQueue(data.totalInQueue);
+            emitQueueChange(data.totalInQueue);
             if (data.status === 'active') {
-              // 已經是 active 但可能沒收到 your_turn
-              if (queueState !== 'your_turn') {
-                setQueueState('your_turn');
-              }
+              setQueueState('active');
             } else if (data.status === 'waiting') {
               setQueueState('waiting');
             }
+            break;
+
+          case 'queue_count':
+            setTotalInQueue(data.count);
+            emitQueueChange(data.count);
             break;
 
           case 'session_expired':
@@ -84,17 +92,14 @@ export default function DrawQueueManager({
             break;
 
           case 'product_sold_out':
-            // 商品完售，重新載入頁面
             window.location.reload();
             break;
 
           case 'replaced':
-            // 連線被新分頁取代
             cleanup();
             break;
 
           case 'connected':
-            // 連線成功
             break;
         }
       } catch {
@@ -105,7 +110,7 @@ export default function DrawQueueManager({
     es.onerror = () => {
       // SSE 會自動重連
     };
-  }, [productId, cleanup, queueState]);
+  }, [productId, cleanup, emitQueueChange]);
 
   // 啟動心跳
   const startHeartbeat = useCallback(() => {
@@ -132,44 +137,34 @@ export default function DrawQueueManager({
 
   // 檢查初始排隊狀態
   useEffect(() => {
-    if (!isAuthenticated()) {
-      setQueueState('no_queue');
-      return;
-    }
-
     const checkStatus = async () => {
       try {
         const token = getAuthToken();
+        const headers: HeadersInit = {};
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
         const res = await fetch(`/api/queue/status?productId=${productId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers,
         });
 
         if (!res.ok) {
-          setQueueState('no_queue');
+          setQueueState('idle');
           return;
         }
 
         const data = await res.json();
+        setTotalInQueue(data.queueLength || 0);
 
         if (!data.inQueue) {
-          // 檢查是否有其他人在排隊
-          if (data.queueLength > 0) {
-            // 有人排隊中，需要加入排隊
-            setQueueState('no_queue');
-            setTotalInQueue(data.queueLength);
-          } else {
-            // 沒人排隊，直接顯示抽獎
-            setQueueState('no_queue');
-          }
+          setQueueState('idle');
           return;
         }
 
         // 恢復排隊狀態
-        setPosition(data.position);
-        setTotalInQueue(data.totalInQueue);
-
         if (data.status === 'active') {
-          setQueueState('your_turn');
+          setQueueState('active');
           setExpiresAt(data.expiresAt);
         } else {
           setQueueState('waiting');
@@ -179,7 +174,7 @@ export default function DrawQueueManager({
         connectSSE();
         startHeartbeat();
       } catch {
-        setQueueState('no_queue');
+        setQueueState('idle');
       }
     };
 
@@ -191,7 +186,7 @@ export default function DrawQueueManager({
   // beforeunload 時通知離開
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (queueState === 'waiting' || queueState === 'your_turn') {
+      if (queueState === 'waiting' || queueState === 'active') {
         const token = getAuthToken();
         if (token) {
           navigator.sendBeacon(
@@ -229,7 +224,7 @@ export default function DrawQueueManager({
       if (!res.ok) {
         const data = await res.json();
         alert(data.error || '加入排隊失敗');
-        setQueueState('no_queue');
+        setQueueState('idle');
         return;
       }
 
@@ -237,18 +232,21 @@ export default function DrawQueueManager({
       const entry = data.entry;
 
       if (entry.status === 'active') {
-        setQueueState('your_turn');
+        setQueueState('active');
         setExpiresAt(entry.expiresAt);
       } else {
         setQueueState('waiting');
       }
+
+      // 通知 badge 即時更新
+      emitQueueChange();
 
       // 建立 SSE 連線和心跳
       connectSSE();
       startHeartbeat();
     } catch {
       alert('加入排隊失敗，請重試');
-      setQueueState('no_queue');
+      setQueueState('idle');
     }
   };
 
@@ -269,13 +267,14 @@ export default function DrawQueueManager({
     }
 
     cleanup();
-    setQueueState('no_queue');
+    setQueueState('idle');
+    emitQueueChange();
   };
 
   // 抽獎完成回調
   const handleDrawComplete = () => {
     cleanup();
-    // 重新整理頁面以確保所有資料同步
+    emitQueueChange();
     window.location.reload();
   };
 
@@ -298,41 +297,31 @@ export default function DrawQueueManager({
     );
   }
 
-  // 沒人排隊 → 登入用戶直接顯示號碼牌，未登入則顯示按鈕
-  if (queueState === 'no_queue') {
-    if (!isAuthenticated()) {
-      return (
-        <div className="text-center">
+  // idle：顯示「開始抽選」按鈕 + 排隊人數
+  if (queueState === 'idle') {
+    return (
+      <div className="text-center py-12 px-4">
+        <div className="max-w-md mx-auto">
+          {totalInQueue > 0 && (
+            <div className="mb-6">
+              <div className="bg-orange-500/15 rounded-xl p-4 border border-orange-400/30">
+                <p className="text-orange-400 font-medium">
+                  目前 <span className="font-bold text-lg">{totalInQueue}</span> 人排隊中
+                </p>
+              </div>
+            </div>
+          )}
           <button
             onClick={handleJoinQueue}
-            className="bg-orange-500 text-white font-bold py-4 px-12 rounded-xl hover:bg-orange-600 transition-all transform hover:scale-[1.02] shadow-lg text-lg"
+            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-5 px-16 rounded-2xl hover:from-orange-600 hover:to-pink-600 transition-all transform hover:scale-[1.03] shadow-xl text-xl"
           >
-            開始抽獎
+            開始抽選
           </button>
+          <p className="text-slate-500 text-sm mt-4">
+            點擊後將開始 5 分鐘倒數計時抽獎
+          </p>
         </div>
-      );
-    }
-
-    // 登入用戶直接顯示號碼牌，有人排隊時提示需排隊
-    return (
-      <>
-        {totalInQueue > 0 && (
-          <div className="text-center mb-6">
-            <div className="bg-orange-500/20 rounded-xl p-4 border border-orange-400/30 max-w-lg mx-auto">
-              <p className="text-orange-400 font-medium">
-                目前有 <span className="font-bold">{totalInQueue}</span> 人正在排隊中
-              </p>
-            </div>
-          </div>
-        )}
-        <LotterySystem
-          productId={productId}
-          productPrice={productPrice}
-          totalTickets={totalTickets}
-          onDrawComplete={handleDrawComplete}
-          onRequireQueue={handleJoinQueue}
-        />
-      </>
+      </div>
     );
   }
 
@@ -349,7 +338,6 @@ export default function DrawQueueManager({
   if (queueState === 'waiting') {
     return (
       <QueueWaitingUI
-        position={position}
         totalInQueue={totalInQueue}
         onLeave={handleLeaveQueue}
       />
@@ -377,17 +365,15 @@ export default function DrawQueueManager({
     );
   }
 
-  // 輪到你了
+  // active：倒數計時 + 抽獎系統
   return (
     <div>
-      {/* 倒數計時 */}
       {expiresAt && (
         <div className="mb-6">
           <QueueCountdown expiresAt={expiresAt} onExpired={handleExpired} />
         </div>
       )}
 
-      {/* 抽獎系統 */}
       <LotterySystem
         productId={productId}
         productPrice={productPrice}

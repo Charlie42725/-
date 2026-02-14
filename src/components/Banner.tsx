@@ -67,8 +67,8 @@ export default function Banner() {
         {banners.map((banner, index) => (
           <div
             key={banner.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            className={`absolute inset-0 transition-all duration-1000 ease-in-out ${
+              index === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
             }`}
             role="group"
             aria-roledescription="slide"
@@ -152,8 +152,8 @@ export default function Banner() {
             role="tab"
             aria-selected={index === currentSlide}
             aria-label={`前往第 ${index + 1} 張幻燈片`}
-            className={`w-3 h-3 rounded-full transition-colors duration-200 ${
-              index === currentSlide ? 'bg-white' : 'bg-white/50'
+            className={`h-3 rounded-full transition-all duration-300 ${
+              index === currentSlide ? 'bg-white w-8' : 'bg-white/50 w-3'
             }`}
           />
         ))}

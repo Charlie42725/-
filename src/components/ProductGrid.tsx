@@ -37,28 +37,16 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-[#0f0f0f] rounded-2xl overflow-hidden animate-pulse border border-white/5 h-full flex flex-col">
-            {/* Image skeleton */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <div key={i} className="bg-[#1a1a1a] rounded-lg overflow-hidden animate-pulse border border-white/5 flex flex-col">
             <div className="relative aspect-[4/3] bg-slate-800/50"></div>
-            {/* Content skeleton */}
-            <div className="p-5 flex-1 flex flex-col">
-              <div className="h-5 bg-slate-800/50 rounded w-3/4 mb-2"></div>
-              <div className="h-5 bg-slate-800/50 rounded w-1/2 mb-6"></div>
-              <div className="mt-auto space-y-4">
-                {/* Progress bar skeleton */}
-                <div>
-                  <div className="flex justify-between mb-1.5">
-                    <div className="h-3 bg-slate-800/50 rounded w-16"></div>
-                    <div className="h-3 bg-slate-800/50 rounded w-8"></div>
-                  </div>
-                  <div className="h-2 bg-slate-800/50 rounded-full"></div>
-                </div>
-                {/* CTA skeleton */}
-                <div className="h-11 bg-slate-800/30 rounded-xl"></div>
-              </div>
+            <div className="p-2.5 md:p-4 flex-1 flex flex-col gap-2">
+              <div className="h-4 bg-slate-800/50 rounded w-3/4"></div>
+              <div className="h-3 bg-slate-800/50 rounded w-full"></div>
+              <div className="h-3 bg-slate-800/50 rounded w-2/3"></div>
             </div>
+            <div className="h-9 bg-slate-800/30"></div>
           </div>
         ))}
       </div>
@@ -87,22 +75,25 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {products.map((product) => {
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-4">
+      {products.map((product, index) => {
         const progress = calculateProgress(product.soldTickets, product.totalTickets);
         const remaining = product.totalTickets - product.soldTickets;
         const isSoldOut = product.status === 'sold_out';
+        const variants = product.variants || [];
 
         return (
           <Link
             key={product.id}
             href={`/products/${product.slug}`}
-            className="group block"
+            className="group block fade-in-up"
+            style={{ animationDelay: `${index * 0.06}s` }}
           >
-            <div className="relative bg-[#0f0f0f] rounded-2xl overflow-hidden border border-white/5 hover:border-orange-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] h-full flex flex-col">
+            <div className="relative bg-[#1a1a1a] rounded-lg md:rounded-xl overflow-hidden border border-white/[0.06] hover:border-orange-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
+
               {/* Status Badge */}
-              <div className="absolute top-3 right-3 z-10">
-                <div className={`${statusColor[product.status]} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-md`}>
+              <div className="absolute top-1.5 right-1.5 md:top-2.5 md:right-2.5 z-10">
+                <div className={`${statusColor[product.status]} text-white px-2 py-0.5 md:px-2.5 md:py-1 rounded text-[10px] md:text-xs font-bold shadow-lg`}>
                   {statusText[product.status]}
                 </div>
               </div>
@@ -113,57 +104,65 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
                   src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}
                   alt={product.name}
                   fill
-                  className={`object-cover transition-transform duration-700 group-hover:scale-110 ${isSoldOut ? 'grayscale opacity-50' : ''}`}
+                  className={`object-cover transition-transform duration-500 group-hover:scale-105 ${isSoldOut ? 'grayscale opacity-60' : ''}`}
                   onError={(e) => {
                     e.currentTarget.src = `https://picsum.photos/400/300?random=${product.id}`;
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-80"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
 
-                {/* Brand Tag */}
-                <div className="absolute top-3 left-3 z-10">
-                  <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2 py-1 rounded border border-white/10">
+                {/* Brand Tag - bottom left of image */}
+                <div className="absolute bottom-1.5 left-1.5 md:bottom-2.5 md:left-2.5 z-10 flex items-center gap-1">
+                  <span className="bg-black/70 backdrop-blur-sm text-slate-300 text-[9px] md:text-[11px] font-bold px-1.5 py-0.5 rounded">
                     {product.series.brand.name}
                   </span>
-                </div>
-
-                {/* Price Tag Overlay */}
-                <div className="absolute bottom-4 left-4">
-                  <p className="text-orange-400 font-black text-2xl drop-shadow-lg">
-                    NT$ <span className="text-3xl">{product.price}</span>
-                  </p>
                 </div>
               </div>
 
               {/* Card Content */}
-              <div className="p-5 flex-1 flex flex-col">
-                <h3 className="text-white font-heading font-bold text-lg mb-3 line-clamp-2 group-hover:text-orange-400 transition-colors duration-200 min-h-[3.5rem]">
+              <div className="p-2 md:p-3 flex-1 flex flex-col">
+                {/* Product Title */}
+                <h3 className="text-white font-bold text-[11px] md:text-sm leading-snug line-clamp-1 md:line-clamp-2 mb-1 md:mb-2 group-hover:text-orange-400 transition-colors">
                   {product.name}
                 </h3>
 
-                <div className="mt-auto space-y-4">
-                  {/* Progress Bar */}
-                  <div>
-                    <div className="flex justify-between text-xs text-slate-400 mb-1.5 font-bold">
-                      <span>
-                        <span className={isSoldOut ? 'text-red-500' : 'text-green-400'}>
-                          {remaining}
-                        </span> / {product.totalTickets} 抽
-                      </span>
-                      <span>{progress}%</span>
-                    </div>
-                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-slate-600' : 'bg-orange-500'}`}
-                        style={{ width: `${progress}%` }}
-                      ></div>
-                    </div>
+                {/* Variant/Prize List */}
+                {variants.length > 0 && (
+                  <div className="flex-1 mb-1.5 md:mb-2">
+                    <ul className="space-y-0 md:space-y-0.5">
+                      {variants.slice(0, 6).map((v) => (
+                        <li key={v.id} className="text-slate-400 text-[9px] md:text-xs leading-relaxed truncate">
+                          {v.prize} {v.name}
+                        </li>
+                      ))}
+                      {variants.length > 6 && (
+                        <li className="text-slate-500 text-[9px] md:text-xs">
+                          ...還有 {variants.length - 6} 項
+                        </li>
+                      )}
+                    </ul>
                   </div>
+                )}
 
-                  {/* CTA Button Mock */}
-                  <div className="w-full py-3 bg-white/5 rounded-xl text-center text-sm font-bold text-slate-300 group-hover:bg-orange-500 group-hover:text-white transition-all">
-                    {isSoldOut ? '查看結果' : '立即開抽'}
-                  </div>
+                {/* Spacer - only when no variants */}
+                {variants.length === 0 && <div className="flex-1"></div>}
+              </div>
+
+              {/* Bottom Info Bar */}
+              <div className="flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-[#111] border-t border-white/[0.04]">
+                <div className="flex items-center gap-1">
+                  <svg className="w-3 h-3 md:w-3.5 md:h-3.5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.736 6.979C9.208 6.193 9.696 6 10 6c.304 0 .792.193 1.264.979a1 1 0 001.715-1.029C12.279 4.784 11.232 4 10 4s-2.279.784-2.979 1.95c-.285.475-.507 1-.67 1.55H6a1 1 0 000 2h.013a9.358 9.358 0 000 1H6a1 1 0 100 2h.351c.163.55.385 1.075.67 1.55C7.721 15.216 8.768 16 10 16s2.279-.784 2.979-1.95a1 1 0 10-1.715-1.029c-.472.786-.96.979-1.264.979-.304 0-.792-.193-1.264-.979a5.95 5.95 0 01-.4-.821h1.664a1 1 0 000-2H8.063a7.343 7.343 0 010-1h1.937a1 1 0 000-2H8.336c.14-.292.302-.57.4-.821z" />
+                  </svg>
+                  <span className="text-orange-400 font-black text-[11px] md:text-sm">{product.price}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <svg className="w-3 h-3 md:w-3.5 md:h-3.5 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                  </svg>
+                  <span className={`font-bold text-[11px] md:text-sm ${isSoldOut ? 'text-red-400' : 'text-slate-300'}`}>
+                    {remaining}/{product.totalTickets}
+                  </span>
                 </div>
               </div>
             </div>
