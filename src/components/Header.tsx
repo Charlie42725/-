@@ -131,23 +131,8 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* 桌面版導航選單 */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-white hover:text-orange-400 transition-colors duration-200">
-              全部一番賞
-            </Link>
-            {loggedIn && (
-              <Link href="/member/prizes" className="text-white hover:text-orange-400 transition-colors duration-200 flex items-center">
-                <svg className="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-                獎品包包
-              </Link>
-            )}
-          </div>
-
-          {/* 右側按鈕 */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* 桌面版右側選單 */}
+          <div className="hidden md:flex items-center space-x-3">
             {loggedIn && user ? (
               <>
                 {/* 點數餘額顯示 */}
@@ -163,6 +148,7 @@ export default function Header() {
                   <span className="text-slate-400 text-sm">點</span>
                 </Link>
 
+                {/* 使用者下拉選單（含所有導航） */}
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -179,20 +165,20 @@ export default function Header() {
                     </svg>
                   </button>
 
-                  {/* 會員下拉選單 */}
                   {isUserMenuOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden z-50 dropdown-in" role="menu">
                       <div className="py-2">
+                        {/* 導航連結 */}
                         <Link
-                          href="/member/profile"
+                          href="/"
                           onClick={() => setIsUserMenuOpen(false)}
                           className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                           </svg>
-                          基本設定
+                          全部一番賞
                         </Link>
                         <Link
                           href="/member/prizes"
@@ -204,6 +190,19 @@ export default function Header() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                           </svg>
                           獎品包包
+                        </Link>
+                        <hr className="border-slate-700 my-2" />
+                        {/* 會員功能 */}
+                        <Link
+                          href="/member/profile"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center px-4 py-3 text-white hover:bg-slate-700 transition-colors duration-200"
+                          role="menuitem"
+                        >
+                          <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          基本設定
                         </Link>
                         <Link
                           href="/member/points"
@@ -256,6 +255,9 @@ export default function Header() {
               </>
             ) : (
               <>
+                <Link href="/" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800">
+                  全部一番賞
+                </Link>
                 <Link href="/login" className="text-white hover:text-orange-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-slate-800">
                   登入
                 </Link>

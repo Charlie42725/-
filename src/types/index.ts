@@ -36,7 +36,7 @@ export type ProductCard = {
     id: number;
     name: string;
     prize: string;
-    rarity: string;
+    rarity: string | null;
   }[];
 };
 
