@@ -2,11 +2,17 @@ import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
+// 如果全域快取的 PrismaClient 缺少新 model（例如 banner），丟棄舊實例
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+if (globalForPrisma.prisma && !(globalForPrisma.prisma as any).banner) {
+  globalForPrisma.prisma.$disconnect().catch(() => {});
+  (globalForPrisma as unknown as Record<string, unknown>).prisma = undefined;
+}
+
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-    // 優化連接池設定，防止超時
     datasources: {
       db: {
         url: process.env.DATABASE_URL,

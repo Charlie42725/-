@@ -3,32 +3,28 @@
 import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 
-export default function Banner() {
+interface BannerItem {
+  id: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  imageUrl: string;
+  linkUrl: string;
+}
+
+interface BannerProps {
+  initialBanners: BannerItem[];
+}
+
+export default function Banner({ initialBanners }: BannerProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const banners = [
-    {
-      id: 1,
-      image: '/assets/images/banners/banner1.jpg',
-      fallbackImage: 'https://picsum.photos/1920/500?random=1',
-      title: 'FOUNTAIN OF LIFE',
-      subtitle: '連賞被擊退12次',
-      description: '獲得119萬玖福',
-      alt: 'Banner 1'
-    },
-    {
-      id: 2,
-      image: '/assets/images/banners/banner2.jpg',
-      fallbackImage: 'https://picsum.photos/1920/500?random=2',
-      title: '限時活動',
-      subtitle: '新手禮包大放送',
-      description: '立即註冊領取',
-      alt: 'Banner 2'
-    }
-  ];
+  const banners = initialBanners;
 
   // 自動輪播
   useEffect(() => {
+    if (banners.length <= 1) return;
+
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
@@ -52,6 +48,8 @@ export default function Banner() {
       nextSlide();
     }
   }, [prevSlide, nextSlide]);
+
+  if (banners.length === 0) return null;
 
   return (
     <section
@@ -77,14 +75,11 @@ export default function Banner() {
           >
             {/* 背景圖片 */}
             <Image
-              src={banner.image}
-              alt={banner.alt}
+              src={banner.imageUrl}
+              alt={banner.title}
               fill
               className="object-cover rounded-lg"
               priority={index === 0}
-              onError={(e) => {
-                e.currentTarget.src = banner.fallbackImage;
-              }}
             />
 
             {/* 深色漸層覆蓋，增強文字對比 */}
@@ -99,12 +94,16 @@ export default function Banner() {
                     {banner.title}
                   </h1>
                   <div className="space-y-3">
-                    <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded inline-block">
-                      {banner.subtitle}
-                    </p>
-                    <p className="text-base md:text-lg lg:text-xl text-amber-300 font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded inline-block">
-                      {banner.description}
-                    </p>
+                    {banner.subtitle && (
+                      <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded inline-block">
+                        {banner.subtitle}
+                      </p>
+                    )}
+                    {banner.description && (
+                      <p className="text-base md:text-lg lg:text-xl text-amber-300 font-bold bg-black/40 backdrop-blur-sm px-3 py-1 rounded inline-block">
+                        {banner.description}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -120,42 +119,48 @@ export default function Banner() {
         ))}
       </div>
 
-      {/* 左右箭頭 */}
-      <button
-        onClick={prevSlide}
-        aria-label="上一張幻燈片"
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-
-      <button
-        onClick={nextSlide}
-        aria-label="下一張幻燈片"
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-
-      {/* 指示點 */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2" role="tablist" aria-label="幻燈片選擇">
-        {banners.map((_, index) => (
+      {/* 左右箭頭（多張時才顯示） */}
+      {banners.length > 1 && (
+        <>
           <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            role="tab"
-            aria-selected={index === currentSlide}
-            aria-label={`前往第 ${index + 1} 張幻燈片`}
-            className={`h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide ? 'bg-white w-8' : 'bg-white/50 w-3'
-            }`}
-          />
-        ))}
-      </div>
+            onClick={prevSlide}
+            aria-label="上一張幻燈片"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <button
+            onClick={nextSlide}
+            aria-label="下一張幻燈片"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors duration-200"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
+
+      {/* 指示點（多張時才顯示） */}
+      {banners.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2" role="tablist" aria-label="幻燈片選擇">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              role="tab"
+              aria-selected={index === currentSlide}
+              aria-label={`前往第 ${index + 1} 張幻燈片`}
+              className={`h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide ? 'bg-white w-8' : 'bg-white/50 w-3'
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -7,7 +7,7 @@ import { unstable_cache } from 'next/cache';
 // 快取首頁資料，30 秒內不重複查 DB
 const getHomeData = unstable_cache(
   async () => {
-    const [products, brands] = await Promise.all([
+    const [products, brands, banners] = await Promise.all([
       prisma.product.findMany({
         where: { status: { in: ['active', 'sold_out'] } },
         orderBy: { createdAt: 'desc' },
@@ -28,20 +28,24 @@ const getHomeData = unstable_cache(
         },
         orderBy: { name: 'asc' },
       }),
+      prisma.banner.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+      }),
     ]);
-    return { products, brands };
+    return { products, brands, banners };
   },
   ['home-data'],
   { revalidate: 30 }
 );
 
 export default async function Home() {
-  const { products: productsData, brands: brandsData } = await getHomeData();
+  const { products: productsData, brands: brandsData, banners: bannersData } = await getHomeData();
 
   return (
     <div className="min-h-screen text-white w-full flex flex-col">
       {/* 主要 Banner */}
-      <Banner />
+      <Banner initialBanners={bannersData} />
 
       {/* 篩選區域 */}
       <FilterSection initialBrands={brandsData} />

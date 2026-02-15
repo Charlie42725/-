@@ -3,11 +3,15 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { getCurrentUser, logout, isAuthenticated } from '@/lib/auth';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // admin 頁面不顯示前台 Header
+  if (pathname.startsWith('/admin')) return null;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [user, setUser] = useState<{ id: number; email: string; nickname: string } | null>(null);
