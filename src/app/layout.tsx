@@ -38,6 +38,7 @@ export const metadata: Metadata = {
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BottomNav from "@/components/BottomNav";
 
 export default function RootLayout({
   children,
@@ -53,10 +54,11 @@ export default function RootLayout({
         className={`${russoOne.variable} ${chakraPetch.variable} antialiased bg-background text-white min-h-screen flex flex-col font-body`}
       >
         <Header />
-        <main className="flex-grow">
+        <main className="flex-grow pb-16 md:pb-0">
           {children}
         </main>
         <Footer />
+        <BottomNav />
       </body>
     </html>
   );

@@ -214,67 +214,67 @@ export default function PrizesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white py-12 px-4">
+    <div className="min-h-screen bg-background text-white py-6 md:py-12 px-3 md:px-4">
       <div className="max-w-7xl mx-auto">
         {/* 頁面標題 */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">我的獎品包包</h1>
-          <p className="text-zinc-500">管理您抽中的所有獎品</p>
+        <div className="mb-5 md:mb-8 text-center">
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-1">我的獎品包包</h1>
+          <p className="text-zinc-500 text-sm md:text-base">管理您抽中的所有獎品</p>
         </div>
 
         {/* 統計資訊 */}
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-amber-500/10 rounded-3xl p-6 backdrop-blur-sm border border-amber-500/18 shadow-2xl">
-            <p className="text-zinc-300 text-sm mb-2">獎品總數</p>
-            <p className="text-4xl font-black text-amber-400">{prizes.length}</p>
+        <div className="mb-5 md:mb-8 grid grid-cols-2 gap-3 md:gap-6">
+          <div className="bg-amber-500/10 rounded-2xl md:rounded-3xl p-4 md:p-6 backdrop-blur-sm border border-amber-500/18 shadow-2xl">
+            <p className="text-zinc-300 text-xs md:text-sm mb-1 md:mb-2">獎品總數</p>
+            <p className="text-2xl md:text-4xl font-black text-amber-400">{prizes.length}</p>
           </div>
-          <div className="bg-surface-2/50 rounded-3xl p-6 backdrop-blur-sm border border-white/10 shadow-2xl">
-            <p className="text-zinc-300 text-sm mb-2">總價值</p>
-            <p className="text-4xl font-black text-purple-400">{totalValue.toLocaleString()}</p>
-            <p className="text-zinc-500 text-xs mt-1">可兌換點數</p>
+          <div className="bg-surface-2/50 rounded-2xl md:rounded-3xl p-4 md:p-6 backdrop-blur-sm border border-white/10 shadow-2xl">
+            <p className="text-zinc-300 text-xs md:text-sm mb-1 md:mb-2">總價值</p>
+            <p className="text-2xl md:text-4xl font-black text-purple-400">{totalValue.toLocaleString()}</p>
+            <p className="text-zinc-500 text-xs mt-0.5 md:mt-1">可兌換點數</p>
           </div>
         </div>
 
         {/* 一鍵兌換按鈕 */}
         {prizes.length > 0 && (
-          <div className="mb-8 text-center">
+          <div className="mb-5 md:mb-8 text-center">
             <button
               onClick={handleRedeemAll}
               disabled={redeemingAll}
-              className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full md:w-auto px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-sm md:text-base rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {redeemingAll ? '兌換中...' : `一鍵兌換全部 (${totalValue.toLocaleString()} 點)`}
             </button>
-            <p className="text-zinc-500 text-sm mt-2">將所有獎品轉換為點數</p>
+            <p className="text-zinc-500 text-xs md:text-sm mt-2">將所有獎品轉換為點數</p>
           </div>
         )}
 
         {/* 獎品列表 */}
         {prizes.length === 0 ? (
-          <div className="bg-surface-1/30 rounded-3xl p-12 backdrop-blur-sm border border-[var(--border)] text-center">
-            <div className="text-zinc-500 text-lg mb-4">
-              <svg className="w-24 h-24 mx-auto mb-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-surface-1/30 rounded-2xl md:rounded-3xl p-8 md:p-12 backdrop-blur-sm border border-[var(--border)] text-center">
+            <div className="text-zinc-500 text-base mb-3">
+              <svg className="w-14 h-14 md:w-24 md:h-24 mx-auto mb-3 md:mb-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
               目前沒有任何獎品
             </div>
-            <p className="text-zinc-500 mb-6">快去抽獎贏取精美獎品吧！</p>
+            <p className="text-zinc-500 text-sm mb-5 md:mb-6">快去抽獎贏取精美獎品吧！</p>
             <button
               onClick={() => router.push('/')}
-              className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all shadow-lg"
+              className="px-5 py-2.5 md:px-6 md:py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm md:text-base rounded-xl transition-all shadow-lg"
             >
               前往抽獎
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
             {prizes.map((prize) => (
               <div
                 key={prize.id}
-                className="bg-surface-1/50 rounded-3xl p-6 backdrop-blur-sm border border-[var(--border)] hover:border-amber-400/50 transition-all"
+                className="bg-surface-1/50 rounded-2xl md:rounded-3xl p-3 md:p-6 backdrop-blur-sm border border-[var(--border)] hover:border-amber-400/50 transition-all"
               >
                 {/* 獎品圖片 */}
-                <div className="relative w-full aspect-square mb-4 rounded-2xl overflow-hidden bg-surface-2/30">
+                <div className="relative w-full aspect-[4/3] md:aspect-square mb-3 md:mb-4 rounded-xl md:rounded-2xl overflow-hidden bg-surface-2/30">
                   {prize.variant.imageUrl || prize.product.coverImage ? (
                     <Image
                       src={prize.variant.imageUrl || prize.product.coverImage || '/placeholder.jpg'}
@@ -284,7 +284,7 @@ export default function PrizesPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-zinc-500">
-                      <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-8 h-8 md:w-16 md:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                       </svg>
                     </div>
@@ -292,8 +292,8 @@ export default function PrizesPage() {
 
                   {/* 稀有度標籤 */}
                   {prize.variant.rarity && (
-                    <div className="absolute top-2 left-2">
-                      <div className={`px-3 py-1 rounded-full text-xs font-bold border ${getRarityColor(prize.variant.rarity)}`}>
+                    <div className="absolute top-1.5 left-1.5">
+                      <div className={`px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold border ${getRarityColor(prize.variant.rarity)}`}>
                         {prize.variant.rarity}
                       </div>
                     </div>
@@ -301,8 +301,8 @@ export default function PrizesPage() {
 
                   {/* Last 賞標籤 */}
                   {prize.isLastPrize && (
-                    <div className="absolute top-2 right-2">
-                      <div className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-400 to-amber-400 text-white shadow-lg">
+                    <div className="absolute top-1.5 right-1.5">
+                      <div className="px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold bg-gradient-to-r from-yellow-400 to-amber-400 text-white shadow-lg">
                         Last賞
                       </div>
                     </div>
@@ -310,25 +310,25 @@ export default function PrizesPage() {
                 </div>
 
                 {/* 獎項資訊 */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-amber-400 font-bold text-lg">{prize.variant.prize}</span>
-                    <span className="text-zinc-500 text-sm">#{prize.ticketNumber}</span>
+                <div className="mb-2 md:mb-4">
+                  <div className="flex items-center justify-between mb-1 md:mb-2">
+                    <span className="text-amber-400 font-bold text-sm md:text-lg">{prize.variant.prize}</span>
+                    <span className="text-zinc-500 text-xs">#{prize.ticketNumber}</span>
                   </div>
-                  <h3 className="text-white font-bold text-lg mb-2">{prize.variant.name}</h3>
-                  <p className="text-zinc-500 text-sm mb-1">{prize.product.name}</p>
-                  <p className="text-zinc-500 text-xs">
+                  <h3 className="text-white font-bold text-sm md:text-lg mb-1 md:mb-2 line-clamp-2">{prize.variant.name}</h3>
+                  <p className="text-zinc-500 text-xs mb-0.5 line-clamp-1">{prize.product.name}</p>
+                  <p className="text-zinc-600 text-[10px] md:text-xs line-clamp-1">
                     {prize.product.series.brand.name} · {prize.product.series.name}
                   </p>
                 </div>
 
                 {/* 價值與抽中時間 */}
-                <div className="mb-4 p-3 bg-surface-2/30 rounded-xl">
-                  <div className="flex items-center justify-between text-sm mb-1">
+                <div className="mb-2 md:mb-4 p-2 md:p-3 bg-surface-2/30 rounded-lg md:rounded-xl">
+                  <div className="flex items-center justify-between text-xs mb-0.5 md:mb-1">
                     <span className="text-zinc-500">價值</span>
                     <span className="text-green-400 font-bold">{prize.variant.value.toLocaleString()} 點</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-[10px] md:text-xs">
                     <span className="text-zinc-500">抽中時間</span>
                     <span className="text-zinc-500">
                       {new Date(prize.createdAt).toLocaleDateString('zh-TW')}
@@ -340,7 +340,7 @@ export default function PrizesPage() {
                 <button
                   onClick={() => handleRedeem(prize.id)}
                   disabled={redeeming === prize.id}
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-2 md:py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs md:text-sm rounded-lg md:rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {redeeming === prize.id ? '兌換中...' : '兌換成點數'}
                 </button>
@@ -350,14 +350,14 @@ export default function PrizesPage() {
         )}
 
         {/* 說明區塊 */}
-        <div className="mt-8 bg-surface-1/30 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-[var(--border)]">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-            <svg className="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="mt-5 md:mt-8 bg-surface-1/30 rounded-2xl md:rounded-3xl p-4 md:p-8 backdrop-blur-sm border border-[var(--border)]">
+          <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center">
+            <svg className="w-4 h-4 md:w-6 md:h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             兌換說明
           </h3>
-          <div className="space-y-3 text-zinc-300">
+          <div className="space-y-2 md:space-y-3 text-zinc-300 text-xs md:text-base">
             <p>• 獎品可兌換成等值點數，用於再次抽獎</p>
             <p>• 兌換後獎品將從包包中移除，無法撤銷</p>
             <p>• 使用「一鍵兌換全部」可快速兌換所有獎品</p>
@@ -367,10 +367,10 @@ export default function PrizesPage() {
         </div>
 
         {/* 返回按鈕 */}
-        <div className="mt-8 text-center">
+        <div className="mt-5 md:mt-8 text-center">
           <button
             onClick={() => router.back()}
-            className="px-8 py-3 bg-surface-3 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
+            className="px-6 py-2.5 md:px-8 md:py-3 bg-surface-3 text-white text-sm md:text-base font-medium rounded-xl hover:bg-zinc-600 transition-colors"
           >
             返回
           </button>

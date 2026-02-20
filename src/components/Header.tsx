@@ -111,7 +111,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-surface-0 sticky top-0 z-50 border-b border-[var(--border)]">
+    <header className="w-full bg-surface-0 sticky top-0 z-50 border-b border-[var(--border)] pt-[env(safe-area-inset-top)]">
       <div className="max-w-screen-xl mx-auto px-4">
         <nav className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
