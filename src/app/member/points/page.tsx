@@ -189,72 +189,72 @@ export default function PointsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white py-12 px-4">
+    <div className="min-h-screen bg-background text-white py-6 md:py-12 px-3 md:px-4">
       <div className="max-w-7xl mx-auto">
         {/* 頁面標題 */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">點數購買</h1>
-          <p className="text-zinc-500">選擇適合您的點數方案</p>
+        <div className="mb-5 md:mb-8 text-center">
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-1">點數購買</h1>
+          <p className="text-zinc-500 text-sm md:text-base">選擇適合您的點數方案</p>
         </div>
 
         {/* 目前點數餘額 */}
-        <div className="mb-8">
-          <div className="bg-amber-500/10 rounded-3xl p-8 backdrop-blur-sm border border-amber-500/18 shadow-2xl text-center">
-            <p className="text-zinc-300 text-lg mb-2">目前點數餘額</p>
-            <p className="text-5xl font-black text-amber-400">{user.points.toLocaleString()}</p>
-            <p className="text-zinc-500 text-sm mt-2">點數可用於抽獎及兌換優惠</p>
+        <div className="mb-5 md:mb-8">
+          <div className="bg-amber-500/10 rounded-2xl md:rounded-3xl p-5 md:p-8 backdrop-blur-sm border border-amber-500/18 shadow-2xl text-center">
+            <p className="text-zinc-300 text-sm md:text-lg mb-1 md:mb-2">目前點數餘額</p>
+            <p className="text-4xl md:text-5xl font-black text-amber-400">{user.points.toLocaleString()}</p>
+            <p className="text-zinc-500 text-xs md:text-sm mt-1 md:mt-2">點數可用於抽獎及兌換優惠</p>
           </div>
         </div>
 
         {/* 點數方案 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-5 md:mb-8">
           {pointPackages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`relative bg-surface-1/50 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border ${
+              className={`relative bg-surface-1/50 rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 backdrop-blur-sm border ${
                 pkg.popular
                   ? 'border-amber-400 shadow-xl shadow-amber-400/20'
                   : 'border-[var(--border)]'
-              } hover:border-amber-400/50 transition-all hover:scale-105`}
+              } hover:border-amber-400/50 transition-all`}
             >
               {/* 熱門標籤 */}
               {pkg.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                  <div className="bg-amber-500 text-white px-3 py-0.5 rounded-full text-xs md:text-sm font-bold shadow-lg whitespace-nowrap">
                     最熱門
                   </div>
                 </div>
               )}
 
               {/* 方案名稱 */}
-              <h3 className="text-2xl font-bold text-white mb-4 text-center">{pkg.name}</h3>
+              <h3 className="text-base md:text-2xl font-bold text-white mb-2 md:mb-4 text-center">{pkg.name}</h3>
 
               {/* 點數資訊 */}
-              <div className="text-center mb-6">
-                <div className="text-4xl font-black text-amber-400 mb-2">
+              <div className="text-center mb-3 md:mb-6">
+                <div className="text-2xl md:text-4xl font-black text-amber-400 mb-1 md:mb-2">
                   {pkg.points.toLocaleString()}
                 </div>
-                <div className="text-zinc-300 text-sm">基礎點數</div>
+                <div className="text-zinc-300 text-xs md:text-sm">基礎點數</div>
 
                 {pkg.bonus > 0 && (
-                  <div className="mt-4 p-3 bg-green-500/10 rounded-xl border border-green-500/30">
-                    <div className="text-green-400 font-bold text-lg">
-                      + {pkg.bonus.toLocaleString()} 贈點
+                  <div className="mt-2 md:mt-4 p-2 md:p-3 bg-green-500/10 rounded-lg md:rounded-xl border border-green-500/30">
+                    <div className="text-green-400 font-bold text-sm md:text-lg">
+                      +{pkg.bonus.toLocaleString()} 贈點
                     </div>
-                    <div className="text-zinc-500 text-xs">
-                      總共獲得 {(pkg.points + pkg.bonus).toLocaleString()} 點
+                    <div className="text-zinc-500 text-[10px] md:text-xs">
+                      共 {(pkg.points + pkg.bonus).toLocaleString()} 點
                     </div>
                   </div>
                 )}
               </div>
 
               {/* 價格 */}
-              <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-white">
+              <div className="text-center mb-3 md:mb-6">
+                <div className="text-xl md:text-3xl font-bold text-white">
                   NT$ {pkg.price.toLocaleString()}
                 </div>
                 {pkg.bonus > 0 && (
-                  <div className="text-green-400 text-sm mt-1">
+                  <div className="text-green-400 text-xs md:text-sm mt-0.5 md:mt-1">
                     省下 NT$ {pkg.bonus}
                   </div>
                 )}
@@ -264,7 +264,7 @@ export default function PointsPage() {
               <button
                 onClick={() => handlePurchase(pkg)}
                 disabled={purchasing && selectedPackage?.id === pkg.id}
-                className={`w-full font-bold py-4 px-6 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full font-bold py-2.5 md:py-4 px-3 md:px-6 text-sm md:text-base rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
                   pkg.popular
                     ? 'bg-amber-500 hover:bg-amber-600 text-white'
                     : 'bg-surface-3 hover:bg-surface-3/80 text-white'
@@ -277,14 +277,14 @@ export default function PointsPage() {
         </div>
 
         {/* 說明區塊 */}
-        <div className="bg-surface-1/30 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-[var(--border)]">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-            <svg className="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-surface-1/30 rounded-2xl md:rounded-3xl p-4 md:p-8 backdrop-blur-sm border border-[var(--border)]">
+          <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center">
+            <svg className="w-4 h-4 md:w-6 md:h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             購買說明
           </h3>
-          <div className="space-y-3 text-zinc-300">
+          <div className="space-y-2 md:space-y-3 text-zinc-300 text-xs md:text-base">
             <p>• 點數可用於一番賞抽獎，每次抽獎消耗對應點數</p>
             <p>• 購買後點數即時入帳，永久有效</p>
             <p>• 贈送的點數與購買點數效力相同</p>
@@ -294,10 +294,10 @@ export default function PointsPage() {
         </div>
 
         {/* 返回按鈕 */}
-        <div className="mt-8 text-center">
+        <div className="mt-5 md:mt-8 text-center">
           <button
             onClick={() => router.back()}
-            className="px-8 py-3 bg-zinc-700 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
+            className="px-6 py-2.5 md:px-8 md:py-3 bg-zinc-700 text-white text-sm md:text-base font-medium rounded-xl hover:bg-zinc-600 transition-colors"
           >
             返回
           </button>

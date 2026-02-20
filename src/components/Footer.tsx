@@ -10,7 +10,7 @@ export default function Footer() {
   if (pathname.startsWith('/admin')) return null;
 
   return (
-    <footer className="w-full bg-surface-deep mt-12 lg:mt-16 py-16 border-t border-[var(--border)]">
+    <footer className="w-full bg-surface-deep mt-12 lg:mt-16 pt-16 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-16 border-t border-[var(--border)]">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {/* 公司資訊 */}
