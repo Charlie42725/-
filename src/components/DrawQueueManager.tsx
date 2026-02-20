@@ -313,7 +313,7 @@ export default function DrawQueueManager({
           )}
           <button
             onClick={handleJoinQueue}
-            className="bg-gradient-to-r from-amber-500 to-pink-500 text-white font-bold py-5 px-16 rounded-2xl hover:from-amber-600 hover:to-pink-600 transition-all transform hover:scale-[1.03] shadow-xl text-xl"
+            className="bg-amber-500 text-white font-bold py-5 px-16 rounded-2xl hover:bg-amber-600 transition-all transform hover:scale-[1.03] shadow-lg shadow-amber-500/20 text-xl"
           >
             開始抽選
           </button>
