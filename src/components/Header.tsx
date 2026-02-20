@@ -294,11 +294,6 @@ export default function Header() {
               <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                 全部一番賞
               </Link>
-              {loggedIn && (
-                <Link href="/member/prizes" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
-                  獎品包包
-                </Link>
-              )}
               <hr className="border-[var(--border)] my-2" />
               {loggedIn && user ? (
                 <>

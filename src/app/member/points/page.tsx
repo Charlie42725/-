@@ -35,6 +35,7 @@ export default function PointsPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<PointPackage | null>(null);
+  const [confirmPackage, setConfirmPackage] = useState<PointPackage | null>(null); // 確認彈窗
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [ecpayFormData, setEcpayFormData] = useState<{ formData: Record<string, string>; checkoutUrl: string } | null>(null);
@@ -85,7 +86,18 @@ export default function PointsPage() {
     }
   }, [ecpayFormData]);
 
-  const handlePurchase = async (pkg: PointPackage) => {
+  // 第一步：打開確認彈窗
+  const handleSelectPackage = (pkg: PointPackage) => {
+    if (purchasing) return;
+    setConfirmPackage(pkg);
+  };
+
+  // 第二步：確認後真正購買
+  const handleConfirmPurchase = async () => {
+    const pkg = confirmPackage;
+    if (!pkg) return;
+
+    setConfirmPackage(null); // 關閉彈窗
     setSelectedPackage(pkg);
     setPurchasing(true);
 
@@ -189,120 +201,117 @@ export default function PointsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-white py-6 md:py-12 px-3 md:px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* 頁面標題 */}
-        <div className="mb-5 md:mb-8 text-center">
-          <h1 className="text-2xl md:text-4xl font-bold text-white mb-1">點數購買</h1>
-          <p className="text-zinc-500 text-sm md:text-base">選擇適合您的點數方案</p>
-        </div>
-
-        {/* 目前點數餘額 */}
-        <div className="mb-5 md:mb-8">
-          <div className="bg-amber-500/10 rounded-2xl md:rounded-3xl p-5 md:p-8 backdrop-blur-sm border border-amber-500/18 shadow-2xl text-center">
-            <p className="text-zinc-300 text-sm md:text-lg mb-1 md:mb-2">目前點數餘額</p>
-            <p className="text-4xl md:text-5xl font-black text-amber-400">{user.points.toLocaleString()}</p>
-            <p className="text-zinc-500 text-xs md:text-sm mt-1 md:mt-2">點數可用於抽獎及兌換優惠</p>
+    <div className="min-h-screen bg-background text-white py-4 md:py-10 px-3 md:px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* 餘額 */}
+        <div className="flex items-center justify-between mb-5 md:mb-8 px-1">
+          <h1 className="text-xl md:text-3xl font-bold">點數購買</h1>
+          <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl">
+            <span className="text-amber-400 font-black text-xl md:text-2xl">{user.points.toLocaleString()}</span>
+            <span className="text-zinc-500 text-sm">點</span>
           </div>
         </div>
 
-        {/* 點數方案 */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-5 md:mb-8">
+        {/* 方案列表 */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-4 mb-6 md:mb-8">
           {pointPackages.map((pkg) => (
-            <div
+            <button
               key={pkg.id}
-              className={`relative bg-surface-1/50 rounded-2xl md:rounded-3xl p-4 md:p-6 lg:p-8 backdrop-blur-sm border ${
+              onClick={() => handleSelectPackage(pkg)}
+              disabled={purchasing}
+              className={`relative text-left rounded-xl md:rounded-2xl p-3.5 md:p-5 border transition-all disabled:opacity-50 ${
                 pkg.popular
-                  ? 'border-amber-400 shadow-xl shadow-amber-400/20'
-                  : 'border-[var(--border)]'
-              } hover:border-amber-400/50 transition-all`}
+                  ? 'border-amber-400/60 bg-amber-500/8'
+                  : 'border-[var(--border)] bg-surface-1/40 hover:border-zinc-600'
+              }`}
             >
-              {/* 熱門標籤 */}
               {pkg.popular && (
-                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                  <div className="bg-amber-500 text-white px-3 py-0.5 rounded-full text-xs md:text-sm font-bold shadow-lg whitespace-nowrap">
-                    最熱門
-                  </div>
-                </div>
+                <span className="absolute -top-2 right-3 bg-amber-500 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full">
+                  熱門
+                </span>
               )}
 
-              {/* 方案名稱 */}
-              <h3 className="text-base md:text-2xl font-bold text-white mb-2 md:mb-4 text-center">{pkg.name}</h3>
-
-              {/* 點數資訊 */}
-              <div className="text-center mb-3 md:mb-6">
-                <div className="text-2xl md:text-4xl font-black text-amber-400 mb-1 md:mb-2">
-                  {pkg.points.toLocaleString()}
-                </div>
-                <div className="text-zinc-300 text-xs md:text-sm">基礎點數</div>
-
-                {pkg.bonus > 0 && (
-                  <div className="mt-2 md:mt-4 p-2 md:p-3 bg-green-500/10 rounded-lg md:rounded-xl border border-green-500/30">
-                    <div className="text-green-400 font-bold text-sm md:text-lg">
-                      +{pkg.bonus.toLocaleString()} 贈點
-                    </div>
-                    <div className="text-zinc-500 text-[10px] md:text-xs">
-                      共 {(pkg.points + pkg.bonus).toLocaleString()} 點
-                    </div>
-                  </div>
+              {/* 點數 */}
+              <div className="text-amber-400 font-black text-xl md:text-3xl leading-tight">
+                {(pkg.points + pkg.bonus).toLocaleString()}
+              </div>
+              <div className="text-zinc-500 text-[11px] md:text-sm mt-0.5">
+                {pkg.bonus > 0 ? (
+                  <span>含 <span className="text-green-400">+{pkg.bonus.toLocaleString()}</span> 贈點</span>
+                ) : (
+                  '點數'
                 )}
               </div>
 
               {/* 價格 */}
-              <div className="text-center mb-3 md:mb-6">
-                <div className="text-xl md:text-3xl font-bold text-white">
-                  NT$ {pkg.price.toLocaleString()}
-                </div>
-                {pkg.bonus > 0 && (
-                  <div className="text-green-400 text-xs md:text-sm mt-0.5 md:mt-1">
-                    省下 NT$ {pkg.bonus}
-                  </div>
-                )}
+              <div className="mt-2.5 md:mt-4 pt-2.5 md:pt-3 border-t border-white/8">
+                <span className="text-white font-bold text-base md:text-xl">NT$ {pkg.price.toLocaleString()}</span>
               </div>
 
-              {/* 購買按鈕 */}
-              <button
-                onClick={() => handlePurchase(pkg)}
-                disabled={purchasing && selectedPackage?.id === pkg.id}
-                className={`w-full font-bold py-2.5 md:py-4 px-3 md:px-6 text-sm md:text-base rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
-                  pkg.popular
-                    ? 'bg-amber-500 hover:bg-amber-600 text-white'
-                    : 'bg-surface-3 hover:bg-surface-3/80 text-white'
-                }`}
-              >
-                {purchasing && selectedPackage?.id === pkg.id ? '處理中...' : '立即購買'}
-              </button>
-            </div>
+              {/* 處理中指示 */}
+              {purchasing && selectedPackage?.id === pkg.id && (
+                <div className="absolute inset-0 bg-black/50 rounded-xl md:rounded-2xl flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
+            </button>
           ))}
         </div>
 
-        {/* 說明區塊 */}
-        <div className="bg-surface-1/30 rounded-2xl md:rounded-3xl p-4 md:p-8 backdrop-blur-sm border border-[var(--border)]">
-          <h3 className="text-base md:text-xl font-bold text-white mb-3 md:mb-4 flex items-center">
-            <svg className="w-4 h-4 md:w-6 md:h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            購買說明
-          </h3>
-          <div className="space-y-2 md:space-y-3 text-zinc-300 text-xs md:text-base">
-            <p>• 點數可用於一番賞抽獎，每次抽獎消耗對應點數</p>
-            <p>• 購買後點數即時入帳，永久有效</p>
-            <p>• 贈送的點數與購買點數效力相同</p>
-            <p>• 測試帳號可直接購買，無需實際付款</p>
-            <p>• 如有任何問題，請聯絡客服</p>
+        {/* 說明 */}
+        <p className="text-zinc-600 text-xs md:text-sm text-center leading-relaxed">
+          購買後點數即時入帳，可用於一番賞抽獎。如有問題請聯絡客服。
+        </p>
+      </div>
+
+      {/* 確認購買彈窗 */}
+      {confirmPackage && (
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setConfirmPackage(null)}
+          />
+          <div className="relative bg-zinc-900 w-full md:w-auto md:min-w-[360px] md:max-w-sm rounded-t-2xl md:rounded-2xl p-5 md:p-6 border-t md:border border-zinc-700/80 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+            <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-4 md:hidden" />
+
+            <h3 className="text-lg font-bold text-white mb-4">確認購買</h3>
+
+            <div className="space-y-2.5 mb-5 text-sm">
+              <div className="flex justify-between">
+                <span className="text-zinc-400">{confirmPackage.name}</span>
+                <span className="text-amber-400 font-bold">
+                  {(confirmPackage.points + confirmPackage.bonus).toLocaleString()} 點
+                </span>
+              </div>
+              {confirmPackage.bonus > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-zinc-500 text-xs">含贈點</span>
+                  <span className="text-green-400 text-xs">+{confirmPackage.bonus.toLocaleString()}</span>
+                </div>
+              )}
+              <div className="border-t border-zinc-800 pt-2.5 flex justify-between items-center">
+                <span className="text-zinc-400">支付金額</span>
+                <span className="text-white font-black text-lg">NT$ {confirmPackage.price.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="flex gap-2.5">
+              <button
+                onClick={() => setConfirmPackage(null)}
+                className="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleConfirmPurchase}
+                className="flex-[1.5] py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl transition-colors"
+              >
+                確認付款
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* 返回按鈕 */}
-        <div className="mt-5 md:mt-8 text-center">
-          <button
-            onClick={() => router.back()}
-            className="px-6 py-2.5 md:px-8 md:py-3 bg-zinc-700 text-white text-sm md:text-base font-medium rounded-xl hover:bg-zinc-600 transition-colors"
-          >
-            返回
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* ECPay 隱藏表單 */}
       {ecpayFormData && (
