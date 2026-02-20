@@ -111,9 +111,9 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-surface-0 sticky top-0 z-50 border-b border-[var(--border)]">
+    <header className="w-full bg-surface-0 fixed top-0 left-0 right-0 z-50 border-b border-[var(--border)]">
       <div className="max-w-screen-xl mx-auto px-4">
-        <nav className="flex items-center justify-between h-20">
+        <nav className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
@@ -122,7 +122,7 @@ export default function Header() {
                 alt="失控抽抽"
                 width={180}
                 height={60}
-                className="h-14 w-auto"
+                className="h-10 md:h-14 w-auto"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const textLogo = e.currentTarget.nextElementSibling as HTMLElement;
