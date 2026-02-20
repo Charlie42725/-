@@ -159,7 +159,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
                   <div className="flex-1 mb-1.5 md:mb-2">
                     <ul className="space-y-0 md:space-y-0.5">
                       {variants.slice(0, 6).map((v) => (
-                        <li key={v.id} className="text-zinc-500 text-[9px] md:text-xs leading-relaxed truncate">
+                        <li key={v.id} className="text-white text-[9px] md:text-xs leading-relaxed truncate">
                           {v.prize} {v.name}
                         </li>
                       ))}

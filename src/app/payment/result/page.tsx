@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { isAuthenticated } from '@/lib/auth';
 
@@ -14,7 +14,7 @@ interface OrderInfo {
   status: string;
 }
 
-export default function PaymentResultPage() {
+function PaymentResultContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderNumber = searchParams.get('orderNumber');
@@ -219,5 +219,17 @@ export default function PaymentResultPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PaymentResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <PaymentResultContent />
+    </Suspense>
   );
 }

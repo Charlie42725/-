@@ -37,7 +37,9 @@
       "WebSearch",
       "Bash(npx fix-react2shell-next:*)",
       "Bash(python scripts/search.py:*)",
-      "Bash(PYTHONIOENCODING=utf-8 python:*)"
+      "Bash(PYTHONIOENCODING=utf-8 python:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []
