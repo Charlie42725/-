@@ -43,9 +43,9 @@ interface Brand {
 
 const rarityOptions = [
   { value: 'SSR', label: 'SSR（超稀有）', color: 'text-yellow-400' },
-  { value: 'SR', label: 'SR（稀有）', color: 'text-indigo-400' },
+  { value: 'SR', label: 'SR（稀有）', color: 'text-amber-400' },
   { value: 'R', label: 'R（普通）', color: 'text-blue-400' },
-  { value: 'N', label: 'N（一般）', color: 'text-gray-400' },
+  { value: 'N', label: 'N（一般）', color: 'text-zinc-400' },
 ];
 
 export default function VariantsPage() {
@@ -213,9 +213,9 @@ export default function VariantsPage() {
   }
 
   function getRarityColor(rarity: string | null) {
-    if (!rarity) return 'text-gray-400';
+    if (!rarity) return 'text-zinc-400';
     const option = rarityOptions.find((opt) => opt.value === rarity);
-    return option?.color || 'text-gray-400';
+    return option?.color || 'text-zinc-400';
   }
 
   function getAvailableSeries() {
@@ -258,9 +258,9 @@ export default function VariantsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">全局獎項管理</h1>
-          <p className="text-gray-400">
+          <p className="text-zinc-400">
             查看所有獎項（共 {filteredVariants.length} 個）
-            <span className="text-gray-500 ml-2">
+            <span className="text-zinc-500 ml-2">
               提示：建議從「商品管理」進入各商品的獎項頁面進行管理
             </span>
           </p>
@@ -273,20 +273,20 @@ export default function VariantsPage() {
               setShowForm(true);
             }
           }}
-          className="bg-indigo-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 transition-all"
+          className="bg-amber-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-600 transition-all"
         >
           {showForm ? '取消' : '+ 新增獎項'}
         </button>
       </div>
 
       {/* 篩選器 */}
-      <div className="bg-gray-900/60 rounded-lg p-6 border border-white/[0.06] mb-6">
+      <div className="bg-surface-1/60 rounded-lg p-6 border border-[var(--border)] mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-white">篩選條件</h3>
           {(filterBrand || filterSeries || filterProduct) && (
             <button
               onClick={clearFilters}
-              className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
             >
               清除篩選
             </button>
@@ -294,7 +294,7 @@ export default function VariantsPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-gray-300 mb-2 text-sm">品牌</label>
+            <label className="block text-zinc-300 mb-2 text-sm">品牌</label>
             <select
               value={filterBrand}
               onChange={(e) => {
@@ -302,7 +302,7 @@ export default function VariantsPage() {
                 setFilterSeries('');
                 setFilterProduct('');
               }}
-              className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
             >
               <option value="">全部品牌</option>
               {brands.map((brand) => (
@@ -314,14 +314,14 @@ export default function VariantsPage() {
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2 text-sm">系列</label>
+            <label className="block text-zinc-300 mb-2 text-sm">系列</label>
             <select
               value={filterSeries}
               onChange={(e) => {
                 setFilterSeries(e.target.value);
                 setFilterProduct('');
               }}
-              className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
               disabled={!filterBrand}
             >
               <option value="">全部系列</option>
@@ -334,11 +334,11 @@ export default function VariantsPage() {
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2 text-sm">商品</label>
+            <label className="block text-zinc-300 mb-2 text-sm">商品</label>
             <select
               value={filterProduct}
               onChange={(e) => setFilterProduct(e.target.value)}
-              className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
             >
               <option value="">全部商品</option>
               {getAvailableProducts().map((product) => (
@@ -353,13 +353,13 @@ export default function VariantsPage() {
 
       {/* 新增/編輯表單 */}
       {showForm && (
-        <div className="bg-gray-900/60 rounded-lg p-6 border border-white/[0.06] mb-8">
+        <div className="bg-surface-1/60 rounded-lg p-6 border border-[var(--border)] mb-8">
           <h2 className="text-xl font-bold text-white mb-4">
             {editingId ? '編輯獎項' : '新增獎項'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-300 mb-2">選擇商品 *</label>
+              <label className="block text-zinc-300 mb-2">選擇商品 *</label>
               <select
                 required
                 disabled={!!editingId}
@@ -367,7 +367,7 @@ export default function VariantsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, productId: e.target.value })
                 }
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 disabled:opacity-50"
               >
                 <option value="">請選擇商品</option>
                 {brands.map((brand) => (
@@ -383,7 +383,7 @@ export default function VariantsPage() {
                 ))}
               </select>
               {editingId && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   編輯時無法更改所屬商品
                 </p>
               )}
@@ -391,7 +391,7 @@ export default function VariantsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-300 mb-2">賞等 *</label>
+                <label className="block text-zinc-300 mb-2">賞等 *</label>
                 <input
                   type="text"
                   required
@@ -399,13 +399,13 @@ export default function VariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, prize: e.target.value })
                   }
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                   placeholder="例如：A賞、B賞、Last賞"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">獎項名稱 *</label>
+                <label className="block text-zinc-300 mb-2">獎項名稱 *</label>
                 <input
                   type="text"
                   required
@@ -413,7 +413,7 @@ export default function VariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                   placeholder="例如：特等獎公仔、限定海報"
                 />
               </div>
@@ -421,13 +421,13 @@ export default function VariantsPage() {
 
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-gray-300 mb-2">稀有度</label>
+                <label className="block text-zinc-300 mb-2">稀有度</label>
                 <select
                   value={formData.rarity}
                   onChange={(e) =>
                     setFormData({ ...formData, rarity: e.target.value })
                   }
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                 >
                   <option value="">未設定</option>
                   {rarityOptions.map((option) => (
@@ -439,7 +439,7 @@ export default function VariantsPage() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">獎項價值 (¥) *</label>
+                <label className="block text-zinc-300 mb-2">獎項價值 (¥) *</label>
                 <input
                   type="number"
                   required
@@ -449,13 +449,13 @@ export default function VariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, value: e.target.value })
                   }
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                   placeholder="例如：3000"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">庫存數量 *</label>
+                <label className="block text-zinc-300 mb-2">庫存數量 *</label>
                 <input
                   type="number"
                   required
@@ -464,7 +464,7 @@ export default function VariantsPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, stock: e.target.value })
                   }
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                   placeholder="例如：5"
                 />
               </div>
@@ -484,9 +484,9 @@ export default function VariantsPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, isActive: e.target.checked })
                 }
-                className="w-4 h-4 text-indigo-500 bg-gray-800 border-gray-700 rounded focus:ring-indigo-500"
+                className="w-4 h-4 text-amber-500 bg-surface-2 border-surface-3 rounded focus:ring-amber-500"
               />
-              <label htmlFor="isActive" className="ml-2 text-gray-300">
+              <label htmlFor="isActive" className="ml-2 text-zinc-300">
                 啟用此獎項
               </label>
             </div>
@@ -494,14 +494,14 @@ export default function VariantsPage() {
             <div className="flex space-x-4">
               <button
                 type="submit"
-                className="bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
+                className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors"
               >
                 儲存
               </button>
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                className="bg-surface-3 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 取消
               </button>
@@ -511,36 +511,36 @@ export default function VariantsPage() {
       )}
 
       {/* 獎項列表 */}
-      <div className="bg-gray-900/60 rounded-lg border border-white/[0.06] overflow-hidden">
+      <div className="bg-surface-1/60 rounded-lg border border-[var(--border)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-900">
+            <thead className="bg-surface-deep">
               <tr>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   ID
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   賞等
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   獎項名稱
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   所屬商品
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   稀有度
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   價值
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   抽取狀況
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   狀態
                 </th>
-                <th className="text-left px-6 py-4 text-gray-300 font-medium">
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">
                   操作
                 </th>
               </tr>
@@ -548,16 +548,16 @@ export default function VariantsPage() {
             <tbody className="divide-y divide-white/[0.06]">
               {filteredVariants.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center text-gray-400">
+                  <td colSpan={9} className="px-6 py-12 text-center text-zinc-400">
                     {variants.length === 0 ? '目前沒有獎項' : '沒有符合條件的獎項'}
                   </td>
                 </tr>
               ) : (
                 filteredVariants.map((variant) => (
                   <tr key={variant.id} className="hover:bg-white/[0.04]">
-                    <td className="px-6 py-4 text-gray-300">{variant.id}</td>
+                    <td className="px-6 py-4 text-zinc-300">{variant.id}</td>
                     <td className="px-6 py-4">
-                      <span className="text-indigo-400 font-bold">
+                      <span className="text-amber-400 font-bold">
                         {variant.prize}
                       </span>
                     </td>
@@ -583,7 +583,7 @@ export default function VariantsPage() {
                           {variant.product.name}
                         </div>
                         {variant.product.series && (
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-zinc-400">
                             {variant.product.series.brand?.name || '未知品牌'} •{' '}
                             {variant.product.series.name}
                           </div>
@@ -606,10 +606,10 @@ export default function VariantsPage() {
                           <span className="text-red-400 font-bold">已抽: {variant._count?.lotteryDraws || 0}</span>
                           <span className="text-green-400 font-bold">剩餘: {variant.stock}</span>
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-zinc-400">
                           總數: {variant.stock + (variant._count?.lotteryDraws || 0)}
                         </div>
-                        <div className="w-24 bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                        <div className="w-24 bg-surface-3 rounded-full h-1.5 overflow-hidden">
                           <div
                             className="bg-red-500 h-1.5 rounded-full transition-all"
                             style={{
@@ -625,7 +625,7 @@ export default function VariantsPage() {
                           啟用
                         </span>
                       ) : (
-                        <span className="bg-gray-500/20 text-gray-400 px-2 py-1 rounded text-xs">
+                        <span className="bg-gray-500/20 text-zinc-400 px-2 py-1 rounded text-xs">
                           停用
                         </span>
                       )}
@@ -640,7 +640,7 @@ export default function VariantsPage() {
                         </Link>
                         <button
                           onClick={() => handleEdit(variant)}
-                          className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+                          className="text-amber-400 hover:text-amber-300 text-sm transition-colors"
                         >
                           編輯
                         </button>

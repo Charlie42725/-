@@ -103,7 +103,7 @@ export default async function AdminDashboard() {
     <div className="w-full">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white mb-1">儀表板</h1>
-        <p className="text-gray-500 text-sm">系統總覽與快速操作</p>
+        <p className="text-zinc-500 text-sm">系統總覽與快速操作</p>
       </div>
 
       {/* 統計卡片 */}
@@ -115,7 +115,7 @@ export default async function AdminDashboard() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">{card.label}</p>
+                <p className="text-zinc-400 text-sm">{card.label}</p>
                 <p className={`text-3xl font-bold mt-1 ${card.color}`}>{card.value}</p>
               </div>
               <div className="opacity-80">{card.icon}</div>
@@ -125,19 +125,19 @@ export default async function AdminDashboard() {
       </div>
 
       {/* 快速操作 */}
-      <div className="bg-gray-900/60 rounded-xl p-6 border border-white/[0.06]">
+      <div className="bg-surface-1/60 rounded-xl p-6 border border-[var(--border)]">
         <h2 className="text-lg font-semibold text-white mb-4">快速操作</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {quickActions.map((action) => (
             <Link
               key={action.href}
               href={action.href}
-              className="flex items-center p-4 bg-white/[0.03] rounded-lg hover:bg-white/[0.06] transition-colors duration-200 border border-white/[0.04] cursor-pointer group"
+              className="flex items-center p-4 bg-surface-1/30 rounded-lg hover:bg-surface-1/40 transition-colors duration-200 border border-[var(--border)] cursor-pointer group"
             >
               <div className="mr-4 opacity-80 group-hover:opacity-100 transition-opacity">{action.icon}</div>
               <div>
                 <p className="font-medium text-white text-sm">{action.title}</p>
-                <p className="text-xs text-gray-500">{action.desc}</p>
+                <p className="text-xs text-zinc-500">{action.desc}</p>
               </div>
             </Link>
           ))}

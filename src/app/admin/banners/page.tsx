@@ -141,11 +141,11 @@ export default function BannersPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">輪播管理</h1>
-          <p className="text-gray-400">管理首頁輪播 Banner</p>
+          <p className="text-zinc-400">管理首頁輪播 Banner</p>
         </div>
         <button
           onClick={() => (showForm ? setShowForm(false) : openCreateForm())}
-          className="bg-indigo-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-600 transition-all"
+          className="bg-amber-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-600 transition-all"
         >
           {showForm ? '取消' : '+ 新增 Banner'}
         </button>
@@ -153,42 +153,42 @@ export default function BannersPage() {
 
       {/* 新增/編輯表單 */}
       {showForm && (
-        <div className="bg-gray-900/60 rounded-lg p-6 border border-white/[0.06] mb-8">
+        <div className="bg-surface-1/60 rounded-lg p-6 border border-[var(--border)] mb-8">
           <h2 className="text-xl font-bold text-white mb-4">
             {editingId ? '編輯 Banner' : '新增 Banner'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-300 mb-2">標題 *</label>
+                <label className="block text-zinc-300 mb-2">標題 *</label>
                 <input
                   type="text"
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="例如：FOUNTAIN OF LIFE"
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-2">副標題</label>
+                <label className="block text-zinc-300 mb-2">副標題</label>
                 <input
                   type="text"
                   value={formData.subtitle}
                   onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="例如：連賞被擊退12次"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-gray-300 mb-2">描述文字</label>
+              <label className="block text-zinc-300 mb-2">描述文字</label>
               <input
                 type="text"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 placeholder="例如：獲得119萬玖福"
               />
             </div>
@@ -202,22 +202,22 @@ export default function BannersPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-300 mb-2">連結網址</label>
+                <label className="block text-zinc-300 mb-2">連結網址</label>
                 <input
                   type="text"
                   value={formData.linkUrl}
                   onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="例如：/products/some-product"
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-2">排序（數字越小越前面）</label>
+                <label className="block text-zinc-300 mb-2">排序（數字越小越前面）</label>
                 <input
                   type="number"
                   value={formData.sortOrder}
                   onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
-                  className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 />
               </div>
             </div>
@@ -230,15 +230,15 @@ export default function BannersPage() {
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500"></div>
+                <div className="w-11 h-6 bg-surface-3 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
               </label>
-              <span className="text-gray-300">啟用</span>
+              <span className="text-zinc-300">啟用</span>
             </div>
 
             <div className="flex space-x-4">
               <button
                 type="submit"
-                className="bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-600 transition-colors"
+                className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors"
               >
                 {editingId ? '更新' : '儲存'}
               </button>
@@ -248,7 +248,7 @@ export default function BannersPage() {
                   setShowForm(false);
                   setEditingId(null);
                 }}
-                className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                className="bg-surface-3 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 取消
               </button>
@@ -258,31 +258,31 @@ export default function BannersPage() {
       )}
 
       {/* Banner 列表 */}
-      <div className="bg-gray-900/60 rounded-lg border border-white/[0.06] overflow-hidden">
+      <div className="bg-surface-1/60 rounded-lg border border-[var(--border)] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-900">
+          <thead className="bg-surface-deep">
             <tr>
-              <th className="text-left px-6 py-4 text-gray-300 font-medium">排序</th>
-              <th className="text-left px-6 py-4 text-gray-300 font-medium">圖片</th>
-              <th className="text-left px-6 py-4 text-gray-300 font-medium">標題</th>
-              <th className="text-left px-6 py-4 text-gray-300 font-medium">連結</th>
-              <th className="text-left px-6 py-4 text-gray-300 font-medium">狀態</th>
-              <th className="text-left px-6 py-4 text-gray-300 font-medium">操作</th>
+              <th className="text-left px-6 py-4 text-zinc-300 font-medium">排序</th>
+              <th className="text-left px-6 py-4 text-zinc-300 font-medium">圖片</th>
+              <th className="text-left px-6 py-4 text-zinc-300 font-medium">標題</th>
+              <th className="text-left px-6 py-4 text-zinc-300 font-medium">連結</th>
+              <th className="text-left px-6 py-4 text-zinc-300 font-medium">狀態</th>
+              <th className="text-left px-6 py-4 text-zinc-300 font-medium">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/[0.06]">
             {banners.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                <td colSpan={6} className="px-6 py-12 text-center text-zinc-400">
                   目前沒有 Banner，點擊「新增 Banner」開始建立
                 </td>
               </tr>
             ) : (
               banners.map((banner) => (
                 <tr key={banner.id} className="hover:bg-white/[0.04] transition-colors">
-                  <td className="px-6 py-4 text-gray-300">{banner.sortOrder}</td>
+                  <td className="px-6 py-4 text-zinc-300">{banner.sortOrder}</td>
                   <td className="px-6 py-4">
-                    <div className="relative w-24 h-14 bg-gray-800 rounded overflow-hidden">
+                    <div className="relative w-24 h-14 bg-surface-2 rounded overflow-hidden">
                       <Image
                         src={banner.imageUrl}
                         alt={banner.title}
@@ -294,16 +294,16 @@ export default function BannersPage() {
                   <td className="px-6 py-4">
                     <div className="font-medium text-white">{banner.title}</div>
                     {banner.subtitle && (
-                      <div className="text-sm text-gray-400">{banner.subtitle}</div>
+                      <div className="text-sm text-zinc-400">{banner.subtitle}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-gray-300 max-w-xs truncate">
+                  <td className="px-6 py-4 text-zinc-300 max-w-xs truncate">
                     {banner.linkUrl ? (
-                      <code className="text-sm text-indigo-400 bg-black/40 px-2 py-1 rounded">
+                      <code className="text-sm text-amber-400 bg-surface-deep/60 px-2 py-1 rounded">
                         {banner.linkUrl}
                       </code>
                     ) : (
-                      <span className="text-gray-500">-</span>
+                      <span className="text-zinc-500">-</span>
                     )}
                   </td>
                   <td className="px-6 py-4">
@@ -316,7 +316,7 @@ export default function BannersPage() {
                           啟用中
                         </span>
                       ) : (
-                        <span className="bg-gray-500/20 text-gray-400 px-3 py-1 rounded-full text-sm">
+                        <span className="bg-gray-500/20 text-zinc-400 px-3 py-1 rounded-full text-sm">
                           已停用
                         </span>
                       )}
@@ -326,7 +326,7 @@ export default function BannersPage() {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => openEditForm(banner)}
-                        className="text-indigo-400 hover:text-indigo-300 text-sm"
+                        className="text-amber-400 hover:text-amber-300 text-sm"
                       >
                         編輯
                       </button>

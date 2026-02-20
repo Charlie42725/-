@@ -19,6 +19,7 @@ const chakraPetch = Chakra_Petch({
 export const metadata: Metadata = {
   title: "失控抽抽 - GK.盲盒.一番賞",
   description: "失控抽抽 — 失控事務所線上抽賞平台，GK、盲盒、一番賞，提供最公平、公正、公開的抽賞體驗。",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

@@ -111,7 +111,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-surface-0/95 backdrop-blur-md sticky top-0 z-50 border-b border-[var(--border)]">
+    <header className="w-full bg-surface-0 sticky top-0 z-50 border-b border-[var(--border)]">
       <div className="max-w-screen-xl mx-auto px-4">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -291,11 +291,11 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden bg-surface-1 py-4 slide-down">
             <div className="flex flex-col space-y-2">
-              <Link href="/" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                 全部一番賞
               </Link>
               {loggedIn && (
-                <Link href="/member/prizes" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                <Link href="/member/prizes" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                   獎品包包
                 </Link>
               )}
@@ -308,6 +308,7 @@ export default function Header() {
                     </div>
                     <Link
                       href="/member/points"
+                      onClick={() => setIsMenuOpen(false)}
                       className="flex items-center space-x-2 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl hover:bg-amber-500/18 transition-all duration-200"
                     >
                       <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
@@ -318,19 +319,19 @@ export default function Header() {
                       <span className="text-zinc-500 text-sm">點</span>
                     </Link>
                   </div>
-                  <Link href="/member/profile" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/profile" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     基本設定
                   </Link>
-                  <Link href="/member/prizes" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/prizes" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     獎品包包
                   </Link>
-                  <Link href="/member/points" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/points" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     點數購買
                   </Link>
-                  <Link href="/member/orders" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/orders" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     訂單紀錄
                   </Link>
-                  <Link href="/member/point-history" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/member/point-history" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     點數異動紀錄
                   </Link>
                   <hr className="border-[var(--border)] my-2" />
@@ -343,10 +344,10 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/login" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     登入
                   </Link>
-                  <Link href="/register" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
+                  <Link href="/register" onClick={() => setIsMenuOpen(false)} className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     註冊
                   </Link>
                 </>
