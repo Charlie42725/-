@@ -19,6 +19,14 @@ const chakraPetch = Chakra_Petch({
 export const metadata: Metadata = {
   title: "失控抽抽 - GK.盲盒.一番賞",
   description: "失控抽抽 — 失控事務所線上抽賞平台，GK、盲盒、一番賞，提供最公平、公正、公開的抽賞體驗。",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "失控抽抽",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 import Header from "@/components/Header";
@@ -31,6 +39,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
+      <head>
+        <meta name="theme-color" content="#0F1219" />
+        <link rel="apple-touch-icon" href="/assets/images/logos/apple-touch-icon.png" />
+      </head>
       <body
         className={`${russoOne.variable} ${chakraPetch.variable} antialiased bg-background text-white min-h-screen flex flex-col font-body`}
       >

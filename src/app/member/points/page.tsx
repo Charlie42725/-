@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { isAuthenticated } from '@/lib/auth';
+
+const PAYMENT_MODE = process.env.NEXT_PUBLIC_PAYMENT_MODE || 'mock';
 
 interface PointPackage {
   id: number;
@@ -35,6 +37,8 @@ export default function PointsPage() {
   const [selectedPackage, setSelectedPackage] = useState<PointPackage | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
+  const [ecpayFormData, setEcpayFormData] = useState<{ formData: Record<string, string>; checkoutUrl: string } | null>(null);
+  const ecpayFormRef = useRef<HTMLFormElement>(null);
 
   const loadUserProfile = useCallback(async () => {
     try {
@@ -74,6 +78,13 @@ export default function PointsPage() {
     loadUserProfile();
   }, [router, loadUserProfile]);
 
+  // ECPay 表單自動提交
+  useEffect(() => {
+    if (ecpayFormData && ecpayFormRef.current) {
+      ecpayFormRef.current.submit();
+    }
+  }, [ecpayFormData]);
+
   const handlePurchase = async (pkg: PointPackage) => {
     setSelectedPackage(pkg);
     setPurchasing(true);
@@ -97,7 +108,28 @@ export default function PointsPage() {
 
       const { order } = await createOrderResponse.json();
 
-      // 2. 模擬付款（藍新金流）
+      if (PAYMENT_MODE === 'ecpay') {
+        // ECPay 綠界金流
+        const ecpayResponse = await fetch('/api/payment/ecpay/create-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ orderNumber: order.orderNumber }),
+        });
+
+        if (!ecpayResponse.ok) {
+          throw new Error('建立付款失敗');
+        }
+
+        const ecpayResult = await ecpayResponse.json();
+        // 設定表單資料，useEffect 會自動提交
+        setEcpayFormData(ecpayResult);
+        return; // 不要 reset purchasing 狀態，讓使用者知道正在跳轉
+      }
+
+      // Mock 模式 — 保留現有邏輯
       const paymentResponse = await fetch('/api/payment/newebpay-mock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -113,7 +145,6 @@ export default function PointsPage() {
 
       const paymentResult = await paymentResponse.json();
 
-      // 3. 付款成功，更新顯示
       alert(
         `付款成功！\n\n` +
         `訂單編號：${order.orderNumber}\n` +
@@ -125,10 +156,8 @@ export default function PointsPage() {
         `新點數餘額：${paymentResult.newBalance.toLocaleString()}`
       );
 
-      // 重新載入用戶資料
       await loadUserProfile();
 
-      // 觸發 storage 事件，通知 Header 組件更新點數
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'points_updated',
         newValue: paymentResult.newBalance.toString()
@@ -274,6 +303,20 @@ export default function PointsPage() {
           </button>
         </div>
       </div>
+
+      {/* ECPay 隱藏表單 */}
+      {ecpayFormData && (
+        <form
+          ref={ecpayFormRef}
+          method="POST"
+          action={ecpayFormData.checkoutUrl}
+          style={{ display: 'none' }}
+        >
+          {Object.entries(ecpayFormData.formData).map(([key, value]) => (
+            <input key={key} type="hidden" name={key} value={value} />
+          ))}
+        </form>
+      )}
     </div>
   );
 }
