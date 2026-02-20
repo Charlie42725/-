@@ -53,7 +53,7 @@ export default function RootLayout({
         className={`${russoOne.variable} ${chakraPetch.variable} antialiased bg-background text-white min-h-screen flex flex-col font-body`}
       >
         <Header />
-        <main className="flex-grow pt-16 md:pt-20">
+        <main className="flex-grow">
           {children}
         </main>
         <Footer />
