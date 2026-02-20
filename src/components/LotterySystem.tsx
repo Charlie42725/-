@@ -275,7 +275,7 @@ export default function LotterySystem({
         aria-modal="true"
         aria-label="確認抽獎"
       >
-        <div className="bg-zinc-800 rounded-2xl p-8 max-w-md w-full border border-zinc-700 shadow-2xl">
+        <div className="bg-surface-1 rounded-2xl p-8 max-w-md w-full border border-[var(--border)] shadow-2xl">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-heading font-bold text-white mb-2">確認開始抽獎？</h3>
             <p className="text-zinc-500">
@@ -283,7 +283,7 @@ export default function LotterySystem({
             </p>
           </div>
 
-          <div className="bg-zinc-900/50 rounded-xl p-4 mb-4">
+          <div className="bg-surface-2/50 rounded-xl p-4 mb-4">
             <p className="text-zinc-300 text-sm text-center leading-relaxed mb-3">
               選擇的號碼：
             </p>
@@ -382,7 +382,7 @@ export default function LotterySystem({
 
                       {/* 背面：獎品 */}
                       <div className="flip-card-back rounded-xl overflow-hidden shadow-xl">
-                        <div className="absolute inset-0 bg-zinc-800 flex flex-col">
+                        <div className="absolute inset-0 bg-surface-1 flex flex-col">
                           <div className="relative flex-1">
                             {result.variant.imageUrl ? (
                               <Image
@@ -393,14 +393,14 @@ export default function LotterySystem({
                                 className="object-cover"
                               />
                             ) : (
-                              <div className="absolute inset-0 bg-zinc-800 flex items-center justify-center">
+                              <div className="absolute inset-0 bg-surface-1 flex items-center justify-center">
                                 <svg className="w-10 h-10 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                                 </svg>
                               </div>
                             )}
                           </div>
-                          <div className="bg-zinc-900 px-3 py-4 flex flex-col justify-center gap-1 flex-shrink-0">
+                          <div className="bg-surface-deep px-3 py-4 flex flex-col justify-center gap-1 flex-shrink-0">
                             <p className="text-amber-400 font-bold text-center text-sm leading-tight">
                               {result.ticketNumber} - {result.variant.prize}
                             </p>
@@ -437,12 +437,12 @@ export default function LotterySystem({
     return (
       <div>
         <div className="flex items-center justify-between mb-6">
-          <div className="h-6 w-32 bg-zinc-700/50 rounded animate-pulse"></div>
-          <div className="h-5 w-24 bg-zinc-700/50 rounded animate-pulse"></div>
+          <div className="h-6 w-32 bg-surface-2/50 rounded animate-pulse"></div>
+          <div className="h-5 w-24 bg-surface-2/50 rounded animate-pulse"></div>
         </div>
         <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-[repeat(14,minmax(0,1fr))] xl:grid-cols-[repeat(16,minmax(0,1fr))] gap-2 md:gap-3">
           {Array.from({ length: Math.min(totalTickets, 48) }, (_, i) => (
-            <div key={i} className="aspect-square rounded-lg bg-zinc-700/40 animate-pulse" />
+            <div key={i} className="aspect-square rounded-lg bg-surface-2/40 animate-pulse" />
           ))}
         </div>
       </div>
@@ -492,10 +492,10 @@ export default function LotterySystem({
                 className={`
                   aspect-square rounded-lg font-bold text-sm transition-all duration-200 relative overflow-hidden
                   ${drawn
-                    ? 'bg-zinc-700/50 text-zinc-500'
+                    ? 'bg-surface-2/50 text-zinc-500'
                     : selected
                     ? 'bg-amber-500 text-white shadow-lg ring-2 ring-amber-500/25'
-                    : 'bg-zinc-700 text-white hover:bg-zinc-600 hover:-translate-y-0.5'
+                    : 'bg-surface-3 text-white hover:bg-surface-3/80 hover:-translate-y-0.5'
                   }
                 `}
                 title={drawn && variant ? `${variant.prize} - ${variant.name}` : ''}
@@ -516,7 +516,7 @@ export default function LotterySystem({
         </div>
       </div>
 
-      <div className="sticky bottom-0 bg-[#0a0a0a]/95 backdrop-blur-md border-t border-white/10 -mx-4 px-4 py-4 mt-6 md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:mx-0 md:px-0 md:py-0 md:mt-0">
+      <div className="sticky bottom-0 bg-surface-deep/95 backdrop-blur-md border-t border-[var(--border)] -mx-4 px-4 py-4 mt-6 md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:mx-0 md:px-0 md:py-0 md:mt-0">
         <div className="flex gap-4 max-w-2xl mx-auto md:max-w-none">
           <button
             onClick={handleConfirmDraw}

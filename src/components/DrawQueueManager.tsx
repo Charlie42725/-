@@ -348,7 +348,7 @@ export default function DrawQueueManager({
   if (queueState === 'expired') {
     return (
       <div className="text-center py-12 px-4">
-        <div className="bg-zinc-800/50 rounded-3xl p-8 md:p-12 backdrop-blur-sm border border-zinc-700/50 max-w-lg mx-auto">
+        <div className="bg-surface-1/50 rounded-3xl p-8 md:p-12 backdrop-blur-sm border border-[var(--border)] max-w-lg mx-auto">
           <div className="text-6xl mb-6">⏰</div>
           <h3 className="text-2xl font-bold text-white mb-4">抽獎時間已過期</h3>
           <p className="text-zinc-500 mb-8">

@@ -145,7 +145,7 @@ export default function PointsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-xl">載入中...</div>
       </div>
     );
@@ -153,14 +153,14 @@ export default function PointsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-xl">無法載入用戶資料</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white py-12 px-4">
+    <div className="min-h-screen bg-background text-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* 頁面標題 */}
         <div className="mb-8 text-center">
@@ -182,10 +182,10 @@ export default function PointsPage() {
           {pointPackages.map((pkg) => (
             <div
               key={pkg.id}
-              className={`relative bg-zinc-800/50 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border ${
+              className={`relative bg-surface-1/50 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border ${
                 pkg.popular
                   ? 'border-amber-400 shadow-xl shadow-amber-400/20'
-                  : 'border-zinc-700/50'
+                  : 'border-[var(--border)]'
               } hover:border-amber-400/50 transition-all hover:scale-105`}
             >
               {/* 熱門標籤 */}
@@ -238,7 +238,7 @@ export default function PointsPage() {
                 className={`w-full font-bold py-4 px-6 rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
                   pkg.popular
                     ? 'bg-amber-500 hover:bg-amber-600 text-white'
-                    : 'bg-zinc-700 hover:bg-zinc-600 text-white'
+                    : 'bg-surface-3 hover:bg-surface-3/80 text-white'
                 }`}
               >
                 {purchasing && selectedPackage?.id === pkg.id ? '處理中...' : '立即購買'}
@@ -248,7 +248,7 @@ export default function PointsPage() {
         </div>
 
         {/* 說明區塊 */}
-        <div className="bg-zinc-800/30 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-zinc-700/50">
+        <div className="bg-surface-1/30 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-[var(--border)]">
           <h3 className="text-xl font-bold text-white mb-4 flex items-center">
             <svg className="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

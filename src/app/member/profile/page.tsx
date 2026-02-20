@@ -98,14 +98,14 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-xl">載入中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white py-12 px-4">
+    <div className="min-h-screen bg-background text-white py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* 頁面標題 */}
         <div className="mb-8">
@@ -113,10 +113,10 @@ export default function ProfilePage() {
           <p className="text-zinc-500">管理您的個人資料</p>
         </div>
 
-        <div className="bg-zinc-800/50 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-zinc-700/50 shadow-2xl">
+        <div className="bg-surface-1/50 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-[var(--border)] shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 帳號資訊 */}
-            <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="space-y-4 p-6 bg-surface-2/50 rounded-2xl">
               <h3 className="text-lg font-semibold text-amber-400 mb-4">帳號資訊</h3>
 
               <div>
@@ -127,7 +127,7 @@ export default function ProfilePage() {
                   type="email"
                   value={user.email}
                   disabled
-                  className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-zinc-500 cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-surface-3 border border-[var(--border)] rounded-xl text-zinc-500 cursor-not-allowed"
                 />
                 <p className="text-zinc-500 text-xs mt-2">Email 無法變更</p>
               </div>
@@ -141,7 +141,7 @@ export default function ProfilePage() {
                   name="nickname"
                   value={formData.nickname}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="您的暱稱"
                   required
                 />
@@ -153,7 +153,7 @@ export default function ProfilePage() {
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                 >
                   <option value="">請選擇</option>
                   <option value="male">男性</option>
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="09xxxxxxxx"
                 />
                 {user.isPhoneVerified && (
@@ -181,7 +181,7 @@ export default function ProfilePage() {
             </div>
 
             {/* 變更密碼 */}
-            <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="space-y-4 p-6 bg-surface-2/50 rounded-2xl">
               <h3 className="text-lg font-semibold text-amber-400 mb-4">變更密碼</h3>
 
               <div>
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                   name="currentPassword"
                   value={formData.currentPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="輸入目前密碼"
                 />
                 <p className="text-zinc-500 text-xs mt-2">若不需變更密碼，請留空此區塊</p>
@@ -208,7 +208,7 @@ export default function ProfilePage() {
                   name="newPassword"
                   value={formData.newPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="6-24 個字元"
                 />
               </div>
@@ -222,7 +222,7 @@ export default function ProfilePage() {
                   name="confirmNewPassword"
                   value={formData.confirmNewPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="再次輸入新密碼"
                 />
               </div>
@@ -254,7 +254,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-8 bg-zinc-700 text-white font-medium py-4 rounded-xl hover:bg-zinc-600 transition-colors"
+                className="px-8 bg-surface-3 text-white font-medium py-4 rounded-xl hover:bg-zinc-600 transition-colors"
               >
                 返回
               </button>

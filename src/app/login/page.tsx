@@ -84,9 +84,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-background text-white flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full">
-        <div className="bg-zinc-800/50 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-zinc-700/50 shadow-2xl">
+        <div className="bg-surface-1/80 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-[var(--border)] shadow-2xl">
           {/* 標題 */}
           <div className="text-center mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">會員登入</h1>
@@ -104,7 +104,7 @@ export default function LoginPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                 placeholder="your@email.com"
                 required
               />
@@ -121,7 +121,7 @@ export default function LoginPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                 placeholder="請輸入密碼"
                 required
               />
@@ -136,13 +136,13 @@ export default function LoginPage() {
             </div>
 
             {/* 服務條款 */}
-            <div className="flex items-start gap-3 p-4 bg-zinc-900/50 rounded-2xl">
+            <div className="flex items-start gap-3 p-4 bg-surface-2/50 rounded-2xl">
               <input
                 type="checkbox"
                 name="agreedToTerms"
                 checked={formData.agreedToTerms}
                 onChange={handleChange}
-                className="mt-1 w-5 h-5 rounded border-zinc-700 text-amber-500 focus:ring-amber-400 bg-zinc-800"
+                className="mt-1 w-5 h-5 rounded border-[var(--border)] text-amber-500 focus:ring-amber-400 bg-surface-2"
                 required
               />
               <label className="text-sm text-zinc-300">

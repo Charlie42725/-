@@ -152,9 +152,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-background text-white flex items-center justify-center py-12 px-4">
       <div className="max-w-2xl w-full">
-        <div className="bg-zinc-800/50 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-zinc-700/50 shadow-2xl">
+        <div className="bg-surface-1/80 rounded-3xl p-8 lg:p-10 backdrop-blur-sm border border-[var(--border)] shadow-2xl">
           {/* 標題 */}
           <div className="text-center mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">會員註冊</h1>
@@ -163,7 +163,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email 區塊 */}
-            <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="space-y-4 p-6 bg-surface-2/50 rounded-2xl">
               <h3 className="text-lg font-semibold text-amber-400 mb-4">Email 驗證</h3>
 
               <div>
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="your@email.com"
                   required
                 />
@@ -189,7 +189,7 @@ export default function RegisterPage() {
                   name="emailCode"
                   value={formData.emailCode}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="flex-1 px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="輸入 Email 驗證碼"
                   required
                 />
@@ -205,7 +205,7 @@ export default function RegisterPage() {
             </div>
 
             {/* 密碼區塊 */}
-            <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="space-y-4 p-6 bg-surface-2/50 rounded-2xl">
               <h3 className="text-lg font-semibold text-amber-400 mb-4">設定密碼</h3>
 
               <div>
@@ -217,7 +217,7 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="6-24 個字元"
                   required
                 />
@@ -233,7 +233,7 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="再次輸入密碼"
                   required
                 />
@@ -241,7 +241,7 @@ export default function RegisterPage() {
             </div>
 
             {/* 基本資料區塊 */}
-            <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="space-y-4 p-6 bg-surface-2/50 rounded-2xl">
               <h3 className="text-lg font-semibold text-amber-400 mb-4">基本資料</h3>
 
               <div>
@@ -253,7 +253,7 @@ export default function RegisterPage() {
                   name="nickname"
                   value={formData.nickname}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="您的暱稱"
                   required
                 />
@@ -265,7 +265,7 @@ export default function RegisterPage() {
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                 >
                   <option value="">請選擇</option>
                   <option value="male">男性</option>
@@ -276,7 +276,7 @@ export default function RegisterPage() {
             </div>
 
             {/* 手機驗證區塊（選填） */}
-            <div className="space-y-4 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="space-y-4 p-6 bg-surface-2/50 rounded-2xl">
               <h3 className="text-lg font-semibold text-zinc-500 mb-4">手機驗證（選填）</h3>
 
               <div>
@@ -286,7 +286,7 @@ export default function RegisterPage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                  className="w-full px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                   placeholder="09xxxxxxxx"
                 />
                 {errors.phone && <p className="text-red-400 text-sm mt-2">{errors.phone}</p>}
@@ -300,7 +300,7 @@ export default function RegisterPage() {
                       name="phoneCode"
                       value={formData.phoneCode}
                       onChange={handleChange}
-                      className="flex-1 px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
+                      className="flex-1 px-4 py-3 bg-surface-2 border border-[var(--border)] rounded-xl text-white focus:outline-none focus:border-amber-400 transition-colors"
                       placeholder="輸入手機驗證碼"
                     />
                     <button
@@ -317,13 +317,13 @@ export default function RegisterPage() {
             </div>
 
             {/* 服務條款 */}
-            <div className="flex items-start gap-3 p-6 bg-zinc-900/50 rounded-2xl">
+            <div className="flex items-start gap-3 p-6 bg-surface-2/50 rounded-2xl">
               <input
                 type="checkbox"
                 name="agreedToTerms"
                 checked={formData.agreedToTerms}
                 onChange={handleChange}
-                className="mt-1 w-5 h-5 rounded border-zinc-700 text-amber-500 focus:ring-amber-400 bg-zinc-800"
+                className="mt-1 w-5 h-5 rounded border-[var(--border)] text-amber-500 focus:ring-amber-400 bg-surface-2"
                 required
               />
               <label className="text-sm text-zinc-300">

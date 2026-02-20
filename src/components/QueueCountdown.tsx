@@ -56,7 +56,7 @@ export default function QueueCountdown({ expiresAt, onExpired }: QueueCountdownP
       </div>
 
       {/* 進度條 */}
-      <div className="w-full bg-zinc-700 rounded-full h-2 overflow-hidden">
+      <div className="w-full bg-surface-3 rounded-full h-2 overflow-hidden">
         <div
           className={`h-full transition-all duration-1000 rounded-full ${
             isWarning

@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body
-        className={`${russoOne.variable} ${chakraPetch.variable} antialiased bg-[#09090b] text-white min-h-screen flex flex-col font-body`}
+        className={`${russoOne.variable} ${chakraPetch.variable} antialiased bg-background text-white min-h-screen flex flex-col font-body`}
       >
         <Header />
         <main className="flex-grow">

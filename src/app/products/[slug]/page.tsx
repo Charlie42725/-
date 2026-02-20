@@ -91,7 +91,7 @@ export default async function ProductDetailPage({
   const remaining = product.totalTickets - product.soldTickets;
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-[#050505] text-white">
+    <div className="min-h-[calc(100vh-80px)] bg-surface-deep text-white">
 
       {/* === SECTION 1: Product Info (Image + Details side by side) === */}
       <div className="max-w-screen-xl mx-auto px-4 py-6 md:py-10">
@@ -187,7 +187,7 @@ export default async function ProductDetailPage({
                 <span>已售出 {product.soldTickets} 抽</span>
                 <span className="text-amber-400">{progress}%</span>
               </div>
-              <div className="w-full bg-zinc-800 rounded-full h-3 overflow-hidden border border-white/5">
+              <div className="w-full bg-surface-2 rounded-full h-3 overflow-hidden border border-white/5">
                 <div
                   className="h-full bg-amber-500 rounded-full transition-all duration-1000"
                   style={{ width: `${progress}%` }}
@@ -228,7 +228,7 @@ export default async function ProductDetailPage({
       </div>
 
       {/* === SECTION 2: Lottery System (Full Width) === */}
-      <div className="border-t border-white/5 bg-[#0a0a0a]">
+      <div className="border-t border-white/5 bg-surface-deep">
         <div className="max-w-screen-xl mx-auto px-4 py-8 md:py-12">
           <DrawQueueManager
             productId={product.id}

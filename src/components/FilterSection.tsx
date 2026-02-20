@@ -74,7 +74,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
           {/* 排序選項 */}
           <div className="hidden md:flex items-center space-x-3">
             <span className="text-zinc-400 text-sm font-medium">排序：</span>
-            <select className="bg-[#1a1a1e] text-white border border-white/[0.08] rounded-lg px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+            <select className="bg-surface-2 text-white border border-[var(--border)] rounded-lg px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
               <option>最新發佈</option>
               <option>價格低到高</option>
               <option>價格高到低</option>
@@ -85,12 +85,12 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
 
         {/* 展開的篩選面板 */}
         {isFilterOpen && (
-          <div className="mt-4 bg-[#111113] rounded-lg p-4 border border-white/[0.08] slide-down">
+          <div className="mt-4 bg-surface-1 rounded-lg p-4 border border-[var(--border)] slide-down">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {/* 類別篩選 */}
               <div>
                 <label className="block text-white font-bold mb-2">類別</label>
-                <select className="w-full bg-[#1a1a1e] text-white border border-white/[0.08] rounded px-3 py-2">
+                <select className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2">
                   <option>全部類別</option>
                   <option>ACG動漫</option>
                   <option>潮流玩具</option>
@@ -103,7 +103,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
               <div>
                 <label className="block text-white font-bold mb-2">品牌</label>
                 <select
-                  className="w-full bg-[#1a1a1e] text-white border border-white/[0.08] rounded px-3 py-2"
+                  className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2"
                   value={selectedBrand}
                   onChange={(e) => {
                     setSelectedBrand(e.target.value);
@@ -123,7 +123,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
               <div>
                 <label className="block text-white font-bold mb-2">系列</label>
                 <select
-                  className="w-full bg-[#1a1a1e] text-white border border-white/[0.08] rounded px-3 py-2 disabled:opacity-50"
+                  className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2 disabled:opacity-50"
                   value={selectedSeries}
                   onChange={(e) => setSelectedSeries(e.target.value)}
                   disabled={!selectedBrand}
@@ -144,13 +144,13 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
                   <input 
                     type="number" 
                     placeholder="最低"
-                    className="w-full bg-[#1a1a1e] text-white border border-white/[0.08] rounded px-3 py-2"
+                    className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2"
                   />
                   <span className="text-white self-center">-</span>
                   <input 
                     type="number" 
                     placeholder="最高"
-                    className="w-full bg-[#1a1a1e] text-white border border-white/[0.08] rounded px-3 py-2"
+                    className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2"
                   />
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
 
             {/* 篩選按鈕 */}
             <div className="flex justify-end space-x-2 mt-4">
-              <button className="px-4 py-2 bg-white/[0.08] hover:bg-white/[0.12] text-white rounded transition-colors">
+              <button className="px-4 py-2 bg-white/[0.10] hover:bg-white/[0.15] text-white rounded transition-colors">
                 重置
               </button>
               <button className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded transition-colors">

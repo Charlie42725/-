@@ -69,7 +69,7 @@ export default function ProductDetailClient({
     if (r === 'SSR') return 'rarity-bg-ssr';
     if (r === 'SR') return 'rarity-bg-sr';
     if (r === 'R') return 'rarity-bg-r';
-    return 'bg-zinc-800';
+    return 'bg-surface-2';
   };
 
   return (
@@ -85,7 +85,7 @@ export default function ProductDetailClient({
               key={variant.id}
               className={`
                 group relative flex items-center p-2 rounded-lg overflow-hidden 
-                ${isSoldOut ? 'bg-[#1a1a1a]/40 opacity-50' : 'bg-[#151515]/60 hover:bg-[#1f1f1f]/80'} 
+                ${isSoldOut ? 'bg-surface-1/40 opacity-50' : 'bg-surface-1/60 hover:bg-surface-2/80'} 
                 border border-white/5 hover:border-white/10 transition-all duration-200 backdrop-blur-sm
               `}
             >
@@ -120,7 +120,7 @@ export default function ProductDetailClient({
 
                 {/* Stock Bar */}
                 <div className="flex items-center space-x-2">
-                  <div className="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1 bg-surface-2 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${isSoldOut ? 'bg-zinc-600' : 'bg-amber-500'}`}
                       style={{ width: `${progress}%` }}

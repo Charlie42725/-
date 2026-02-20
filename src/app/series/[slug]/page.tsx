@@ -39,7 +39,7 @@ export default async function SeriesPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
+    <div className="min-h-screen bg-background text-white">
       {/* Immersive Series Banner */}
       <div className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
         {series.coverImage ? (
@@ -54,7 +54,7 @@ export default async function SeriesPage({
             <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-transparent"></div>
           </div>
         ) : (
-          <div className="absolute inset-0 bg-zinc-900 opacity-50"></div>
+          <div className="absolute inset-0 bg-surface-deep opacity-50"></div>
         )}
 
         <div className="relative max-w-screen-xl mx-auto px-4 w-full z-10 pt-20">
@@ -123,7 +123,7 @@ export default async function SeriesPage({
                   href={`/products/${product.slug}`}
                   className="group block"
                 >
-                  <div className="relative bg-[#0f0f0f] rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] h-full flex flex-col">
+                  <div className="relative bg-surface-1 rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6)] h-full flex flex-col">
                     {/* Status Badge */}
                     <div className="absolute top-3 right-3 z-10">
                       <div className={`${statusColor[product.status]} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg backdrop-blur-md`}>
@@ -166,7 +166,7 @@ export default async function SeriesPage({
                             </span>
                             <span>{progress}%</span>
                           </div>
-                          <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+                          <div className="w-full bg-surface-2 rounded-full h-2 overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${isSoldOut ? 'bg-zinc-600' : 'bg-amber-500'}`}
                               style={{ width: `${progress}%` }}

@@ -61,7 +61,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 md:gap-4">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="bg-[#111113] rounded-lg overflow-hidden animate-pulse border border-white/5 flex flex-col">
+          <div key={i} className="bg-surface-1 rounded-lg overflow-hidden animate-pulse border border-white/5 flex flex-col">
             <div className="relative aspect-[4/3] bg-white/[0.04]"></div>
             <div className="p-2.5 md:p-4 flex-1 flex flex-col gap-2">
               <div className="h-4 bg-white/[0.04] rounded w-3/4"></div>
@@ -90,7 +90,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-20 bg-white/[0.03] rounded-3xl border border-white/[0.06]">
+      <div className="text-center py-20 bg-white/[0.03] rounded-3xl border border-[var(--border)]">
         <p className="text-zinc-500 text-lg">目前沒有商品</p>
       </div>
     );
@@ -111,7 +111,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
             className="group block fade-in-up"
             style={{ animationDelay: `${index * 0.06}s` }}
           >
-            <div className="relative bg-[#111113] rounded-lg md:rounded-xl overflow-hidden border border-white/[0.06] hover:border-amber-500/30 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
+            <div className="relative bg-surface-1 rounded-lg md:rounded-xl overflow-hidden border border-[var(--border)] hover:border-amber-500/30 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
 
               {/* Status Badge */}
               <div className="absolute top-1.5 right-1.5 md:top-2.5 md:right-2.5 z-10 flex flex-col items-end gap-1">
@@ -177,7 +177,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
               </div>
 
               {/* Bottom Info Bar */}
-              <div className="flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-[#0c0c0e] border-t border-white/[0.04]">
+              <div className="flex items-center justify-between px-2 md:px-3 py-1.5 md:py-2 bg-surface-deep border-t border-[var(--border)]">
                 <div className="flex items-center gap-1">
                   <svg className="w-3 h-3 md:w-3.5 md:h-3.5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.736 6.979C9.208 6.193 9.696 6 10 6c.304 0 .792.193 1.264.979a1 1 0 001.715-1.029C12.279 4.784 11.232 4 10 4s-2.279.784-2.979 1.95c-.285.475-.507 1-.67 1.55H6a1 1 0 000 2h.013a9.358 9.358 0 000 1H6a1 1 0 100 2h.351c.163.55.385 1.075.67 1.55C7.721 15.216 8.768 16 10 16s2.279-.784 2.979-1.95a1 1 0 10-1.715-1.029c-.472.786-.96.979-1.264.979-.304 0-.792-.193-1.264-.979a5.95 5.95 0 01-.4-.821h1.664a1 1 0 000-2H8.063a7.343 7.343 0 010-1h1.937a1 1 0 000-2H8.336c.14-.292.302-.57.4-.821z" />

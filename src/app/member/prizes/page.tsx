@@ -207,14 +207,14 @@ export default function PrizesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-xl">載入中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white py-12 px-4">
+    <div className="min-h-screen bg-background text-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* 頁面標題 */}
         <div className="mb-8 text-center">
@@ -228,7 +228,7 @@ export default function PrizesPage() {
             <p className="text-zinc-300 text-sm mb-2">獎品總數</p>
             <p className="text-4xl font-black text-amber-400">{prizes.length}</p>
           </div>
-          <div className="bg-zinc-700/50 rounded-3xl p-6 backdrop-blur-sm border border-white/10 shadow-2xl">
+          <div className="bg-surface-2/50 rounded-3xl p-6 backdrop-blur-sm border border-white/10 shadow-2xl">
             <p className="text-zinc-300 text-sm mb-2">總價值</p>
             <p className="text-4xl font-black text-purple-400">{totalValue.toLocaleString()}</p>
             <p className="text-zinc-500 text-xs mt-1">可兌換點數</p>
@@ -251,7 +251,7 @@ export default function PrizesPage() {
 
         {/* 獎品列表 */}
         {prizes.length === 0 ? (
-          <div className="bg-zinc-800/30 rounded-3xl p-12 backdrop-blur-sm border border-zinc-700/50 text-center">
+          <div className="bg-surface-1/30 rounded-3xl p-12 backdrop-blur-sm border border-[var(--border)] text-center">
             <div className="text-zinc-500 text-lg mb-4">
               <svg className="w-24 h-24 mx-auto mb-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -271,10 +271,10 @@ export default function PrizesPage() {
             {prizes.map((prize) => (
               <div
                 key={prize.id}
-                className="bg-zinc-800/50 rounded-3xl p-6 backdrop-blur-sm border border-zinc-700/50 hover:border-amber-400/50 transition-all"
+                className="bg-surface-1/50 rounded-3xl p-6 backdrop-blur-sm border border-[var(--border)] hover:border-amber-400/50 transition-all"
               >
                 {/* 獎品圖片 */}
-                <div className="relative w-full aspect-square mb-4 rounded-2xl overflow-hidden bg-zinc-700/30">
+                <div className="relative w-full aspect-square mb-4 rounded-2xl overflow-hidden bg-surface-2/30">
                   {prize.variant.imageUrl || prize.product.coverImage ? (
                     <Image
                       src={prize.variant.imageUrl || prize.product.coverImage || '/placeholder.jpg'}
@@ -323,7 +323,7 @@ export default function PrizesPage() {
                 </div>
 
                 {/* 價值與抽中時間 */}
-                <div className="mb-4 p-3 bg-zinc-700/30 rounded-xl">
+                <div className="mb-4 p-3 bg-surface-2/30 rounded-xl">
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="text-zinc-500">價值</span>
                     <span className="text-green-400 font-bold">{prize.variant.value.toLocaleString()} 點</span>
@@ -350,7 +350,7 @@ export default function PrizesPage() {
         )}
 
         {/* 說明區塊 */}
-        <div className="mt-8 bg-zinc-800/30 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-zinc-700/50">
+        <div className="mt-8 bg-surface-1/30 rounded-3xl p-6 lg:p-8 backdrop-blur-sm border border-[var(--border)]">
           <h3 className="text-xl font-bold text-white mb-4 flex items-center">
             <svg className="w-6 h-6 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -370,7 +370,7 @@ export default function PrizesPage() {
         <div className="mt-8 text-center">
           <button
             onClick={() => router.back()}
-            className="px-8 py-3 bg-zinc-700 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
+            className="px-8 py-3 bg-surface-3 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
           >
             返回
           </button>

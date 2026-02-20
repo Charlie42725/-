@@ -111,7 +111,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-[#09090b]/95 backdrop-blur-md sticky top-0 z-50 border-b border-white/[0.06]">
+    <header className="w-full bg-surface-0/95 backdrop-blur-md sticky top-0 z-50 border-b border-[var(--border)]">
       <div className="max-w-screen-xl mx-auto px-4">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -158,7 +158,7 @@ export default function Header() {
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     aria-expanded={isUserMenuOpen}
                     aria-haspopup="true"
-                    className="flex items-center space-x-2 text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]"
+                    className="flex items-center space-x-2 text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.08]"
                   >
                     <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center font-bold">
                       {user.nickname?.[0]?.toUpperCase() || 'U'}
@@ -170,13 +170,13 @@ export default function Header() {
                   </button>
 
                   {isUserMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-[#111113] rounded-xl shadow-2xl border border-white/[0.08] overflow-hidden z-50 dropdown-in" role="menu">
+                    <div className="absolute right-0 mt-2 w-56 bg-surface-1 rounded-xl shadow-2xl border border-[var(--border)] overflow-hidden z-50 dropdown-in" role="menu">
                       <div className="py-2">
                         {/* 導航連結 */}
                         <Link
                           href="/"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@ export default function Header() {
                         <Link
                           href="/member/prizes"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,12 +195,12 @@ export default function Header() {
                           </svg>
                           獎品包包
                         </Link>
-                        <hr className="border-white/[0.08] my-2" />
+                        <hr className="border-[var(--border)] my-2" />
                         {/* 會員功能 */}
                         <Link
                           href="/member/profile"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +211,7 @@ export default function Header() {
                         <Link
                           href="/member/points"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +222,7 @@ export default function Header() {
                         <Link
                           href="/member/orders"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,7 +233,7 @@ export default function Header() {
                         <Link
                           href="/member/point-history"
                           onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center px-4 py-3 text-white hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,10 +241,10 @@ export default function Header() {
                           </svg>
                           點數異動紀錄
                         </Link>
-                        <hr className="border-white/[0.08] my-2" />
+                        <hr className="border-[var(--border)] my-2" />
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-3 text-red-400 hover:bg-white/[0.06] transition-colors duration-200"
+                          className="flex items-center w-full px-4 py-3 text-red-400 hover:bg-white/[0.08] transition-colors duration-200"
                           role="menuitem"
                         >
                           <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,13 +259,13 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]">
+                <Link href="/" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.08]">
                   全部一番賞
                 </Link>
-                <Link href="/login" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]">
+                <Link href="/login" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.08]">
                   登入
                 </Link>
-                <Link href="/register" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.06]">
+                <Link href="/register" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-white/[0.08]">
                   註冊
                 </Link>
               </>
@@ -289,7 +289,7 @@ export default function Header() {
 
         {/* 手機版選單 */}
         {isMenuOpen && (
-          <div className="md:hidden bg-[#111113] py-4 slide-down">
+          <div className="md:hidden bg-surface-1 py-4 slide-down">
             <div className="flex flex-col space-y-2">
               <Link href="/" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                 全部一番賞
@@ -299,7 +299,7 @@ export default function Header() {
                   獎品包包
                 </Link>
               )}
-              <hr className="border-white/[0.06] my-2" />
+              <hr className="border-[var(--border)] my-2" />
               {loggedIn && user ? (
                 <>
                   <div className="px-4 py-2">
@@ -333,7 +333,7 @@ export default function Header() {
                   <Link href="/member/point-history" className="text-white hover:text-amber-400 transition-colors duration-200 px-4 py-2">
                     點數異動紀錄
                   </Link>
-                  <hr className="border-white/[0.06] my-2" />
+                  <hr className="border-[var(--border)] my-2" />
                   <button
                     onClick={handleLogout}
                     className="text-left text-red-400 hover:text-red-300 transition-colors duration-200 px-4 py-2 w-full"

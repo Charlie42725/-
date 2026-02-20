@@ -52,7 +52,7 @@ export default function ProductImageGallery({
   return (
     <div className="flex flex-col gap-3">
       {/* 主圖 */}
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-900 border border-white/10">
+      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-surface-deep border border-white/10">
         <Image
           src={currentImage.url}
           alt={`${productName} - ${currentImage.label}`}

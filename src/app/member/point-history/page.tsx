@@ -102,7 +102,7 @@ export default function PointHistoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-xl">載入中...</div>
       </div>
     );
@@ -110,14 +110,14 @@ export default function PointHistoryPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#09090b] text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-white flex items-center justify-center">
         <div className="text-xl">無法載入用戶資料</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white py-12 px-4">
+    <div className="min-h-screen bg-background text-white py-12 px-4">
       <div className="max-w-5xl mx-auto">
         {/* 頁面標題 */}
         <div className="mb-8">
@@ -137,14 +137,14 @@ export default function PointHistoryPage() {
 
         {/* 篩選器 */}
         <div className="mb-6">
-          <div className="bg-zinc-800/50 rounded-2xl p-4 backdrop-blur-sm border border-zinc-700/50">
+          <div className="bg-surface-1/50 rounded-2xl p-4 backdrop-blur-sm border border-[var(--border)]">
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => setFilterType('all')}
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'all'
                     ? 'bg-amber-500 text-white'
-                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                    : 'bg-surface-3 text-zinc-300 hover:bg-surface-3/80'
                 }`}
               >
                 全部
@@ -154,7 +154,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'purchase'
                     ? 'bg-green-500 text-white'
-                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                    : 'bg-surface-3 text-zinc-300 hover:bg-surface-3/80'
                 }`}
               >
                 購買
@@ -164,7 +164,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'bonus'
                     ? 'bg-purple-500 text-white'
-                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                    : 'bg-surface-3 text-zinc-300 hover:bg-surface-3/80'
                 }`}
               >
                 贈送
@@ -174,7 +174,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'lottery'
                     ? 'bg-amber-500 text-white'
-                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                    : 'bg-surface-3 text-zinc-300 hover:bg-surface-3/80'
                 }`}
               >
                 抽獎
@@ -184,7 +184,7 @@ export default function PointHistoryPage() {
                 className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                   filterType === 'refund'
                     ? 'bg-blue-500 text-white'
-                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                    : 'bg-surface-3 text-zinc-300 hover:bg-surface-3/80'
                 }`}
               >
                 退款
@@ -194,7 +194,7 @@ export default function PointHistoryPage() {
         </div>
 
         {filteredTransactions.length === 0 ? (
-          <div className="bg-zinc-800/30 rounded-3xl p-12 text-center backdrop-blur-sm border border-zinc-700/50">
+          <div className="bg-surface-1/30 rounded-3xl p-12 text-center backdrop-blur-sm border border-[var(--border)]">
             <div className="text-6xl mb-4">📊</div>
             <h3 className="text-2xl font-bold text-white mb-2">
               {filterType === 'all' ? '尚無點數異動紀錄' : '無符合條件的紀錄'}
@@ -216,7 +216,7 @@ export default function PointHistoryPage() {
             {filteredTransactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="bg-zinc-800/50 rounded-2xl p-6 backdrop-blur-sm border border-zinc-700/50 hover:border-zinc-600/50 transition-all"
+                className="bg-surface-1/50 rounded-2xl p-6 backdrop-blur-sm border border-[var(--border)] hover:border-[var(--border-hover)] transition-all"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4 flex-1">
@@ -260,7 +260,7 @@ export default function PointHistoryPage() {
         <div className="mt-8 text-center">
           <button
             onClick={() => router.back()}
-            className="px-8 py-3 bg-zinc-700 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
+            className="px-8 py-3 bg-surface-3 text-white font-medium rounded-xl hover:bg-zinc-600 transition-colors"
           >
             返回
           </button>

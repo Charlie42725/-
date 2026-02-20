@@ -50,7 +50,7 @@ export default async function BrandPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
+    <div className="min-h-screen bg-background text-white">
       {/* 品牌 Banner */}
       <div className="relative h-64 bg-amber-500">
         {brand.logoUrl && (
@@ -122,7 +122,7 @@ export default async function BrandPage({
                           href={`/products/${product.slug}`}
                           className="block group"
                         >
-                          <div className="bg-[#1a1a1a] rounded-lg overflow-hidden border border-white/[0.06] hover:border-amber-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
+                          <div className="bg-surface-1 rounded-lg overflow-hidden border border-white/[0.06] hover:border-amber-500/40 transition-all duration-300 md:hover:-translate-y-1 h-full flex flex-col">
                             <div className="relative aspect-[4/3]">
                               <Image
                                 src={product.coverImage || `https://picsum.photos/400/300?random=${product.id}`}

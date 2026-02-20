@@ -53,7 +53,7 @@ export default function Banner({ initialBanners }: BannerProps) {
 
   return (
     <section
-      className="w-full relative h-[350px] md:h-[450px] overflow-hidden bg-[#09090b]"
+      className="w-full relative h-[350px] md:h-[450px] overflow-hidden bg-background"
       role="region"
       aria-label="主要輪播橫幅"
       aria-roledescription="carousel"
