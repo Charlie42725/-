@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       amount: order.amount,
       itemName: `${order.packageName} - ${order.totalPoints} 點`,
       returnUrl: `${baseUrl}/api/payment/ecpay/callback`,
-      clientBackUrl: `${baseUrl}/payment/result?orderNumber=${order.orderNumber}`,
+      orderResultUrl: `${baseUrl}/payment/result?orderNumber=${order.orderNumber}`,
     });
 
     return NextResponse.json({

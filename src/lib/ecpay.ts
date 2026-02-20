@@ -79,8 +79,9 @@ interface PaymentFormParams {
   orderNumber: string;
   amount: number;
   itemName: string;
-  returnUrl: string;   // server-to-server callback
-  clientBackUrl: string; // 使用者付款完成後導回的頁面
+  returnUrl: string;      // server-to-server callback（綠界主動通知）
+  orderResultUrl: string;  // 付款完成後自動導回的頁面
+  clientBackUrl?: string;  // 付款頁面「返回商店」按鈕連結（選填）
 }
 
 interface PaymentFormResult {
@@ -102,10 +103,10 @@ export function buildPaymentFormData(params: PaymentFormParams): PaymentFormResu
     MerchantTradeDate: merchantTradeDate,
     PaymentType: 'aio',
     TotalAmount: params.amount.toString(),
-    TradeDesc: encodeURIComponent('良級懸賞點數購買'),
+    TradeDesc: '良級懸賞點數購買',
     ItemName: params.itemName,
     ReturnURL: params.returnUrl,
-    ClientBackURL: params.clientBackUrl,
+    OrderResultURL: params.orderResultUrl,
     ChoosePayment: 'ALL',
     EncryptType: '1', // SHA256
     CustomField1: params.orderNumber, // 存完整訂單編號供 callback 使用
