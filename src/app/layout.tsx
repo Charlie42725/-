@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <head>
-        <meta name="theme-color" content="#0F1219" />
+        <meta name="theme-color" content="#161B26" />
         <link rel="apple-touch-icon" href="/assets/images/logos/apple-touch-icon.png" />
       </head>
       <body

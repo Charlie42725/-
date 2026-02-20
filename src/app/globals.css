@@ -6,7 +6,7 @@ html {
 }
 
 :root {
-  --background: #0F1219;
+  --background: #161B26;
   --foreground: #f0f2f7;
   --font-heading: var(--font-russo-one), 'Arial Black', sans-serif;
   --font-body: var(--font-chakra-petch), 'Arial', sans-serif;
@@ -16,13 +16,13 @@ html {
   --accent-hover: #D97706;
   --accent-light: #FBBF24;
   --accent-subtle: rgba(245, 158, 11, 0.10);
-  --surface-0: #0F1219;
-  --surface-1: #1A1F2E;
-  --surface-2: #242B3D;
-  --surface-3: #2E3750;
-  --surface-deep: #0A0D16;
-  --border: rgba(148, 163, 184, 0.10);
-  --border-hover: rgba(148, 163, 184, 0.18);
+  --surface-0: #161B26;
+  --surface-1: #1E2433;
+  --surface-2: #283042;
+  --surface-3: #323C54;
+  --surface-deep: #10141E;
+  --border: rgba(148, 163, 184, 0.12);
+  --border-hover: rgba(148, 163, 184, 0.22);
 }
 
 @theme inline {
