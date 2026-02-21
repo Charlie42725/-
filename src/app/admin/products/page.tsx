@@ -24,6 +24,13 @@ interface Brand {
   name: string;
 }
 
+const statusMap: Record<string, { label: string; className: string }> = {
+  active: { label: '進行中', className: 'bg-green-500/20 text-green-400' },
+  draft: { label: '草稿', className: 'bg-gray-500/20 text-zinc-400' },
+  sold_out: { label: '已完售', className: 'bg-red-500/20 text-red-400' },
+  archived: { label: '已結束', className: 'bg-slate-500/20 text-zinc-400' },
+};
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -31,6 +38,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   // 篩選狀態
   const [filterBrand, setFilterBrand] = useState<string>('');
@@ -154,7 +162,6 @@ export default function ProductsPage() {
   }
 
   async function handleEdit(product: Product) {
-    // 獲取完整商品資料（包含圖片）
     try {
       const res = await fetch(`/api/products/${product.slug}`);
       const data = await res.json();
@@ -222,17 +229,29 @@ export default function ProductsPage() {
     setFilterStatus('');
   }
 
+  const hasActiveFilters = filterBrand || filterStatus;
+
   if (loading) {
-    return <div className="text-white">載入中...</div>;
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-surface-1/60 rounded-xl p-4 border border-[var(--border)] animate-pulse">
+            <div className="h-5 bg-surface-3 rounded w-1/3 mb-3" />
+            <div className="h-4 bg-surface-3 rounded w-2/3 mb-2" />
+            <div className="h-8 bg-surface-3 rounded w-full mt-3" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   return (
     <div>
       {/* 頁面標題 */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-5 md:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">商品管理</h1>
-          <p className="text-zinc-400">管理所有一番賞商品（共 {filteredProducts.length} 件）</p>
+          <h1 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">商品管理</h1>
+          <p className="text-zinc-400 text-sm">共 {filteredProducts.length} 件商品</p>
         </div>
         <button
           onClick={() => {
@@ -242,74 +261,91 @@ export default function ProductsPage() {
               setShowForm(true);
             }
           }}
-          className="bg-amber-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-600 transition-all"
+          className="bg-amber-500 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl font-medium hover:bg-amber-600 active:bg-amber-700 transition-all text-sm md:text-base min-h-[44px]"
         >
-          {showForm ? '取消' : '+ 新增商品'}
+          {showForm ? '取消' : '+ 新增'}
         </button>
       </div>
 
       {/* 篩選器 */}
-      <div className="bg-surface-1/60 rounded-lg p-6 border border-[var(--border)] mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-white">篩選條件</h3>
-          {(filterBrand || filterStatus) && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-            >
-              清除篩選
-            </button>
+      <div className="mb-4 md:mb-6">
+        {/* 手機版：折疊篩選 */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="md:hidden flex items-center gap-2 text-sm text-zinc-400 active:text-white transition-colors mb-3 min-h-[44px] cursor-pointer"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+          </svg>
+          篩選
+          {hasActiveFilters && (
+            <span className="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full text-xs">
+              篩選中
+            </span>
           )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-zinc-300 mb-2 text-sm">品牌</label>
-            <select
-              value={filterBrand}
-              onChange={(e) => setFilterBrand(e.target.value)}
-              className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
-            >
-              <option value="">全部品牌</option>
-              {brands.map((brand) => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        </button>
 
-          <div>
-            <label className="block text-zinc-300 mb-2 text-sm">狀態</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
-            >
-              <option value="">全部狀態</option>
-              <option value="draft">草稿</option>
-              <option value="active">進行中</option>
-              <option value="sold_out">已完售</option>
-              <option value="archived">已結束</option>
-            </select>
+        <div className={`bg-surface-1/60 rounded-xl p-4 md:p-6 border border-[var(--border)] ${showFilters ? 'block' : 'hidden'} md:block`}>
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h3 className="text-sm md:text-lg font-medium text-white">篩選條件</h3>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="text-sm text-amber-400 hover:text-amber-300 active:text-amber-200 transition-colors min-h-[44px] flex items-center cursor-pointer"
+              >
+                清除篩選
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            <div>
+              <label className="block text-zinc-300 mb-1.5 text-sm">品牌</label>
+              <select
+                value={filterBrand}
+                onChange={(e) => setFilterBrand(e.target.value)}
+                className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
+              >
+                <option value="">全部品牌</option>
+                {brands.map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-zinc-300 mb-1.5 text-sm">狀態</label>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
+              >
+                <option value="">全部狀態</option>
+                <option value="draft">草稿</option>
+                <option value="active">進行中</option>
+                <option value="sold_out">已完售</option>
+                <option value="archived">已結束</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 新增/編輯表單 */}
       {showForm && (
-        <div className="bg-surface-1/60 rounded-lg p-6 border border-[var(--border)] mb-8">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="bg-surface-1/60 rounded-xl p-4 md:p-6 border border-[var(--border)] mb-5 md:mb-8">
+          <h2 className="text-lg md:text-xl font-bold text-white mb-4">
             {editingId ? '編輯商品' : '新增商品'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-zinc-300 mb-2">選擇品牌 *</label>
+                <label className="block text-zinc-300 mb-1.5 text-sm">選擇品牌 *</label>
                 <select
                   required
                   value={formData.brandId}
                   onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
-                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
                 >
                   <option value="">請選擇品牌</option>
                   {brands.map((brand) => (
@@ -321,37 +357,37 @@ export default function ProductsPage() {
               </div>
 
               <div>
-                <label className="block text-zinc-300 mb-2">商品名稱 *</label>
+                <label className="block text-zinc-300 mb-1.5 text-sm">商品名稱 *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => handleProductNameChange(e.target.value)}
-                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
                   placeholder="例如：原神須彌主題一番賞"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-zinc-300 mb-2">Slug *</label>
+                <label className="block text-zinc-300 mb-1.5 text-sm">Slug *</label>
                 <input
                   type="text"
                   required
                   value={formData.slug}
                   onChange={(e) => handleProductSlugChange(e.target.value)}
-                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
                   placeholder="自動產生，也可手動修改"
                 />
               </div>
 
               <div>
-                <label className="block text-zinc-300 mb-2">狀態 *</label>
+                <label className="block text-zinc-300 mb-1.5 text-sm">狀態 *</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
                 >
                   <option value="draft">草稿</option>
                   <option value="active">進行中</option>
@@ -362,11 +398,11 @@ export default function ProductsPage() {
             </div>
 
             <div>
-              <label className="block text-zinc-300 mb-2">簡短描述</label>
+              <label className="block text-zinc-300 mb-1.5 text-sm">簡短描述</label>
               <textarea
                 value={formData.shortDescription}
                 onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
+                className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
                 rows={2}
                 placeholder="簡短描述..."
               />
@@ -374,28 +410,28 @@ export default function ProductsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-zinc-300 mb-2">單抽價格 (NT$) *</label>
+                <label className="block text-zinc-300 mb-1.5 text-sm">單抽價格 (NT$) *</label>
                 <input
                   type="number"
                   required
                   min="1"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
-                  placeholder="例如：120"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
+                  placeholder="120"
                 />
               </div>
 
               <div>
-                <label className="block text-zinc-300 mb-2">總抽數 *</label>
+                <label className="block text-zinc-300 mb-1.5 text-sm">總抽數 *</label>
                 <input
                   type="number"
                   required
                   min="1"
                   value={formData.totalTickets}
                   onChange={(e) => setFormData({ ...formData, totalTickets: e.target.value })}
-                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
-                  placeholder="例如：500"
+                  className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
+                  placeholder="500"
                 />
               </div>
             </div>
@@ -413,17 +449,17 @@ export default function ProductsPage() {
               maxImages={4}
             />
 
-            <div className="flex space-x-4">
+            <div className="flex gap-3">
               <button
                 type="submit"
-                className="bg-amber-500 text-white px-6 py-2 rounded-lg hover:bg-amber-600 transition-colors"
+                className="flex-1 md:flex-none bg-amber-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-amber-600 active:bg-amber-700 transition-colors min-h-[44px]"
               >
                 儲存
               </button>
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="bg-surface-3 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                className="flex-1 md:flex-none bg-surface-3 text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-600 active:bg-gray-700 transition-colors min-h-[44px]"
               >
                 取消
               </button>
@@ -433,124 +469,193 @@ export default function ProductsPage() {
       )}
 
       {/* 商品列表 */}
-      <div className="bg-surface-1/60 rounded-lg border border-[var(--border)] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-surface-deep">
-              <tr>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">ID</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">商品名稱</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">品牌</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">價格</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">抽取進度</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">狀態</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">操作</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.06]">
-              {filteredProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-zinc-400">
-                    {products.length === 0 ? '目前沒有商品' : '沒有符合條件的商品'}
-                  </td>
-                </tr>
-              ) : (
-                filteredProducts.map((product) => {
-                  const progress = Math.round(
-                    (product.soldTickets / product.totalTickets) * 100
-                  );
-
-                  return (
-                    <tr key={product.id} className="hover:bg-white/[0.04]">
-                      <td className="px-6 py-4 text-zinc-300">{product.id}</td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-white">{product.name}</div>
-                        <div className="text-sm text-zinc-400">{product.slug}</div>
-                      </td>
-                      <td className="px-6 py-4 text-zinc-300">
-                        <div className="text-sm font-medium">{product.brand.name}</div>
-                      </td>
-                      <td className="px-6 py-4 text-amber-400 font-medium">
-                        NT$ {product.price}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-amber-400 font-bold">已抽: {product.soldTickets}</span>
-                            <span className="text-green-400 font-bold">剩餘: {product.totalTickets - product.soldTickets}</span>
-                          </div>
-                          <div className="text-xs text-zinc-400">
-                            總數: {product.totalTickets} ({progress}%)
-                          </div>
-                          <div className="w-32 bg-surface-3 rounded-full h-2 overflow-hidden">
-                            <div
-                              className={`h-2 rounded-full transition-all ${
-                                progress === 100 ? 'bg-red-500' : 'bg-amber-500'
-                              }`}
-                              style={{ width: `${progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {product.status === 'active' && (
-                          <span className="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs">
-                            進行中
-                          </span>
-                        )}
-                        {product.status === 'draft' && (
-                          <span className="bg-gray-500/20 text-zinc-400 px-2 py-1 rounded text-xs">
-                            草稿
-                          </span>
-                        )}
-                        {product.status === 'sold_out' && (
-                          <span className="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs">
-                            已完售
-                          </span>
-                        )}
-                        {product.status === 'archived' && (
-                          <span className="bg-slate-500/20 text-zinc-400 px-2 py-1 rounded text-xs">
-                            已結束
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-3">
-                          <Link
-                            href={`/products/${product.slug}`}
-                            target="_blank"
-                            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-                          >
-                            查看
-                          </Link>
-                          <button
-                            onClick={() => handleEdit(product)}
-                            className="text-amber-400 hover:text-amber-300 text-sm transition-colors"
-                          >
-                            編輯
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id, product.name)}
-                            className="text-red-400 hover:text-red-300 text-sm transition-colors"
-                          >
-                            刪除
-                          </button>
-                          <Link
-                            href={`/admin/products/${product.id}/variants`}
-                            className="bg-amber-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-amber-700 transition-colors"
-                          >
-                            獎項管理
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+      {filteredProducts.length === 0 ? (
+        <div className="bg-surface-1/60 rounded-xl p-8 md:p-12 border border-[var(--border)] text-center">
+          <svg className="w-12 h-12 text-zinc-600 mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21" />
+          </svg>
+          <p className="text-zinc-400 text-sm">
+            {products.length === 0 ? '目前沒有商品' : '沒有符合條件的商品'}
+          </p>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* 手機版：卡片列表 */}
+          <div className="md:hidden space-y-3">
+            {filteredProducts.map((product) => {
+              const progress = Math.round(
+                (product.soldTickets / product.totalTickets) * 100
+              );
+              const status = statusMap[product.status] || statusMap.draft;
+
+              return (
+                <div
+                  key={product.id}
+                  className="bg-surface-1/60 rounded-xl p-4 border border-[var(--border)]"
+                >
+                  {/* 頂部：名稱 + 狀態 */}
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-white text-base truncate">{product.name}</h3>
+                      <p className="text-xs text-zinc-500 mt-0.5">{product.brand.name}</p>
+                    </div>
+                    <span className={`${status.className} px-2.5 py-1 rounded-full text-xs flex-shrink-0 ml-2`}>
+                      {status.label}
+                    </span>
+                  </div>
+
+                  {/* 中間：價格 + 進度 */}
+                  <div className="flex items-center justify-between mt-3 mb-2">
+                    <span className="text-amber-400 font-bold text-lg">NT$ {product.price}</span>
+                    <span className="text-xs text-zinc-400">
+                      {product.soldTickets}/{product.totalTickets} ({progress}%)
+                    </span>
+                  </div>
+
+                  {/* 進度條 */}
+                  <div className="w-full bg-surface-3 rounded-full h-2 overflow-hidden mb-3">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        progress === 100 ? 'bg-red-500' : 'bg-amber-500'
+                      }`}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+
+                  {/* 底部操作按鈕 */}
+                  <div className="flex items-center gap-2 pt-3 border-t border-white/[0.06]">
+                    <Link
+                      href={`/admin/products/${product.id}/variants`}
+                      className="flex-1 text-center py-2.5 rounded-lg bg-amber-500/15 text-amber-400 text-sm font-medium active:bg-amber-500/25 transition-colors min-h-[44px] flex items-center justify-center"
+                    >
+                      獎項管理
+                    </Link>
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className="py-2.5 px-4 rounded-lg bg-surface-3/50 text-zinc-300 text-sm active:bg-surface-3 transition-colors min-h-[44px] cursor-pointer"
+                    >
+                      編輯
+                    </button>
+                    <Link
+                      href={`/products/${product.slug}`}
+                      target="_blank"
+                      className="py-2.5 px-4 rounded-lg bg-surface-3/50 text-zinc-300 text-sm active:bg-surface-3 transition-colors min-h-[44px] flex items-center"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                      </svg>
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(product.id, product.name)}
+                      className="py-2.5 px-4 rounded-lg bg-red-500/10 text-red-400 text-sm active:bg-red-500/20 transition-colors min-h-[44px] cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 桌面版：表格 */}
+          <div className="hidden md:block bg-surface-1/60 rounded-xl border border-[var(--border)] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-surface-deep">
+                  <tr>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">ID</th>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">商品名稱</th>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">品牌</th>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">價格</th>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">抽取進度</th>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">狀態</th>
+                    <th className="text-left px-6 py-4 text-zinc-300 font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.06]">
+                  {filteredProducts.map((product) => {
+                    const progress = Math.round(
+                      (product.soldTickets / product.totalTickets) * 100
+                    );
+                    const status = statusMap[product.status] || statusMap.draft;
+
+                    return (
+                      <tr key={product.id} className="hover:bg-white/[0.04]">
+                        <td className="px-6 py-4 text-zinc-300">{product.id}</td>
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-white">{product.name}</div>
+                          <div className="text-sm text-zinc-400">{product.slug}</div>
+                        </td>
+                        <td className="px-6 py-4 text-zinc-300">
+                          <div className="text-sm font-medium">{product.brand.name}</div>
+                        </td>
+                        <td className="px-6 py-4 text-amber-400 font-medium">
+                          NT$ {product.price}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-amber-400 font-bold">已抽: {product.soldTickets}</span>
+                              <span className="text-green-400 font-bold">剩餘: {product.totalTickets - product.soldTickets}</span>
+                            </div>
+                            <div className="text-xs text-zinc-400">
+                              總數: {product.totalTickets} ({progress}%)
+                            </div>
+                            <div className="w-32 bg-surface-3 rounded-full h-2 overflow-hidden">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  progress === 100 ? 'bg-red-500' : 'bg-amber-500'
+                                }`}
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`${status.className} px-2 py-1 rounded text-xs`}>
+                            {status.label}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center space-x-3">
+                            <Link
+                              href={`/products/${product.slug}`}
+                              target="_blank"
+                              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                            >
+                              查看
+                            </Link>
+                            <button
+                              onClick={() => handleEdit(product)}
+                              className="text-amber-400 hover:text-amber-300 text-sm transition-colors cursor-pointer"
+                            >
+                              編輯
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product.id, product.name)}
+                              className="text-red-400 hover:text-red-300 text-sm transition-colors cursor-pointer"
+                            >
+                              刪除
+                            </button>
+                            <Link
+                              href={`/admin/products/${product.id}/variants`}
+                              className="bg-amber-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-amber-700 transition-colors"
+                            >
+                              獎項管理
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
