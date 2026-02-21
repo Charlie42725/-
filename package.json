@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate && node scripts/fix-prisma-imports.js",
+    "postinstall": "prisma generate",
+    "prisma:fix": "prisma generate",
     "clean": "rimraf .next node_modules/.prisma",
-    "rebuild": "rimraf .next node_modules/.prisma && npx prisma generate && next dev"
+    "rebuild": "rimraf .next node_modules/.prisma && npm run prisma:fix && next dev"
   },
   "dependencies": {
     "@prisma/client": "6.17.1",

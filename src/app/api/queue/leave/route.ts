@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextRequest, NextResponse } from 'next/server';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
 import { leaveQueue } from '@/lib/queue-manager';

@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyUser } from '@/lib/auth';
 import prisma from '@/lib/db';

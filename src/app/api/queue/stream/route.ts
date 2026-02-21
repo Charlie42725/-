@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import { sseRegistry } from '@/lib/sse-registry';
