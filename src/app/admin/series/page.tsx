@@ -36,6 +36,30 @@ export default function SeriesPage() {
     description: '',
     coverImage: '',
   });
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  function generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\u4e00-\u9fff\u3400-\u4dbf\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function handleNameChange(name: string) {
+    setFormData((prev) => ({
+      ...prev,
+      name,
+      ...(!slugManuallyEdited ? { slug: generateSlug(name) } : {}),
+    }));
+  }
+
+  function handleSlugChange(slug: string) {
+    setSlugManuallyEdited(true);
+    setFormData((prev) => ({ ...prev, slug }));
+  }
 
   useEffect(() => {
     fetchData();
@@ -72,6 +96,7 @@ export default function SeriesPage() {
       if (res.ok) {
         setShowForm(false);
         setFormData({ brandId: '', name: '', slug: '', description: '', coverImage: '' });
+        setSlugManuallyEdited(false);
         fetchData();
       } else {
         const data = await res.json();
@@ -147,7 +172,7 @@ export default function SeriesPage() {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => handleNameChange(e.target.value)}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   placeholder="例如：原神 Ver.3.0 須彌篇"
                 />
@@ -159,9 +184,9 @@ export default function SeriesPage() {
                   type="text"
                   required
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  onChange={(e) => handleSlugChange(e.target.value)}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                  placeholder="例如：genshin-ver-3"
+                  placeholder="自動產生，也可手動修改"
                 />
               </div>
             </div>

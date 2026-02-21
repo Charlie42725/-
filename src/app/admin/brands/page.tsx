@@ -21,6 +21,30 @@ export default function BrandsPage() {
     slug: '',
     description: '',
   });
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  function generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\u4e00-\u9fff\u3400-\u4dbf\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function handleNameChange(name: string) {
+    setFormData((prev) => ({
+      ...prev,
+      name,
+      ...(!slugManuallyEdited ? { slug: generateSlug(name) } : {}),
+    }));
+  }
+
+  function handleSlugChange(slug: string) {
+    setSlugManuallyEdited(true);
+    setFormData((prev) => ({ ...prev, slug }));
+  }
 
   useEffect(() => {
     fetchBrands();
@@ -51,6 +75,7 @@ export default function BrandsPage() {
       if (res.ok) {
         setShowForm(false);
         setFormData({ name: '', slug: '', description: '' });
+        setSlugManuallyEdited(false);
         fetchBrands();
       }
     } catch (error) {
@@ -105,7 +130,7 @@ export default function BrandsPage() {
                 type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => handleNameChange(e.target.value)}
                 className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 placeholder="例如：原神 Genshin Impact"
               />
@@ -116,12 +141,12 @@ export default function BrandsPage() {
                 type="text"
                 required
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e) => handleSlugChange(e.target.value)}
                 className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 placeholder="例如：genshin-impact"
               />
               <p className="text-sm text-zinc-500 mt-1">
-                只能使用小寫英文、數字、連字號
+                根據品牌名稱自動產生，也可手動修改
               </p>
             </div>
             <div>

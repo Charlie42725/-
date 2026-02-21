@@ -53,6 +53,30 @@ export default function ProductsPage() {
     coverImage: '',
     galleryImages: [] as string[],
   });
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  function generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\u4e00-\u9fff\u3400-\u4dbf\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  function handleProductNameChange(name: string) {
+    setFormData((prev) => ({
+      ...prev,
+      name,
+      ...(!slugManuallyEdited ? { slug: generateSlug(name) } : {}),
+    }));
+  }
+
+  function handleProductSlugChange(slug: string) {
+    setSlugManuallyEdited(true);
+    setFormData((prev) => ({ ...prev, slug }));
+  }
 
   const applyFilters = useCallback(() => {
     let filtered = [...products];
@@ -117,6 +141,7 @@ export default function ProductsPage() {
       if (res.ok) {
         setShowForm(false);
         setEditingId(null);
+        setSlugManuallyEdited(false);
         setFormData({
           seriesId: '',
           name: '',
@@ -156,6 +181,7 @@ export default function ProductsPage() {
         galleryImages: data.product.images?.map((img: { url: string }) => img.url) || [],
       });
       setEditingId(product.id);
+      setSlugManuallyEdited(true);
       setShowForm(true);
     } catch (error) {
       console.error('載入商品資料失敗:', error);
@@ -187,6 +213,7 @@ export default function ProductsPage() {
   function handleCancelEdit() {
     setShowForm(false);
     setEditingId(null);
+    setSlugManuallyEdited(false);
     setFormData({
       seriesId: '',
       name: '',
@@ -340,7 +367,7 @@ export default function ProductsPage() {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => handleProductNameChange(e.target.value)}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                   placeholder="例如：原神須彌主題一番賞"
                 />
@@ -354,9 +381,9 @@ export default function ProductsPage() {
                   type="text"
                   required
                   value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  onChange={(e) => handleProductSlugChange(e.target.value)}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
-                  placeholder="例如：genshin-sumeru"
+                  placeholder="自動產生，也可手動修改"
                 />
               </div>
 
