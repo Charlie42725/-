@@ -51,7 +51,8 @@
       "Bash(npx prisma db pull:*)",
       "Bash(npm ls:*)",
       "Bash(head:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
