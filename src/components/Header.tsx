@@ -119,7 +119,7 @@ export default function Header() {
             <Link href="/" className="flex items-center">
               <Image
                 src="/assets/images/logos/logo.jpg"
-                alt="失控抽抽"
+                alt="失控事務所"
                 width={180}
                 height={60}
                 className="h-10 md:h-14 w-auto"
@@ -130,7 +130,7 @@ export default function Header() {
                 }}
               />
               <div className="text-3xl font-heading font-bold text-amber-400" style={{ display: 'none' }}>
-                失控抽抽
+                失控事務所
               </div>
             </Link>
           </div>

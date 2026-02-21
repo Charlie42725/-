@@ -24,12 +24,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "失控抽抽 - GK.盲盒.一番賞",
-  description: "失控抽抽 — 失控事務所線上抽賞平台，GK、盲盒、一番賞，提供最公平、公正、公開的抽賞體驗。",
+  title: "失控事務所 - GK.盲盒.一番賞",
+  description: "歡迎失控事務所，理智請寄放在門口。GK、盲盒、一番賞，提供最公平、公正、公開的抽賞體驗。",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "失控抽抽",
+    title: "失控事務所",
   },
   other: {
     "mobile-web-app-capable": "yes",

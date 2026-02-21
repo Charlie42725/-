@@ -158,7 +158,7 @@ export default function RegisterPage() {
           {/* 標題 */}
           <div className="text-center mb-8">
             <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">會員註冊</h1>
-            <p className="text-zinc-500">加入失控抽抽</p>
+            <p className="text-zinc-500">加入失控事務所</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -135,7 +135,7 @@ export default function AdminLayout({
       <footer className="border-t border-[var(--border)] mt-16">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <p className="text-center text-zinc-600 text-sm">
-            失控抽抽 後台管理系統 &copy; 2025
+            失控事務所 後台管理系統 &copy; 2025
           </p>
         </div>
       </footer>

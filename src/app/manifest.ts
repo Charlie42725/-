@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: '失控抽抽 - GK.盲盒.一番賞',
-    short_name: '失控抽抽',
-    description: '失控抽抽 — 失控事務所線上抽賞平台，GK、盲盒、一番賞',
+    name: '失控事務所 - GK.盲盒.一番賞',
+    short_name: '失控事務所',
+    description: '歡迎失控事務所，理智請寄放在門口。GK、盲盒、一番賞，提供最公平、公正、公開的抽賞體驗。',
     start_url: '/',
     display: 'standalone',
     background_color: '#161B26',
