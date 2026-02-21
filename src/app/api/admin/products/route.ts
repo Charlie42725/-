@@ -7,11 +7,7 @@ export async function GET() {
     const products = await prisma.product.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        series: {
-          include: {
-            brand: true,
-          },
-        },
+        brand: true,
         _count: {
           select: { variants: true, images: true },
         },
@@ -30,7 +26,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
-      seriesId,
+      brandId,
       name,
       slug,
       shortDescription,
@@ -42,7 +38,7 @@ export async function POST(request: Request) {
       galleryImages,
     } = body;
 
-    if (!seriesId || !name || !slug || !price || !totalTickets) {
+    if (!brandId || !name || !slug || !price || !totalTickets) {
       return NextResponse.json(
         { error: '必填欄位不完整' },
         { status: 400 }
@@ -51,7 +47,7 @@ export async function POST(request: Request) {
 
     const product = await prisma.product.create({
       data: {
-        seriesId: parseInt(seriesId),
+        brandId: parseInt(brandId),
         name,
         slug,
         shortDescription: shortDescription || null,

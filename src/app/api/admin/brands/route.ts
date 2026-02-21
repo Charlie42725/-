@@ -18,22 +18,13 @@ export async function GET() {
     const brands = await prisma.brand.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
-        series: {
-          select: { id: true }
+        _count: {
+          select: { products: true },
         },
       },
     });
 
-    // 手動計算系列數量
-    const brandsWithCount = brands.map(brand => ({
-      ...brand,
-      _count: {
-        series: brand.series.length
-      },
-      series: undefined, // 移除完整的系列資料
-    }));
-
-    return NextResponse.json({ brands: brandsWithCount });
+    return NextResponse.json({ brands });
   } catch (error) {
     console.error('獲取品牌失敗:', error);
     return NextResponse.json({ error: '獲取品牌失敗' }, { status: 500 });

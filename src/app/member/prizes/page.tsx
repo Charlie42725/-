@@ -20,13 +20,9 @@ interface PrizeProduct {
   name: string;
   slug: string;
   coverImage: string | null;
-  series: {
+  brand: {
     id: number;
     name: string;
-    brand: {
-      id: number;
-      name: string;
-    };
   };
 }
 
@@ -318,7 +314,7 @@ export default function PrizesPage() {
                   <h3 className="text-white font-bold text-sm md:text-lg mb-1 md:mb-2 line-clamp-2">{prize.variant.name}</h3>
                   <p className="text-zinc-500 text-xs mb-0.5 line-clamp-1">{prize.product.name}</p>
                   <p className="text-zinc-600 text-[10px] md:text-xs line-clamp-1">
-                    {prize.product.series.brand.name} · {prize.product.series.name}
+                    {prize.product.brand.name}
                   </p>
                 </div>
 

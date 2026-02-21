@@ -10,18 +10,11 @@ export async function GET() {
           isActive: true,
         },
         include: {
-          series: {
-            where: {
-              isActive: true,
-            },
-            include: {
-              _count: {
-                select: {
-                  products: {
-                    where: {
-                      status: 'active',
-                    },
-                  },
+          _count: {
+            select: {
+              products: {
+                where: {
+                  status: 'active',
                 },
               },
             },

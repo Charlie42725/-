@@ -1,12 +1,10 @@
-import { Product, Series, Brand, ProductVariant, Image, ProductStatus } from '@prisma/client';
+import { Product, Brand, ProductVariant, Image, ProductStatus } from '@prisma/client';
 
 // ======================================
 // 🔹 前端顯示用的完整商品類型
 // ======================================
 export type ProductWithDetails = Product & {
-  series: Series & {
-    brand: Brand;
-  };
+  brand: Brand;
   variants: ProductVariant[];
   images: Image[];
 };
@@ -24,13 +22,9 @@ export type ProductCard = {
   soldTickets: number;
   status: ProductStatus;
   coverImage: string | null;
-  series: {
+  brand: {
     name: string;
     slug: string;
-    brand: {
-      name: string;
-      slug: string;
-    };
   };
   variants?: {
     id: number;
@@ -41,23 +35,10 @@ export type ProductCard = {
 };
 
 // ======================================
-// 🔹 品牌與系列
-// ======================================
-export type BrandWithSeries = Brand & {
-  series: Series[];
-};
-
-export type SeriesWithProducts = Series & {
-  brand: Brand;
-  products: Product[];
-};
-
-// ======================================
 // 🔹 篩選參數
 // ======================================
 export type FilterParams = {
   brandSlug?: string;
-  seriesSlug?: string;
   status?: ProductStatus;
   minPrice?: number;
   maxPrice?: number;

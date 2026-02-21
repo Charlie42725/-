@@ -142,7 +142,7 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
                 {/* Brand Tag - bottom left of image */}
                 <div className="absolute bottom-1.5 left-1.5 md:bottom-2.5 md:left-2.5 z-10 flex items-center gap-1">
                   <span className="bg-black/70 backdrop-blur-sm text-zinc-300 text-[9px] md:text-[11px] font-bold px-1.5 py-0.5 rounded">
-                    {product.series.brand.name}
+                    {product.brand.name}
                   </span>
                 </div>
               </div>

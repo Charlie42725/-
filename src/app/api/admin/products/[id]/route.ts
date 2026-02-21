@@ -29,11 +29,7 @@ export async function GET(
     const product = await prisma.product.findUnique({
       where: { id: idValidation.id },
       include: {
-        series: {
-          include: {
-            brand: true,
-          },
-        },
+        brand: true,
         images: true,
         variants: true,
       },
@@ -140,7 +136,7 @@ export async function PUT(
     const id = idValidation.id!;
     const body = await request.json();
     const {
-      seriesId,
+      brandId,
       name,
       slug,
       shortDescription,
@@ -152,7 +148,7 @@ export async function PUT(
       galleryImages,
     } = body;
 
-    if (!seriesId || !name || !slug || !price || !totalTickets) {
+    if (!brandId || !name || !slug || !price || !totalTickets) {
       return NextResponse.json(
         { error: '必填欄位不完整' },
         { status: 400 }
@@ -180,7 +176,7 @@ export async function PUT(
     const product = await prisma.product.update({
       where: { id },
       data: {
-        seriesId: parseInt(seriesId),
+        brandId: parseInt(brandId),
         name,
         slug,
         shortDescription: shortDescription || null,
@@ -198,11 +194,7 @@ export async function PUT(
         } : undefined,
       },
       include: {
-        series: {
-          include: {
-            brand: true,
-          },
-        },
+        brand: true,
         images: true,
       },
     });

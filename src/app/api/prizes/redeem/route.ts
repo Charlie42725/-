@@ -38,11 +38,7 @@ export async function POST(request: NextRequest) {
           variant: true,
           product: {
             include: {
-              series: {
-                include: {
-                  brand: true,
-                },
-              },
+              brand: true,
             },
           },
         },

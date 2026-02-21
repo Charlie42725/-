@@ -37,14 +37,8 @@ export async function GET(request: NextRequest) {
               name: true,
               slug: true,
               coverImage: true,
-              series: {
-                select: {
-                  id: true,
-                  name: true,
-                  brand: {
-                    select: { id: true, name: true },
-                  },
-                },
+              brand: {
+                select: { id: true, name: true },
               },
             },
           },

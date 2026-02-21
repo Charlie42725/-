@@ -23,21 +23,11 @@ const getProduct = unstable_cache(
         soldTickets: true,
         status: true,
         coverImage: true,
-        series: {
+        brand: {
           select: {
             id: true,
             name: true,
             slug: true,
-            _count: {
-              select: { products: true }
-            },
-            brand: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-              },
-            },
           },
         },
         variants: {
@@ -100,12 +90,8 @@ export default async function ProductDetailPage({
         <nav className="flex items-center gap-2 text-sm text-zinc-500 mb-6">
           <Link href="/" className="hover:text-zinc-300 transition-colors">首頁</Link>
           <span>/</span>
-          <Link href={`/brands/${product.series.brand.slug}`} className="hover:text-zinc-300 transition-colors">
-            {product.series.brand.name}
-          </Link>
-          <span>/</span>
-          <Link href={`/series/${product.series.slug}`} className="hover:text-zinc-300 transition-colors">
-            {product.series.name}
+          <Link href={`/brands/${product.brand.slug}`} className="hover:text-zinc-300 transition-colors">
+            {product.brand.name}
           </Link>
           <span>/</span>
           <span className="text-zinc-300 truncate max-w-[200px]">{product.name}</span>
@@ -137,19 +123,13 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {/* Brand & Series */}
+            {/* Brand */}
             <div className="flex items-center gap-3 mb-3">
               <Link
-                href={`/brands/${product.series.brand.slug}`}
+                href={`/brands/${product.brand.slug}`}
                 className="bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1 rounded text-xs font-bold text-amber-400 hover:bg-white/20 transition-colors"
               >
-                {product.series.brand.name}
-              </Link>
-              <Link
-                href={`/series/${product.series.slug}`}
-                className="text-zinc-500 text-sm hover:text-zinc-200 transition-colors"
-              >
-                {product.series.name}
+                {product.brand.name}
               </Link>
             </div>
 

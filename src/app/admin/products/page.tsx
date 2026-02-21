@@ -13,20 +13,15 @@ interface Product {
   totalTickets: number;
   soldTickets: number;
   status: string;
-  series: {
+  brand: {
     id: number;
     name: string;
-    brand: {
-      id: number;
-      name: string;
-    };
   };
 }
 
 interface Brand {
   id: number;
   name: string;
-  series: { id: number; name: string }[];
 }
 
 export default function ProductsPage() {
@@ -39,11 +34,10 @@ export default function ProductsPage() {
 
   // 篩選狀態
   const [filterBrand, setFilterBrand] = useState<string>('');
-  const [filterSeries, setFilterSeries] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
 
   const [formData, setFormData] = useState({
-    seriesId: '',
+    brandId: '',
     name: '',
     slug: '',
     shortDescription: '',
@@ -82,11 +76,7 @@ export default function ProductsPage() {
     let filtered = [...products];
 
     if (filterBrand) {
-      filtered = filtered.filter(p => p.series.brand.id.toString() === filterBrand);
-    }
-
-    if (filterSeries) {
-      filtered = filtered.filter(p => p.series.id.toString() === filterSeries);
+      filtered = filtered.filter(p => p.brand.id.toString() === filterBrand);
     }
 
     if (filterStatus) {
@@ -94,7 +84,7 @@ export default function ProductsPage() {
     }
 
     setFilteredProducts(filtered);
-  }, [products, filterBrand, filterSeries, filterStatus]);
+  }, [products, filterBrand, filterStatus]);
 
   useEffect(() => {
     fetchData();
@@ -108,7 +98,7 @@ export default function ProductsPage() {
     try {
       const [productsRes, brandsRes] = await Promise.all([
         fetch('/api/admin/products'),
-        fetch('/api/brands'),
+        fetch('/api/admin/brands'),
       ]);
 
       const productsData = await productsRes.json();
@@ -143,7 +133,7 @@ export default function ProductsPage() {
         setEditingId(null);
         setSlugManuallyEdited(false);
         setFormData({
-          seriesId: '',
+          brandId: '',
           name: '',
           slug: '',
           shortDescription: '',
@@ -170,7 +160,7 @@ export default function ProductsPage() {
       const data = await res.json();
 
       setFormData({
-        seriesId: product.series.id?.toString() || '',
+        brandId: product.brand.id?.toString() || '',
         name: product.name,
         slug: product.slug,
         shortDescription: data.product.shortDescription || '',
@@ -215,7 +205,7 @@ export default function ProductsPage() {
     setEditingId(null);
     setSlugManuallyEdited(false);
     setFormData({
-      seriesId: '',
+      brandId: '',
       name: '',
       slug: '',
       shortDescription: '',
@@ -227,15 +217,8 @@ export default function ProductsPage() {
     });
   }
 
-  function getAvailableSeries() {
-    if (!filterBrand) return [];
-    const brand = brands.find(b => b.id.toString() === filterBrand);
-    return brand?.series || [];
-  }
-
   function clearFilters() {
     setFilterBrand('');
-    setFilterSeries('');
     setFilterStatus('');
   }
 
@@ -269,7 +252,7 @@ export default function ProductsPage() {
       <div className="bg-surface-1/60 rounded-lg p-6 border border-[var(--border)] mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium text-white">篩選條件</h3>
-          {(filterBrand || filterSeries || filterStatus) && (
+          {(filterBrand || filterStatus) && (
             <button
               onClick={clearFilters}
               className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
@@ -278,38 +261,18 @@ export default function ProductsPage() {
             </button>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-zinc-300 mb-2 text-sm">品牌</label>
             <select
               value={filterBrand}
-              onChange={(e) => {
-                setFilterBrand(e.target.value);
-                setFilterSeries(''); // 切換品牌時清除系列篩選
-              }}
+              onChange={(e) => setFilterBrand(e.target.value)}
               className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
             >
               <option value="">全部品牌</option>
               {brands.map((brand) => (
                 <option key={brand.id} value={brand.id}>
                   {brand.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-zinc-300 mb-2 text-sm">系列</label>
-            <select
-              value={filterSeries}
-              onChange={(e) => setFilterSeries(e.target.value)}
-              className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
-              disabled={!filterBrand}
-            >
-              <option value="">全部系列</option>
-              {getAvailableSeries().map((series) => (
-                <option key={series.id} value={series.id}>
-                  {series.name}
                 </option>
               ))}
             </select>
@@ -341,22 +304,18 @@ export default function ProductsPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-zinc-300 mb-2">選擇系列 *</label>
+                <label className="block text-zinc-300 mb-2">選擇品牌 *</label>
                 <select
                   required
-                  value={formData.seriesId}
-                  onChange={(e) => setFormData({ ...formData, seriesId: e.target.value })}
+                  value={formData.brandId}
+                  onChange={(e) => setFormData({ ...formData, brandId: e.target.value })}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500"
                 >
-                  <option value="">請選擇系列</option>
+                  <option value="">請選擇品牌</option>
                   {brands.map((brand) => (
-                    <optgroup key={brand.id} label={brand.name}>
-                      {brand.series.map((series) => (
-                        <option key={series.id} value={series.id}>
-                          {series.name}
-                        </option>
-                      ))}
-                    </optgroup>
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -481,7 +440,7 @@ export default function ProductsPage() {
               <tr>
                 <th className="text-left px-6 py-4 text-zinc-300 font-medium">ID</th>
                 <th className="text-left px-6 py-4 text-zinc-300 font-medium">商品名稱</th>
-                <th className="text-left px-6 py-4 text-zinc-300 font-medium">品牌/系列</th>
+                <th className="text-left px-6 py-4 text-zinc-300 font-medium">品牌</th>
                 <th className="text-left px-6 py-4 text-zinc-300 font-medium">價格</th>
                 <th className="text-left px-6 py-4 text-zinc-300 font-medium">抽取進度</th>
                 <th className="text-left px-6 py-4 text-zinc-300 font-medium">狀態</th>
@@ -509,8 +468,7 @@ export default function ProductsPage() {
                         <div className="text-sm text-zinc-400">{product.slug}</div>
                       </td>
                       <td className="px-6 py-4 text-zinc-300">
-                        <div className="text-sm font-medium">{product.series.brand.name}</div>
-                        <div className="text-xs text-zinc-500">{product.series.name}</div>
+                        <div className="text-sm font-medium">{product.brand.name}</div>
                       </td>
                       <td className="px-6 py-4 text-amber-400 font-medium">
                         NT$ {product.price}

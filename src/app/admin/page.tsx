@@ -6,12 +6,11 @@ export const dynamic = 'force-dynamic';
 export default async function AdminDashboard() {
   const stats = await Promise.all([
     prisma.brand.count(),
-    prisma.series.count(),
     prisma.product.count(),
     prisma.product.count({ where: { status: 'active' } }),
   ]);
 
-  const [brandCount, seriesCount, productCount, activeProductCount] = stats;
+  const [brandCount, productCount, activeProductCount] = stats;
 
   const statCards = [
     {
@@ -24,18 +23,6 @@ export default async function AdminDashboard() {
         <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" />
-        </svg>
-      ),
-    },
-    {
-      label: '系列總數',
-      value: seriesCount,
-      color: 'text-violet-400',
-      bg: 'bg-violet-500/10',
-      border: 'border-violet-500/20',
-      icon: (
-        <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
         </svg>
       ),
     },
@@ -78,16 +65,6 @@ export default async function AdminDashboard() {
       ),
     },
     {
-      href: '/admin/series',
-      title: '新增系列',
-      desc: '創建新的商品系列',
-      icon: (
-        <svg className="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-        </svg>
-      ),
-    },
-    {
       href: '/admin/products',
       title: '新增商品',
       desc: '創建新的一番賞商品',
@@ -107,7 +84,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* 統計卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {statCards.map((card) => (
           <div
             key={card.label}
@@ -127,7 +104,7 @@ export default async function AdminDashboard() {
       {/* 快速操作 */}
       <div className="bg-surface-1/60 rounded-xl p-6 border border-[var(--border)]">
         <h2 className="text-lg font-semibold text-white mb-4">快速操作</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {quickActions.map((action) => (
             <Link
               key={action.href}

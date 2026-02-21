@@ -6,14 +6,9 @@ interface Brand {
   id: number;
   name: string;
   slug: string;
-  series: {
-    id: number;
-    name: string;
-    slug: string;
-    _count: {
-      products: number;
-    };
-  }[];
+  _count: {
+    products: number;
+  };
 }
 
 interface FilterSectionProps {
@@ -24,7 +19,6 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [brands, setBrands] = useState<Brand[]>(initialBrands || []);
   const [selectedBrand, setSelectedBrand] = useState<string>('');
-  const [selectedSeries, setSelectedSeries] = useState<string>('');
 
   useEffect(() => {
     // 如果有預取資料，跳過 API 請求
@@ -43,9 +37,6 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
     fetchBrands();
   }, [initialBrands]);
 
-  const selectedBrandData = brands?.find((b) => b.slug === selectedBrand);
-  const availableSeries = selectedBrandData?.series || [];
-
   return (
     <section className="w-full py-2 mt-2 mb-4">
       <div className="max-w-screen-xl mx-auto px-4">
@@ -53,7 +44,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
           <div className="flex items-center justify-between">
           {/* 篩選按鈕 */}
           <div className="flex items-center space-x-3">
-            <button 
+            <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex items-center space-x-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-full transition-all duration-200 shadow-lg"
             >
@@ -86,7 +77,7 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
         {/* 展開的篩選面板 */}
         {isFilterOpen && (
           <div className="mt-4 bg-surface-1 rounded-lg p-4 border border-[var(--border)] slide-down">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* 類別篩選 */}
               <div>
                 <label className="block text-white font-bold mb-2">類別</label>
@@ -105,33 +96,12 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
                 <select
                   className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2"
                   value={selectedBrand}
-                  onChange={(e) => {
-                    setSelectedBrand(e.target.value);
-                    setSelectedSeries(''); // 重置系列選擇
-                  }}
+                  onChange={(e) => setSelectedBrand(e.target.value)}
                 >
                   <option value="">全部品牌</option>
                   {brands?.map((brand) => (
                     <option key={brand.id} value={brand.slug}>
-                      {brand.name} ({brand.series.reduce((sum, s) => sum + s._count.products, 0)} 個商品)
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 系列篩選 */}
-              <div>
-                <label className="block text-white font-bold mb-2">系列</label>
-                <select
-                  className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2 disabled:opacity-50"
-                  value={selectedSeries}
-                  onChange={(e) => setSelectedSeries(e.target.value)}
-                  disabled={!selectedBrand}
-                >
-                  <option value="">全部系列</option>
-                  {availableSeries.map((series) => (
-                    <option key={series.id} value={series.slug}>
-                      {series.name} ({series._count.products} 個商品)
+                      {brand.name} ({brand._count.products} 個商品)
                     </option>
                   ))}
                 </select>
@@ -141,14 +111,14 @@ export default function FilterSection({ initialBrands }: FilterSectionProps) {
               <div>
                 <label className="block text-white font-bold mb-2">價格範圍</label>
                 <div className="flex space-x-2">
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     placeholder="最低"
                     className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2"
                   />
                   <span className="text-white self-center">-</span>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     placeholder="最高"
                     className="w-full bg-surface-2 text-white border border-[var(--border)] rounded px-3 py-2"
                   />

@@ -48,72 +48,12 @@ async function main() {
 
   console.log(`✅ 建立了 ${brands.length} 個品牌`);
 
-  // ========== 系列 ==========
-  const series = await Promise.all([
-    // 原神系列
-    prisma.series.create({
-      data: {
-        brandId: brands[0].id,
-        name: '原神 璃月篇',
-        slug: 'genshin-liyue',
-        description: '以璃月港為主題的一番賞系列',
-        coverImage: '/uploads/1761125283225-287624572f856bd353a15b5a0fadfc1e.png',
-        isActive: true,
-      }
-    }),
-    prisma.series.create({
-      data: {
-        brandId: brands[0].id,
-        name: '原神 稻妻篇',
-        slug: 'genshin-inazuma',
-        description: '以稻妻為主題的一番賞系列',
-        coverImage: '/uploads/1761125288034-4928d2b15fcb21e4fba4cfde13c457b5.png',
-        isActive: true,
-      }
-    }),
-    // 海賊王系列
-    prisma.series.create({
-      data: {
-        brandId: brands[1].id,
-        name: '海賊王 和之國篇',
-        slug: 'one-piece-wano',
-        description: '和之國戰鬥篇章主題',
-        coverImage: '/uploads/1760897192937-1553580211-30129be9d8e1b24e375e563448554807-696x391.jpg',
-        isActive: true,
-      }
-    }),
-    // 鬼滅系列
-    prisma.series.create({
-      data: {
-        brandId: brands[2].id,
-        name: '鬼滅之刃 無限列車篇',
-        slug: 'demon-slayer-mugen-train',
-        description: '劇場版無限列車主題',
-        coverImage: '/uploads/1760961309234-S__32088081.jpg',
-        isActive: true,
-      }
-    }),
-    // 咒術迴戰系列
-    prisma.series.create({
-      data: {
-        brandId: brands[3].id,
-        name: '咒術迴戰 渋谷事変篇',
-        slug: 'jjk-shibuya',
-        description: '渋谷事変篇主題一番賞',
-        coverImage: '/uploads/1761051302681-7d398fb1848b4e8b72697e3c6f0a03ec.jpg',
-        isActive: true,
-      }
-    }),
-  ]);
-
-  console.log(`✅ 建立了 ${series.length} 個系列`);
-
   // ========== 商品 ==========
   const products = await Promise.all([
-    // 原神璃月篇商品 1
+    // 原神商品 1
     prisma.product.create({
       data: {
-        seriesId: series[0].id,
+        brandId: brands[0].id,
         name: '一番賞 原神 璃月仙境',
         slug: 'genshin-liyue-wonderland',
         shortDescription: '璃月港主題限定一番賞，收錄鍾離、凝光等人氣角色',
@@ -125,10 +65,10 @@ async function main() {
         coverImage: '/uploads/1761125283225-287624572f856bd353a15b5a0fadfc1e.png',
       }
     }),
-    // 原神稻妻篇商品
+    // 原神商品 2
     prisma.product.create({
       data: {
-        seriesId: series[1].id,
+        brandId: brands[0].id,
         name: '一番賞 原神 稻妻雷電',
         slug: 'genshin-inazuma-raiden',
         shortDescription: '稻妻主題限定，收錄雷電將軍、神里綾華等角色',
@@ -140,10 +80,10 @@ async function main() {
         coverImage: '/uploads/1761125288034-4928d2b15fcb21e4fba4cfde13c457b5.png',
       }
     }),
-    // 海賊王商品
+    // 海賊王商品 1
     prisma.product.create({
       data: {
-        seriesId: series[2].id,
+        brandId: brands[1].id,
         name: '一番賞 海賊王 GEAR5',
         slug: 'one-piece-gear5',
         shortDescription: '魯夫 GEAR5 尼卡形態主題一番賞',
@@ -158,7 +98,7 @@ async function main() {
     // 海賊王商品 2 (已售罄)
     prisma.product.create({
       data: {
-        seriesId: series[2].id,
+        brandId: brands[1].id,
         name: '一番賞 海賊王 四皇集結',
         slug: 'one-piece-yonko',
         shortDescription: '四皇主題一番賞，收錄四位頂級海賊',
@@ -173,7 +113,7 @@ async function main() {
     // 鬼滅商品
     prisma.product.create({
       data: {
-        seriesId: series[3].id,
+        brandId: brands[2].id,
         name: '一番賞 鬼滅之刃 煉獄杏壽郎',
         slug: 'demon-slayer-rengoku',
         shortDescription: '炎柱煉獄杏壽郎主題限定一番賞',
@@ -188,7 +128,7 @@ async function main() {
     // 咒術迴戰商品
     prisma.product.create({
       data: {
-        seriesId: series[4].id,
+        brandId: brands[3].id,
         name: '一番賞 咒術迴戰 渋谷決戰',
         slug: 'jjk-shibuya-battle',
         shortDescription: '渋谷事變篇主題，收錄五條悟、虎杖悠仁等角色',
@@ -321,7 +261,6 @@ async function main() {
   console.log('\n🎉 測試資料建立完成！');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`  品牌: ${brands.length} 個`);
-  console.log(`  系列: ${series.length} 個`);
   console.log(`  商品: ${products.length} 個`);
   console.log(`  獎項: ${variantData.length} 個`);
   console.log(`  圖片: ${imageData.length} 張`);

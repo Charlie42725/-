@@ -15,11 +15,7 @@ export async function GET(
           slug,
         },
         include: {
-          series: {
-            include: {
-              brand: true,
-            },
-          },
+          brand: true,
           variants: {
             where: { isActive: true },
             orderBy: { name: 'asc' },

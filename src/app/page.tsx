@@ -13,7 +13,7 @@ const getHomeData = unstable_cache(
         orderBy: { createdAt: 'desc' },
         take: 12,
         include: {
-          series: { include: { brand: true } },
+          brand: true,
           variants: { where: { isActive: true } },
           images: { orderBy: { sortOrder: 'asc' } },
         },
@@ -21,9 +21,8 @@ const getHomeData = unstable_cache(
       prisma.brand.findMany({
         where: { isActive: true },
         include: {
-          series: {
-            where: { isActive: true },
-            include: { _count: { select: { products: { where: { status: 'active' } } } } },
+          _count: {
+            select: { products: { where: { status: 'active' } } },
           },
         },
         orderBy: { name: 'asc' },

@@ -43,27 +43,7 @@ model Brand {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  series      Series[]
-}
-
-// -----------------------------
-// 🔹 系列
-// -----------------------------
-model Series {
-  id          Int       @id @default(autoincrement())
-  brand       Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  brandId     Int
-  name        String
-  slug        String
-  description String?
-  coverImage  String?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
   products    Product[]
-
-  @@unique([brandId, slug])
 }
 
 // -----------------------------
@@ -71,8 +51,8 @@ model Series {
 // -----------------------------
 model Product {
   id               Int             @id @default(autoincrement())
-  series           Series          @relation(fields: [seriesId], references: [id], onDelete: Cascade)
-  seriesId         Int
+  brand            Brand           @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brandId          Int
   name             String
   slug             String
   shortDescription String?
@@ -91,10 +71,10 @@ model Product {
   lotteryDraws     LotteryDraw[]
   drawQueues       DrawQueue[]
 
-  @@unique([seriesId, slug])
+  @@unique([brandId, slug])
   @@index([slug])
   @@index([status])
-  @@index([seriesId])
+  @@index([brandId])
 }
 
 // -----------------------------

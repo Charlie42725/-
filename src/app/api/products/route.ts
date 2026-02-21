@@ -9,14 +9,13 @@ export async function GET(request: Request) {
 
     // 解析查詢參數
     const brandSlug = searchParams.get('brand');
-    const seriesSlug = searchParams.get('series');
     const status = searchParams.get('status') as ProductStatus | null;
     const sortBy = searchParams.get('sortBy') || 'newest';
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
     // 用查詢參數生成快取 key
-    const cacheKey = `products:${brandSlug || ''}:${seriesSlug || ''}:${status || ''}:${sortBy}:${limit}:${offset}`;
+    const cacheKey = `products:${brandSlug || ''}:${status || ''}:${sortBy}:${limit}:${offset}`;
 
     const result = await cache.getOrSet(cacheKey, async () => {
       // 構建 where 條件
@@ -31,16 +30,8 @@ export async function GET(request: Request) {
       }
 
       if (brandSlug) {
-        where.series = {
-          brand: {
-            slug: brandSlug,
-          },
-        };
-      }
-
-      if (seriesSlug) {
-        where.series = {
-          slug: seriesSlug,
+        where.brand = {
+          slug: brandSlug,
         };
       }
 
@@ -67,15 +58,8 @@ export async function GET(request: Request) {
           take: limit,
           skip: offset,
           include: {
-            series: {
-              select: {
-                id: true,
-                name: true,
-                slug: true,
-                brand: {
-                  select: { id: true, name: true, slug: true },
-                },
-              },
+            brand: {
+              select: { id: true, name: true, slug: true },
             },
             _count: {
               select: { variants: true },

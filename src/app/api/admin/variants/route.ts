@@ -34,11 +34,7 @@ export async function GET(request: Request) {
       include: {
         product: {
           include: {
-            series: {
-              include: {
-                brand: true,
-              },
-            },
+            brand: true,
           },
         },
         lotteryDraws: {

@@ -1,11 +1,11 @@
 -- ======================================
 -- 一番賞網站 Database Rebuild SQL
--- Database: PostgreSQL (Supabase)
+-- Database: PostgreSQL (Neon)
 -- 根據 prisma/schema.prisma 生成
 -- ======================================
 
 -- ⚠️ 注意：此腳本會刪除所有現有表格和資料！
--- 請在 Supabase SQL Editor 中執行
+-- 請在 SQL Editor 中執行
 
 -- -----------------------------
 -- 🔸 先刪除所有表格（按照依賴順序）
@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS "VerificationCode" CASCADE;
 DROP TABLE IF EXISTS "AdminUser" CASCADE;
 DROP TABLE IF EXISTS "Image" CASCADE;
 DROP TABLE IF EXISTS "ProductVariant" CASCADE;
+DROP TABLE IF EXISTS "DrawQueue" CASCADE;
 DROP TABLE IF EXISTS "Product" CASCADE;
 DROP TABLE IF EXISTS "Series" CASCADE;
 DROP TABLE IF EXISTS "Brand" CASCADE;
@@ -35,6 +36,7 @@ DROP TYPE IF EXISTS "UserRole" CASCADE;
 DROP TYPE IF EXISTS "CodeType" CASCADE;
 DROP TYPE IF EXISTS "OrderStatus" CASCADE;
 DROP TYPE IF EXISTS "PointTransactionType" CASCADE;
+DROP TYPE IF EXISTS "QueueStatus" CASCADE;
 
 CREATE TYPE "ProductStatus" AS ENUM ('draft', 'active', 'sold_out', 'archived');
 CREATE TYPE "ImageType" AS ENUM ('cover', 'gallery', 'variant');
@@ -44,6 +46,7 @@ CREATE TYPE "UserRole" AS ENUM ('user', 'admin');
 CREATE TYPE "CodeType" AS ENUM ('email', 'phone');
 CREATE TYPE "OrderStatus" AS ENUM ('pending', 'paid', 'completed', 'cancelled', 'failed');
 CREATE TYPE "PointTransactionType" AS ENUM ('purchase', 'bonus', 'lottery', 'refund', 'redemption', 'admin_adjust');
+CREATE TYPE "QueueStatus" AS ENUM ('waiting', 'active', 'completed', 'expired', 'left');
 
 -- -----------------------------
 -- 🔹 Brand（品牌）
@@ -61,30 +64,11 @@ CREATE TABLE "Brand" (
 CREATE UNIQUE INDEX "Brand_slug_key" ON "Brand"("slug");
 
 -- -----------------------------
--- 🔹 Series（系列）
--- -----------------------------
-CREATE TABLE "Series" (
-    "id"          SERIAL       PRIMARY KEY,
-    "brandId"     INTEGER      NOT NULL,
-    "name"        TEXT         NOT NULL,
-    "slug"        TEXT         NOT NULL,
-    "description" TEXT,
-    "coverImage"  TEXT,
-    "isActive"    BOOLEAN      NOT NULL DEFAULT true,
-    "createdAt"   TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt"   TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Series_brandId_fkey" FOREIGN KEY ("brandId")
-        REFERENCES "Brand"("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-CREATE UNIQUE INDEX "Series_brandId_slug_key" ON "Series"("brandId", "slug");
-
--- -----------------------------
 -- 🔹 Product（商品）
 -- -----------------------------
 CREATE TABLE "Product" (
     "id"               SERIAL            PRIMARY KEY,
-    "seriesId"         INTEGER           NOT NULL,
+    "brandId"          INTEGER           NOT NULL,
     "name"             TEXT              NOT NULL,
     "slug"             TEXT              NOT NULL,
     "shortDescription" TEXT,
@@ -97,13 +81,13 @@ CREATE TABLE "Product" (
     "createdAt"        TIMESTAMP(3)      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt"        TIMESTAMP(3)      NOT NULL,
 
-    CONSTRAINT "Product_seriesId_fkey" FOREIGN KEY ("seriesId")
-        REFERENCES "Series"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    CONSTRAINT "Product_brandId_fkey" FOREIGN KEY ("brandId")
+        REFERENCES "Brand"("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
-CREATE UNIQUE INDEX "Product_seriesId_slug_key" ON "Product"("seriesId", "slug");
+CREATE UNIQUE INDEX "Product_brandId_slug_key" ON "Product"("brandId", "slug");
 CREATE INDEX "Product_slug_idx" ON "Product"("slug");
 CREATE INDEX "Product_status_idx" ON "Product"("status");
-CREATE INDEX "Product_seriesId_idx" ON "Product"("seriesId");
+CREATE INDEX "Product_brandId_idx" ON "Product"("brandId");
 
 -- -----------------------------
 -- 🔹 ProductVariant（獎項）
@@ -282,6 +266,7 @@ CREATE INDEX "LotteryDraw_productId_idx" ON "LotteryDraw"("productId");
 CREATE INDEX "LotteryDraw_variantId_idx" ON "LotteryDraw"("variantId");
 CREATE INDEX "LotteryDraw_createdAt_idx" ON "LotteryDraw"("createdAt");
 CREATE INDEX "LotteryDraw_isRedeemed_idx" ON "LotteryDraw"("isRedeemed");
+CREATE INDEX "LotteryDraw_userId_isRedeemed_idx" ON "LotteryDraw"("userId", "isRedeemed");
 
 -- -----------------------------
 -- 🔹 PrizeRedemption（獎品兌換記錄）
@@ -302,6 +287,31 @@ CREATE TABLE "PrizeRedemption" (
 CREATE UNIQUE INDEX "PrizeRedemption_lotteryDrawId_key" ON "PrizeRedemption"("lotteryDrawId");
 CREATE INDEX "PrizeRedemption_userId_idx" ON "PrizeRedemption"("userId");
 CREATE INDEX "PrizeRedemption_createdAt_idx" ON "PrizeRedemption"("createdAt");
+
+-- -----------------------------
+-- 🔹 DrawQueue（抽賞排隊）
+-- -----------------------------
+CREATE TABLE "DrawQueue" (
+    "id"            SERIAL        PRIMARY KEY,
+    "userId"        INTEGER       NOT NULL,
+    "productId"     INTEGER       NOT NULL,
+    "status"        "QueueStatus" NOT NULL DEFAULT 'waiting',
+    "position"      INTEGER       NOT NULL,
+    "joinedAt"      TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "activatedAt"   TIMESTAMP(3),
+    "expiresAt"     TIMESTAMP(3),
+    "completedAt"   TIMESTAMP(3),
+    "lastHeartbeat" TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "DrawQueue_userId_fkey" FOREIGN KEY ("userId")
+        REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT "DrawQueue_productId_fkey" FOREIGN KEY ("productId")
+        REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE INDEX "DrawQueue_productId_status_idx" ON "DrawQueue"("productId", "status");
+CREATE INDEX "DrawQueue_productId_position_idx" ON "DrawQueue"("productId", "position");
+CREATE INDEX "DrawQueue_userId_idx" ON "DrawQueue"("userId");
+CREATE INDEX "DrawQueue_expiresAt_idx" ON "DrawQueue"("expiresAt");
 
 -- ======================================
 -- ✅ 資料庫重建完成！
