@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
 
@@ -68,6 +68,7 @@ const emptyFormData = {
 };
 
 export default function ProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -693,34 +694,36 @@ export default function ProductsPage() {
         const spaceBelow = window.innerHeight - rect.bottom;
         const menuH = 240;
         const top = spaceBelow > menuH ? rect.bottom + 4 : rect.top - menuH - 4;
+        const closeMenu = () => { setOpenMenuId(null); setMenuAnchor(null); };
+        const navigate = (path: string) => { closeMenu(); router.push(path); };
         return createPortal(
           <div
             ref={menuRef}
             style={{ position: 'fixed', top, left, zIndex: 9999 }}
             className="bg-surface-1 border border-[var(--border)] rounded-xl shadow-2xl min-w-[170px] py-1"
           >
-            <Link href={`/products/${openProduct.slug}`} target="_blank" onClick={() => { setOpenMenuId(null); setMenuAnchor(null); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors">
+            <a href={`/products/${openProduct.slug}`} target="_blank" rel="noopener noreferrer" onClick={closeMenu}
+              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer">
               <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
               查看
-            </Link>
-            <button onClick={() => { setOpenMenuId(null); setMenuAnchor(null); handleEdit(openProduct); }}
+            </a>
+            <button onClick={() => { closeMenu(); handleEdit(openProduct); }}
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer">
               <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>
               編輯
             </button>
-            <Link href={`/admin/products/${openProduct.id}/variants`} onClick={() => { setOpenMenuId(null); setMenuAnchor(null); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors">
+            <button onClick={() => navigate(`/admin/products/${openProduct.id}/variants`)}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer">
               <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.003 6.003 0 01-2.27.853 6.003 6.003 0 01-2.27-.853" /></svg>
               獎項管理
-            </Link>
-            <Link href={`/admin/products/${openProduct.id}/discounts`} onClick={() => { setOpenMenuId(null); setMenuAnchor(null); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors">
+            </button>
+            <button onClick={() => navigate(`/admin/products/${openProduct.id}/discounts`)}
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:bg-white/[0.06] transition-colors cursor-pointer">
               <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
               折扣設定
-            </Link>
+            </button>
             <div className="border-t border-white/[0.06] my-1" />
-            <button onClick={() => { setOpenMenuId(null); setMenuAnchor(null); handleDelete(openProduct.id, openProduct.name); }}
+            <button onClick={() => { closeMenu(); handleDelete(openProduct.id, openProduct.name); }}
               className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
               刪除
