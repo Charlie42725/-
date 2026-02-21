@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
+import { getAdminData, getAdminCacheSync, invalidateAdminCache } from '@/lib/admin-cache';
 
 interface Product {
   id: number;
@@ -69,10 +70,11 @@ const emptyFormData = {
 
 export default function ProductsPage() {
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = getAdminCacheSync();
+  const [products, setProducts] = useState<Product[]>(cached?.products || []);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(cached?.products || []);
+  const [brands, setBrands] = useState<Brand[]>(cached?.brands || []);
+  const [loading, setLoading] = useState(!cached);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -200,12 +202,10 @@ export default function ProductsPage() {
 
   async function fetchData() {
     try {
-      const [pRes, bRes] = await Promise.all([fetch('/api/admin/products'), fetch('/api/admin/brands')]);
-      const pData = await pRes.json();
-      const bData = await bRes.json();
-      setProducts(pData.products);
-      setFilteredProducts(pData.products);
-      setBrands(bData.brands);
+      const data = await getAdminData(true);
+      setProducts(data.products);
+      setFilteredProducts(data.products);
+      setBrands(data.brands);
     } catch (error) {
       console.error('載入資料失敗:', error);
     } finally {
@@ -234,6 +234,7 @@ export default function ProductsPage() {
         setSlugManuallyEdited(false);
         setLoadedVariantIds([]);
         setFormData({ ...emptyFormData });
+        invalidateAdminCache();
         fetchData();
       } else {
         const data = await res.json();
@@ -293,7 +294,7 @@ export default function ProductsPage() {
     if (!confirm(`確定要刪除「${name}」嗎？此操作無法復原。`)) return;
     try {
       const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchData(); else alert('刪除失敗');
+      if (res.ok) { invalidateAdminCache(); fetchData(); } else alert('刪除失敗');
     } catch { alert('刪除失敗'); }
   }
 

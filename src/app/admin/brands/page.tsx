@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getAdminData, getAdminCacheSync, invalidateAdminCache } from '@/lib/admin-cache';
 
 interface Brand {
   id: number;
@@ -13,8 +14,9 @@ interface Brand {
 }
 
 export default function BrandsPage() {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = getAdminCacheSync();
+  const [brands, setBrands] = useState<Brand[]>(cached?.brands || []);
+  const [loading, setLoading] = useState(!cached);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -52,8 +54,7 @@ export default function BrandsPage() {
 
   async function fetchBrands() {
     try {
-      const res = await fetch('/api/admin/brands');
-      const data = await res.json();
+      const data = await getAdminData(true);
       setBrands(data.brands || []);
     } catch (error) {
       console.error('載入品牌失敗:', error);
@@ -76,6 +77,7 @@ export default function BrandsPage() {
         setShowForm(false);
         setFormData({ name: '', slug: '', description: '' });
         setSlugManuallyEdited(false);
+        invalidateAdminCache();
         fetchBrands();
       }
     } catch (error) {
@@ -92,6 +94,7 @@ export default function BrandsPage() {
       });
 
       if (res.ok) {
+        invalidateAdminCache();
         fetchBrands();
       }
     } catch (error) {

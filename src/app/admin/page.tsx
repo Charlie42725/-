@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getAdminData, getAdminCacheSync } from '@/lib/admin-cache';
 
 interface Stats {
   brandCount: number;
@@ -10,13 +11,11 @@ interface Stats {
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const cached = getAdminCacheSync();
+  const [stats, setStats] = useState<Stats | null>(cached?.stats || null);
 
   useEffect(() => {
-    fetch('/api/admin/stats')
-      .then(r => r.json())
-      .then(setStats)
-      .catch(() => {});
+    getAdminData().then(d => setStats(d.stats)).catch(() => {});
   }, []);
 
   const statCards = [

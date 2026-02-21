@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import ImageUpload from '@/components/ImageUpload';
+import { getAdminData, getAdminCacheSync, invalidateAdminCache } from '@/lib/admin-cache';
 
 interface Banner {
   id: number;
@@ -27,8 +28,9 @@ const defaultForm = {
 };
 
 export default function BannersPage() {
-  const [banners, setBanners] = useState<Banner[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = getAdminCacheSync();
+  const [banners, setBanners] = useState<Banner[]>(cached?.banners || []);
+  const [loading, setLoading] = useState(!cached);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState(defaultForm);
@@ -39,8 +41,7 @@ export default function BannersPage() {
 
   async function fetchBanners() {
     try {
-      const res = await fetch('/api/admin/banners');
-      const data = await res.json();
+      const data = await getAdminData(true);
       setBanners(data.banners || []);
     } catch (error) {
       console.error('載入 Banner 失敗:', error);
@@ -89,6 +90,7 @@ export default function BannersPage() {
         setShowForm(false);
         setEditingId(null);
         setFormData(defaultForm);
+        invalidateAdminCache();
         fetchBanners();
       } else {
         const data = await res.json();
@@ -108,6 +110,7 @@ export default function BannersPage() {
       });
 
       if (res.ok) {
+        invalidateAdminCache();
         fetchBanners();
       }
     } catch (error) {
@@ -124,6 +127,7 @@ export default function BannersPage() {
       });
 
       if (res.ok) {
+        invalidateAdminCache();
         fetchBanners();
       }
     } catch (error) {

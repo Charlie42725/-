@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import RouteProgress from '@/components/RouteProgress';
+import { getAdminData } from '@/lib/admin-cache';
 
 const navItems = [
   {
@@ -70,6 +72,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  // 進入後台時立刻預載所有資料，後續子頁面直接從快取讀取
+  useEffect(() => {
+    getAdminData();
+  }, []);
 
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
