@@ -4,6 +4,7 @@ import prisma from '@/lib/db';
 import { getTokenFromHeaders, verifyToken } from '@/lib/auth';
 import { cache } from '@/lib/cache';
 import { completeSession } from '@/lib/queue-manager';
+import { calculateDiscountedPrice, type Discount } from '@/lib/discount-engine';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,9 +26,20 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { productId, ticketNumbers } = body;
+    const { productId, ticketNumbers, batchOpen, drawCount } = body;
 
-    if (!productId || !ticketNumbers || !Array.isArray(ticketNumbers) || ticketNumbers.length === 0) {
+    // batchOpen 模式：開套抽獎（自動選號）
+    const isBatchOpen = batchOpen === true && typeof drawCount === 'number' && drawCount > 0;
+
+    if (!isBatchOpen) {
+      // 一般模式驗證
+      if (!productId || !ticketNumbers || !Array.isArray(ticketNumbers) || ticketNumbers.length === 0) {
+        return NextResponse.json(
+          { error: '參數錯誤' },
+          { status: 400 }
+        );
+      }
+    } else if (!productId) {
       return NextResponse.json(
         { error: '參數錯誤' },
         { status: 400 }
@@ -71,8 +83,8 @@ export async function POST(req: NextRequest) {
 
     // 使用交易確保數據一致性
     const result = await prisma.$transaction(async (tx) => {
-      // 並行獲取：商品 + 用戶 + 已抽號碼檢查
-      const [product, user, existingDraws] = await Promise.all([
+      // 並行獲取：商品 + 用戶 + 折扣 + 已抽號碼檢查
+      const [product, user, discounts, existingDraws] = await Promise.all([
         tx.product.findUnique({
           where: { id: productId },
           include: {
@@ -95,31 +107,80 @@ export async function POST(req: NextRequest) {
           where: { id: payload.userId },
           select: { id: true, points: true }
         }),
-        tx.lotteryDraw.findMany({
-          where: { productId, ticketNumber: { in: ticketNumbers } },
-          select: { ticketNumber: true }
-        })
+        tx.productDiscount.findMany({
+          where: { productId, isActive: true },
+          select: { id: true, type: true, drawCount: true, price: true, label: true, isActive: true }
+        }),
+        isBatchOpen
+          ? Promise.resolve([]) // batchOpen 模式不需要檢查指定號碼
+          : tx.lotteryDraw.findMany({
+              where: { productId, ticketNumber: { in: ticketNumbers } },
+              select: { ticketNumber: true }
+            })
       ]);
 
       if (!product) throw new Error('商品不存在');
       if (product.status !== 'active') throw new Error('商品未開放抽獎');
       if (!user) throw new Error('用戶不存在');
 
-      // 計算所需點數
-      const totalPointsNeeded = product.price * ticketNumbers.length;
-      if (user.points < totalPointsNeeded) {
-        throw new Error(`點數不足。需要 ${totalPointsNeeded} 點，目前僅有 ${user.points} 點`);
-      }
+      // batchOpen 模式：驗證並自動選號
+      let finalTicketNumbers: number[];
 
-      // 檢查號碼是否已被抽走
-      if (existingDraws.length > 0) {
-        throw new Error(`號碼 ${existingDraws.map(d => d.ticketNumber).join(', ')} 已被抽走`);
+      if (isBatchOpen) {
+        if (product.soldTickets !== 0) {
+          throw new Error('開套優惠僅限全新未抽商品');
+        }
+
+        // 取得所有已抽號碼
+        const allDrawn = await tx.lotteryDraw.findMany({
+          where: { productId },
+          select: { ticketNumber: true },
+        });
+        const drawnSet = new Set(allDrawn.map(d => d.ticketNumber));
+
+        // 收集可用號碼
+        const available: number[] = [];
+        for (let i = 1; i <= product.totalTickets; i++) {
+          if (!drawnSet.has(i)) available.push(i);
+        }
+
+        if (available.length < drawCount) {
+          throw new Error(`可用號碼不足，目前僅剩 ${available.length} 個`);
+        }
+
+        // Fisher-Yates shuffle，取前 drawCount 個
+        for (let i = available.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [available[i], available[j]] = [available[j], available[i]];
+        }
+        finalTicketNumbers = available.slice(0, drawCount);
+      } else {
+        finalTicketNumbers = ticketNumbers;
+
+        // 檢查號碼是否已被抽走
+        if (existingDraws.length > 0) {
+          throw new Error(`號碼 ${existingDraws.map(d => d.ticketNumber).join(', ')} 已被抽走`);
+        }
       }
 
       // 檢查號碼是否超出範圍
-      const invalidNumbers = ticketNumbers.filter((n: number) => n < 1 || n > product.totalTickets);
+      const invalidNumbers = finalTicketNumbers.filter((n: number) => n < 1 || n > product.totalTickets);
       if (invalidNumbers.length > 0) {
         throw new Error(`無效的號碼: ${invalidNumbers.join(', ')}`);
+      }
+
+      // 折扣計算
+      const breakdown = calculateDiscountedPrice(
+        finalTicketNumbers.length,
+        product.price,
+        product.soldTickets,
+        discounts as Discount[]
+      );
+
+      const totalPointsNeeded = breakdown.totalPrice;
+
+      if (user.points < totalPointsNeeded) {
+        throw new Error(`點數不足。需要 ${totalPointsNeeded} 點，目前僅有 ${user.points} 點`);
       }
 
       // 計算每個獎項的剩餘數量
@@ -135,11 +196,14 @@ export async function POST(req: NextRequest) {
       }
 
       const totalRemaining = variantsWithRemaining.reduce((sum, v) => sum + v.remaining, 0);
-      if (totalRemaining < ticketNumbers.length) {
+      if (totalRemaining < finalTicketNumbers.length) {
         throw new Error(`獎項庫存不足，目前僅剩 ${totalRemaining} 個獎項`);
       }
 
-      // 加權隨機抽取（不展開 pool，直接用 remaining 做權重）
+      // 計算每抽平均花費（存入 LotteryDraw.pointsUsed）
+      const avgPointsPerDraw = Math.round(totalPointsNeeded / finalTicketNumbers.length);
+
+      // 加權隨機抽取
       const draws: Array<{
         userId: number;
         productId: number;
@@ -148,17 +212,14 @@ export async function POST(req: NextRequest) {
         pointsUsed: number;
       }> = [];
 
-      // 複製一份 remaining 追蹤本次抽獎中的消耗
       const remainingTracker = new Map(variantsWithRemaining.map(v => [v.id, v.remaining]));
 
-      for (let i = 0; i < ticketNumbers.length; i++) {
-        // 計算當前總權重
+      for (let i = 0; i < finalTicketNumbers.length; i++) {
         let totalWeight = 0;
         for (const r of remainingTracker.values()) {
           totalWeight += r;
         }
 
-        // 加權隨機選取
         let random = Math.random() * totalWeight;
         let selectedVariant = variantsWithRemaining[0];
 
@@ -172,20 +233,19 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        // 扣除追蹤器中的數量
         remainingTracker.set(selectedVariant.id, (remainingTracker.get(selectedVariant.id) || 1) - 1);
 
         draws.push({
           userId: payload.userId,
           productId,
           variantId: selectedVariant.id,
-          ticketNumber: ticketNumbers[i],
-          pointsUsed: product.price
+          ticketNumber: finalTicketNumbers[i],
+          pointsUsed: avgPointsPerDraw
         });
       }
 
-      // 並行寫入：抽獎記錄 + 更新商品 + 扣點數 + 記錄異動
-      const newSoldTickets = product.soldTickets + ticketNumbers.length;
+      // 並行寫入
+      const newSoldTickets = product.soldTickets + finalTicketNumbers.length;
       const shouldMarkAsSoldOut = newSoldTickets >= product.totalTickets;
       const newBalance = user.points - totalPointsNeeded;
 
@@ -208,13 +268,13 @@ export async function POST(req: NextRequest) {
             type: 'lottery',
             amount: -totalPointsNeeded,
             balance: newBalance,
-            description: `一番賞抽獎 - ${product.name}（抽取 ${ticketNumbers.length} 次）`,
+            description: `一番賞抽獎 - ${product.name}（抽取 ${finalTicketNumbers.length} 次）`,
             relatedId: productId.toString()
           }
         })
       ]);
 
-      // 直接從已有資料構建結果，不再 re-query
+      // 構建結果
       const variantMap = new Map(product.variants.map(v => [v.id, v]));
       const results = draws
         .map(d => ({
@@ -223,7 +283,7 @@ export async function POST(req: NextRequest) {
         }))
         .sort((a, b) => a.ticketNumber - b.ticketNumber);
 
-      return { results, newBalance, pointsUsed: totalPointsNeeded };
+      return { results, newBalance, pointsUsed: totalPointsNeeded, breakdown };
     });
 
     // 抽獎後非同步處理（不阻塞回應）

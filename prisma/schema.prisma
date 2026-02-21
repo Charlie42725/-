@@ -66,6 +66,7 @@ model Product {
   updatedAt        DateTime        @updatedAt
 
   variants         ProductVariant[]
+  discounts        ProductDiscount[]
   images           Image[]
   logs             ProductLog[]
   lotteryDraws     LotteryDraw[]
@@ -317,6 +318,11 @@ enum OrderStatus {
   failed        // 失敗
 }
 
+enum DiscountType {
+  full_set   // 開套優惠
+  combo      // 組合價優惠
+}
+
 enum PointTransactionType {
   purchase      // 購買
   bonus         // 贈送
@@ -324,6 +330,24 @@ enum PointTransactionType {
   refund        // 退款
   redemption    // 獎品兌換
   admin_adjust  // 管理員調整
+}
+
+// -----------------------------
+// 🔹 商品折扣方案
+// -----------------------------
+model ProductDiscount {
+  id         Int          @id @default(autoincrement())
+  product    Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId  Int
+  type       DiscountType
+  drawCount  Int          // 抽數門檻
+  price      Int          // 該方案總價（點數）
+  label      String?      // 顯示名稱（如「半套優惠」）
+  isActive   Boolean      @default(true)
+  createdAt  DateTime     @default(now())
+
+  @@index([productId, type])
+  @@unique([productId, type, drawCount])
 }
 
 // -----------------------------

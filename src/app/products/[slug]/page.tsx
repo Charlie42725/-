@@ -46,6 +46,18 @@ const getProduct = unstable_cache(
           },
           orderBy: { name: 'asc' },
         },
+        discounts: {
+          where: { isActive: true },
+          select: {
+            id: true,
+            type: true,
+            drawCount: true,
+            price: true,
+            label: true,
+            isActive: true,
+          },
+          orderBy: [{ type: 'asc' }, { drawCount: 'asc' }],
+        },
         images: {
           select: {
             id: true,
@@ -215,6 +227,8 @@ export default async function ProductDetailPage({
             productPrice={product.price}
             totalTickets={product.totalTickets}
             productStatus={product.status}
+            soldTickets={product.soldTickets}
+            discounts={product.discounts}
           />
         </div>
       </div>

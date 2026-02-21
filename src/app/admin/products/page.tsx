@@ -533,6 +533,12 @@ export default function ProductsPage() {
                     >
                       獎項管理
                     </Link>
+                    <Link
+                      href={`/admin/products/${product.id}/discounts`}
+                      className="flex-1 text-center py-2.5 rounded-lg bg-blue-500/15 text-blue-400 text-sm font-medium active:bg-blue-500/25 transition-colors min-h-[44px] flex items-center justify-center"
+                    >
+                      折扣設定
+                    </Link>
                     <button
                       onClick={() => handleEdit(product)}
                       className="py-2.5 px-4 rounded-lg bg-surface-3/50 text-zinc-300 text-sm active:bg-surface-3 transition-colors min-h-[44px] cursor-pointer"
@@ -647,6 +653,12 @@ export default function ProductsPage() {
                               className="bg-amber-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-amber-700 transition-colors"
                             >
                               獎項管理
+                            </Link>
+                            <Link
+                              href={`/admin/products/${product.id}/discounts`}
+                              className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+                            >
+                              折扣設定
                             </Link>
                           </div>
                         </td>

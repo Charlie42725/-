@@ -14,11 +14,22 @@ type QueueState =
   | 'active'
   | 'expired';
 
+interface DiscountData {
+  id: number;
+  type: string;
+  drawCount: number;
+  price: number;
+  label: string | null;
+  isActive: boolean;
+}
+
 interface DrawQueueManagerProps {
   productId: number;
   productPrice: number;
   totalTickets: number;
   productStatus: string;
+  soldTickets: number;
+  discounts: DiscountData[];
 }
 
 export default function DrawQueueManager({
@@ -26,6 +37,8 @@ export default function DrawQueueManager({
   productPrice,
   totalTickets,
   productStatus,
+  soldTickets,
+  discounts,
 }: DrawQueueManagerProps) {
   const [queueState, setQueueState] = useState<QueueState>('checking');
   const [totalInQueue, setTotalInQueue] = useState(0);
@@ -378,6 +391,8 @@ export default function DrawQueueManager({
         productId={productId}
         productPrice={productPrice}
         totalTickets={totalTickets}
+        soldTickets={soldTickets}
+        discounts={discounts}
         onDrawComplete={handleDrawComplete}
       />
     </div>
