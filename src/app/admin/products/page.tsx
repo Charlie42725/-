@@ -394,8 +394,8 @@ export default function ProductsPage() {
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
                 >
-                  <option value="draft">草稿</option>
-                  <option value="active">進行中</option>
+                  <option value="active">上架</option>
+                  <option value="draft">待定</option>
                 </select>
               </div>
             </div>
