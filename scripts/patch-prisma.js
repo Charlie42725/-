@@ -1,32 +1,40 @@
 /**
- * Patch .prisma/client/default.js to avoid the `#main-entry-point` subpath
- * import issue in Node.js 22 + Prisma v6 + CJS environments.
+ * Patch Prisma client default.js to resolve `#main-entry-point` subpath import issue.
+ * Affects: Node.js 22 + Prisma v6 + CJS on Windows with non-ASCII paths.
  *
- * Run this after `prisma generate` (handled automatically via postinstall).
+ * Patches BOTH:
+ *   node_modules/.prisma/client/default.js
+ *   node_modules/@prisma/client/default.js
  */
 const fs = require('fs');
 const path = require('path');
 
-const defaultJsPath = path.join(
-  __dirname,
-  '..',
-  'node_modules',
-  '.prisma',
-  'client',
-  'default.js'
-);
+const targets = [
+  path.join(__dirname, '..', 'node_modules', '.prisma', 'client', 'default.js'),
+  path.join(__dirname, '..', 'node_modules', '@prisma', 'client', 'default.js'),
+];
 
-if (!fs.existsSync(defaultJsPath)) {
-  console.log('⚠️  .prisma/client/default.js not found, skipping patch.');
-  process.exit(0);
+let anyPatched = false;
+
+for (const file of targets) {
+  if (!fs.existsSync(file)) {
+    console.log(`⚠️  Not found, skipping: ${file}`);
+    continue;
+  }
+
+  const content = fs.readFileSync(file, 'utf-8');
+
+  if (!content.includes('#main-entry-point')) {
+    console.log(`ℹ️  Already clean: ${path.relative(process.cwd(), file)}`);
+    continue;
+  }
+
+  const patched = content.replace(/#main-entry-point/g, './index.js');
+  fs.writeFileSync(file, patched, 'utf-8');
+  console.log(`✅ Patched: ${path.relative(process.cwd(), file)}`);
+  anyPatched = true;
 }
 
-let content = fs.readFileSync(defaultJsPath, 'utf-8');
-
-if (content.includes("require('#main-entry-point')")) {
-  content = content.replace(/require\('#main-entry-point'\)/g, "require('./index.js')");
-  fs.writeFileSync(defaultJsPath, content);
-  console.log('✅ Patched .prisma/client/default.js (#main-entry-point → ./index.js)');
-} else {
-  console.log('ℹ️  .prisma/client/default.js already patched or pattern not found.');
+if (!anyPatched) {
+  console.log('✅ All Prisma client files are already clean.');
 }
