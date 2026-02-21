@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import RouteProgress from '@/components/RouteProgress';
 
 const navItems = [
   {
@@ -77,6 +78,7 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      <RouteProgress />
       {/* 頂部導航 - 桌面完整版 / 手機精簡版 */}
       <header className="bg-surface-deep/95 backdrop-blur-xl border-b border-[var(--border)] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -102,6 +104,7 @@ export default function AdminLayout({
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={true}
                     className={`
                       flex items-center space-x-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200
                       ${active
@@ -146,15 +149,17 @@ export default function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 className={`
-                  flex flex-col items-center justify-center min-w-[64px] min-h-[44px] py-1 px-3 rounded-xl transition-all duration-200 cursor-pointer
+                  flex flex-col items-center justify-center min-w-[64px] min-h-[44px] py-1 px-3 rounded-xl transition-all duration-150 cursor-pointer
+                  active:scale-90
                   ${active
                     ? 'text-amber-400'
                     : 'text-zinc-500 active:text-zinc-300'
                   }
                 `}
               >
-                <div className={`relative ${active ? 'scale-110' : ''} transition-transform duration-200`}>
+                <div className={`relative ${active ? 'scale-110' : ''} transition-transform duration-150`}>
                   {active ? item.activeIcon : item.icon}
                   {active && (
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-400 rounded-full" />

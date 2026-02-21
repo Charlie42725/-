@@ -1,21 +1,28 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/db';
 
-export const dynamic = 'force-dynamic';
+interface Stats {
+  brandCount: number;
+  productCount: number;
+  activeProductCount: number;
+}
 
-export default async function AdminDashboard() {
-  const stats = await Promise.all([
-    prisma.brand.count(),
-    prisma.product.count(),
-    prisma.product.count({ where: { status: 'active' } }),
-  ]);
+export default function AdminDashboard() {
+  const [stats, setStats] = useState<Stats | null>(null);
 
-  const [brandCount, productCount, activeProductCount] = stats;
+  useEffect(() => {
+    fetch('/api/admin/stats')
+      .then(r => r.json())
+      .then(setStats)
+      .catch(() => {});
+  }, []);
 
   const statCards = [
     {
       label: '品牌總數',
-      value: brandCount,
+      value: stats?.brandCount,
       color: 'text-blue-400',
       bg: 'bg-blue-500/10',
       border: 'border-blue-500/20',
@@ -28,7 +35,7 @@ export default async function AdminDashboard() {
     },
     {
       label: '商品總數',
-      value: productCount,
+      value: stats?.productCount,
       color: 'text-emerald-400',
       bg: 'bg-emerald-500/10',
       border: 'border-emerald-500/20',
@@ -40,7 +47,7 @@ export default async function AdminDashboard() {
     },
     {
       label: '進行中商品',
-      value: activeProductCount,
+      value: stats?.activeProductCount,
       color: 'text-amber-400',
       bg: 'bg-amber-500/10',
       border: 'border-amber-500/20',
@@ -87,13 +94,13 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div className="w-full">
+    <div className="w-full animate-in fade-in duration-150">
       <div className="mb-6 md:mb-8">
         <h1 className="text-xl md:text-2xl font-bold text-white mb-1">儀表板</h1>
         <p className="text-zinc-500 text-sm">系統總覽與快速操作</p>
       </div>
 
-      {/* 統計卡片 - 手機橫向滾動 */}
+      {/* 統計卡片 */}
       <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
         {statCards.map((card) => (
           <div
@@ -103,7 +110,11 @@ export default async function AdminDashboard() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-zinc-400 text-xs md:text-sm">{card.label}</p>
-                <p className={`text-2xl md:text-3xl font-bold mt-0.5 md:mt-1 ${card.color}`}>{card.value}</p>
+                {card.value !== undefined ? (
+                  <p className={`text-2xl md:text-3xl font-bold mt-0.5 md:mt-1 ${card.color}`}>{card.value}</p>
+                ) : (
+                  <div className="h-8 md:h-9 w-12 bg-white/5 rounded mt-0.5 md:mt-1 animate-pulse" />
+                )}
               </div>
               <div className="opacity-80 hidden md:block">{card.icon}</div>
             </div>

@@ -52,7 +52,8 @@
       "Bash(npm ls:*)",
       "Bash(head:*)",
       "Bash(cd:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []
