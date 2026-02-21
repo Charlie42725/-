@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate",
-    "prisma:fix": "prisma generate",
+    "postinstall": "prisma generate && node scripts/patch-prisma.js",
+    "prisma:fix": "prisma generate && node scripts/patch-prisma.js",
     "clean": "rimraf .next node_modules/.prisma",
     "rebuild": "rimraf .next node_modules/.prisma && npm run prisma:fix && next dev"
   },
