@@ -25,8 +25,8 @@ interface Brand {
 }
 
 const statusMap: Record<string, { label: string; className: string }> = {
-  active: { label: '進行中', className: 'bg-green-500/20 text-green-400' },
-  draft: { label: '草稿', className: 'bg-gray-500/20 text-zinc-400' },
+  active: { label: '上架', className: 'bg-green-500/20 text-green-400' },
+  draft: { label: '待定', className: 'bg-gray-500/20 text-zinc-400' },
   sold_out: { label: '已完售', className: 'bg-red-500/20 text-red-400' },
   archived: { label: '已結束', className: 'bg-slate-500/20 text-zinc-400' },
 };
@@ -51,7 +51,7 @@ export default function ProductsPage() {
     shortDescription: '',
     price: '',
     totalTickets: '',
-    status: 'draft',
+    status: 'active',
     coverImage: '',
     galleryImages: [] as string[],
   });
@@ -147,7 +147,7 @@ export default function ProductsPage() {
           shortDescription: '',
           price: '',
           totalTickets: '',
-          status: 'draft',
+          status: 'active',
           coverImage: '',
           galleryImages: [],
         });
@@ -218,7 +218,7 @@ export default function ProductsPage() {
       shortDescription: '',
       price: '',
       totalTickets: '',
-      status: 'draft',
+      status: 'active',
       coverImage: '',
       galleryImages: [],
     });
@@ -269,10 +269,10 @@ export default function ProductsPage() {
 
       {/* 篩選器 */}
       <div className="mb-4 md:mb-6">
-        {/* 手機版：折疊篩選 */}
+        {/* 折疊篩選按鈕 */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className="md:hidden flex items-center gap-2 text-sm text-zinc-400 active:text-white transition-colors mb-3 min-h-[44px] cursor-pointer"
+          className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white active:text-white transition-colors mb-3 min-h-[44px] cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
@@ -283,9 +283,13 @@ export default function ProductsPage() {
               篩選中
             </span>
           )}
+          <svg className={`w-4 h-4 transition-transform duration-200 ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
         </button>
 
-        <div className={`bg-surface-1/60 rounded-xl p-4 md:p-6 border border-[var(--border)] ${showFilters ? 'block' : 'hidden'} md:block`}>
+        {showFilters && (
+        <div className="bg-surface-1/60 rounded-xl p-4 md:p-6 border border-[var(--border)]">
           <div className="flex items-center justify-between mb-3 md:mb-4">
             <h3 className="text-sm md:text-lg font-medium text-white">篩選條件</h3>
             {hasActiveFilters && (
@@ -321,14 +325,15 @@ export default function ProductsPage() {
                 className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base"
               >
                 <option value="">全部狀態</option>
-                <option value="draft">草稿</option>
-                <option value="active">進行中</option>
+                <option value="draft">待定</option>
+                <option value="active">上架</option>
                 <option value="sold_out">已完售</option>
                 <option value="archived">已結束</option>
               </select>
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* 新增/編輯表單 */}
@@ -391,8 +396,6 @@ export default function ProductsPage() {
                 >
                   <option value="draft">草稿</option>
                   <option value="active">進行中</option>
-                  <option value="sold_out">已完售</option>
-                  <option value="archived">已結束</option>
                 </select>
               </div>
             </div>
