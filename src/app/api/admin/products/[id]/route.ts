@@ -33,6 +33,7 @@ export async function GET(
         brand: true,
         images: true,
         variants: true,
+        discounts: true,
       },
     });
 
