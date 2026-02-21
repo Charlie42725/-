@@ -40,7 +40,7 @@ export default function ProductImageGallery({
   // 如果完全沒有圖片，用 placeholder
   if (allImages.length === 0) {
     allImages.push({
-      url: `https://picsum.photos/800/800?random=${productId}`,
+      url: '',
       label: '預設圖',
     });
   }

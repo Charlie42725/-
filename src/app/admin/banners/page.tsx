@@ -177,7 +177,7 @@ export default function BannersPage() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-base"
-                  placeholder="例如：FOUNTAIN OF LIFE"
+                  placeholder=""
                 />
               </div>
               <div>
@@ -187,7 +187,7 @@ export default function BannersPage() {
                   value={formData.subtitle}
                   onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-base"
-                  placeholder="例如：連賞被擊退12次"
+                  placeholder=""
                 />
               </div>
             </div>
@@ -199,7 +199,7 @@ export default function BannersPage() {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-base"
-                placeholder="例如：獲得119萬玖福"
+                placeholder=""
               />
             </div>
 
@@ -218,7 +218,7 @@ export default function BannersPage() {
                   value={formData.linkUrl}
                   onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
                   className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-base"
-                  placeholder="例如：/products/some-product"
+                  placeholder=""
                 />
               </div>
               <div>

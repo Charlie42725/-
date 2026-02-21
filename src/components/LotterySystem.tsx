@@ -787,7 +787,7 @@ export default function LotterySystem({
         </div>
       </div>
 
-      <div className="sticky bottom-0 bg-surface-deep/95 backdrop-blur-md border-t border-[var(--border)] -mx-4 px-4 py-4 mt-6 md:static md:bg-transparent md:backdrop-blur-none md:border-0 md:mx-0 md:px-0 md:py-0 md:mt-0">
+      <div className="sticky bottom-16 bg-surface-deep/95 backdrop-blur-md border-t border-[var(--border)] -mx-4 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] mt-6 z-40 md:static md:bottom-auto md:bg-transparent md:backdrop-blur-none md:border-0 md:mx-0 md:px-0 md:py-0 md:mt-0 md:z-auto">
         <div className="flex gap-4 max-w-2xl mx-auto md:max-w-none">
           <button
             onClick={handleConfirmDraw}
