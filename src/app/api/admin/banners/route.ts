@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { title, subtitle, description, imageUrl, linkUrl, sortOrder, isActive } = body;
+    const { title, subtitle, description, imageUrl, imagePositionX, imagePositionY, linkUrl, sortOrder, isActive } = body;
 
     if (!title || !imageUrl) {
       return NextResponse.json(
@@ -35,6 +35,8 @@ export async function POST(request: Request) {
         subtitle: subtitle || '',
         description: description || '',
         imageUrl,
+        imagePositionX: imagePositionX ?? 50,
+        imagePositionY: imagePositionY ?? 50,
         linkUrl: linkUrl || '',
         sortOrder: sortOrder ?? 0,
         isActive: isActive ?? true,

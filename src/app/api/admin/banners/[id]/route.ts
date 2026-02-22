@@ -11,7 +11,7 @@ export async function PUT(
     const { id: idStr } = await context.params;
     const id = parseInt(idStr);
     const body = await request.json();
-    const { title, subtitle, description, imageUrl, linkUrl, sortOrder, isActive } = body;
+    const { title, subtitle, description, imageUrl, imagePositionX, imagePositionY, linkUrl, sortOrder, isActive } = body;
 
     const banner = await prisma.banner.update({
       where: { id },
@@ -20,6 +20,8 @@ export async function PUT(
         subtitle: subtitle ?? '',
         description: description ?? '',
         imageUrl,
+        imagePositionX: imagePositionX ?? 50,
+        imagePositionY: imagePositionY ?? 50,
         linkUrl: linkUrl ?? '',
         sortOrder: sortOrder ?? 0,
         isActive: isActive ?? true,

@@ -9,6 +9,8 @@ interface BannerItem {
   subtitle: string;
   description: string;
   imageUrl: string;
+  imagePositionX?: number;
+  imagePositionY?: number;
   linkUrl: string;
 }
 
@@ -79,6 +81,7 @@ export default function Banner({ initialBanners }: BannerProps) {
               alt={banner.title}
               fill
               className="object-cover rounded-lg"
+              style={{ objectPosition: `${banner.imagePositionX ?? 50}% ${banner.imagePositionY ?? 50}%` }}
               priority={index === 0}
             />
 

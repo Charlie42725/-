@@ -18,16 +18,18 @@ datasource db {
 // 🔹 輪播 Banner
 // -----------------------------
 model Banner {
-  id          Int      @id @default(autoincrement())
-  title       String
-  subtitle    String   @default("")
-  description String   @default("")
-  imageUrl    String
-  linkUrl     String   @default("")
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  title           String
+  subtitle        String   @default("")
+  description     String   @default("")
+  imageUrl        String
+  imagePositionX  Int      @default(50)   // 圖片焦點 X 軸 (0-100%)
+  imagePositionY  Int      @default(50)   // 圖片焦點 Y 軸 (0-100%)
+  linkUrl         String   @default("")
+  sortOrder       Int      @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 // -----------------------------

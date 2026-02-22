@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import ImageUpload from '@/components/ImageUpload';
 import { getAdminData, getAdminCacheSync, invalidateAdminCache } from '@/lib/admin-cache';
@@ -11,6 +11,8 @@ interface Banner {
   subtitle: string;
   description: string;
   imageUrl: string;
+  imagePositionX: number;
+  imagePositionY: number;
   linkUrl: string;
   sortOrder: number;
   isActive: boolean;
@@ -22,6 +24,8 @@ const defaultForm = {
   subtitle: '',
   description: '',
   imageUrl: '',
+  imagePositionX: 50,
+  imagePositionY: 50,
   linkUrl: '',
   sortOrder: 0,
   isActive: true,
@@ -64,6 +68,8 @@ export default function BannersPage() {
       subtitle: banner.subtitle,
       description: banner.description,
       imageUrl: banner.imageUrl,
+      imagePositionX: banner.imagePositionX ?? 50,
+      imagePositionY: banner.imagePositionY ?? 50,
       linkUrl: banner.linkUrl,
       sortOrder: banner.sortOrder,
       isActive: banner.isActive,
@@ -214,6 +220,16 @@ export default function BannersPage() {
               required
             />
 
+            {/* 圖片位置調整器 */}
+            {formData.imageUrl && (
+              <ImagePositionAdjuster
+                imageUrl={formData.imageUrl}
+                positionX={formData.imagePositionX}
+                positionY={formData.imagePositionY}
+                onChange={(x, y) => setFormData({ ...formData, imagePositionX: x, imagePositionY: y })}
+              />
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-zinc-300 mb-1.5 text-sm">連結網址</label>
@@ -295,6 +311,7 @@ export default function BannersPage() {
                     alt={banner.title}
                     fill
                     className="object-cover"
+                    style={{ objectPosition: `${banner.imagePositionX ?? 50}% ${banner.imagePositionY ?? 50}%` }}
                   />
                   {/* 排序標記 */}
                   <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg">
@@ -383,6 +400,7 @@ export default function BannersPage() {
                           alt={banner.title}
                           fill
                           className="object-cover"
+                          style={{ objectPosition: `${banner.imagePositionX ?? 50}% ${banner.imagePositionY ?? 50}%` }}
                         />
                       </div>
                     </td>
@@ -440,6 +458,115 @@ export default function BannersPage() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// 圖片位置調整器 — 拖曳十字準心來設定焦點位置
+function ImagePositionAdjuster({
+  imageUrl,
+  positionX,
+  positionY,
+  onChange,
+}: {
+  imageUrl: string;
+  positionX: number;
+  positionY: number;
+  onChange: (x: number, y: number) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+
+  const updatePosition = useCallback(
+    (clientX: number, clientY: number) => {
+      const el = containerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
+      const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
+      onChange(x, y);
+    },
+    [onChange]
+  );
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      isDragging.current = true;
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      updatePosition(e.clientX, e.clientY);
+    },
+    [updatePosition]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging.current) return;
+      updatePosition(e.clientX, e.clientY);
+    },
+    [updatePosition]
+  );
+
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false;
+  }, []);
+
+  return (
+    <div>
+      <label className="block text-zinc-300 mb-1.5 text-sm">
+        調整圖片位置
+        <span className="text-zinc-500 ml-2 text-xs">拖曳十字準心設定焦點</span>
+      </label>
+      {/* 預覽容器 — 模擬 Banner 比例 */}
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-[21/9] bg-surface-2 rounded-xl overflow-hidden cursor-crosshair select-none touch-none border border-surface-3"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
+        {/* 完整原圖 */}
+        <Image
+          src={imageUrl}
+          alt="位置預覽"
+          fill
+          className="object-cover pointer-events-none"
+          style={{ objectPosition: `${positionX}% ${positionY}%` }}
+        />
+
+        {/* 暗色遮罩 + 十字準心 */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* 十字線 */}
+          <div
+            className="absolute w-px bg-white/60"
+            style={{ left: `${positionX}%`, top: 0, bottom: 0 }}
+          />
+          <div
+            className="absolute h-px bg-white/60"
+            style={{ top: `${positionY}%`, left: 0, right: 0 }}
+          />
+          {/* 中心圓點 */}
+          <div
+            className="absolute w-5 h-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.5),0_2px_8px_rgba(0,0,0,0.4)]"
+            style={{ left: `${positionX}%`, top: `${positionY}%` }}
+          >
+            <div className="absolute inset-1 bg-amber-400 rounded-full" />
+          </div>
+        </div>
+      </div>
+
+      {/* 座標顯示 + 快速重置 */}
+      <div className="flex items-center justify-between mt-2">
+        <span className="text-xs text-zinc-500">
+          X: {positionX}%　Y: {positionY}%
+        </span>
+        <button
+          type="button"
+          onClick={() => onChange(50, 50)}
+          className="text-xs text-amber-400 hover:text-amber-300 transition-colors cursor-pointer"
+        >
+          重置為中心
+        </button>
+      </div>
     </div>
   );
 }
