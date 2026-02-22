@@ -14,8 +14,9 @@ export default function MultiImageUpload({
   label,
   images,
   onChange,
-  maxImages = 4,
+  maxImages = 0,
 }: MultiImageUploadProps) {
+  const hasLimit = maxImages > 0;
   const [uploading, setUploading] = useState(false);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -24,7 +25,7 @@ export default function MultiImageUpload({
     if (files.length === 0) return;
 
     // 檢查是否超過最大數量
-    if (images.length + files.length > maxImages) {
+    if (hasLimit && images.length + files.length > maxImages) {
       alert(`最多只能上傳 ${maxImages} 張圖片`);
       return;
     }
@@ -76,7 +77,7 @@ export default function MultiImageUpload({
   function handleUrlAdd() {
     const url = prompt('請輸入圖片網址：');
     if (url && url.trim()) {
-      if (images.length >= maxImages) {
+      if (hasLimit && images.length >= maxImages) {
         alert(`最多只能上傳 ${maxImages} 張圖片`);
         return;
       }
@@ -87,7 +88,7 @@ export default function MultiImageUpload({
   return (
     <div>
       <label className="block text-zinc-300 mb-2">
-        {label} ({images.length}/{maxImages})
+        {label} ({images.length}{hasLimit ? `/${maxImages}` : ' 張'})
       </label>
 
       {/* 圖片預覽網格 */}
@@ -118,7 +119,7 @@ export default function MultiImageUpload({
         ))}
 
         {/* 上傳按鈕 */}
-        {images.length < maxImages && (
+        {(!hasLimit || images.length < maxImages) && (
           <label
             className={`
               h-32 border-2 border-dashed border-zinc-600 rounded-lg
@@ -154,7 +155,7 @@ export default function MultiImageUpload({
         <button
           type="button"
           onClick={handleUrlAdd}
-          disabled={images.length >= maxImages}
+          disabled={hasLimit && images.length >= maxImages}
           className="text-sm text-blue-400 hover:text-blue-300 disabled:text-zinc-600 disabled:cursor-not-allowed"
         >
           + 添加圖片網址

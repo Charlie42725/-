@@ -3,8 +3,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import ImageUpload from '@/components/ImageUpload';
-import MultiImageUpload from '@/components/MultiImageUpload';
+import ProductFormPanel from '@/components/admin/ProductFormPanel';
+import type { ProductFormData, DiscountEntry, VariantEntry } from '@/components/admin/ProductFormPanel';
 import { getAdminData, getAdminCacheSync, invalidateAdminCache } from '@/lib/admin-cache';
 
 interface Product {
@@ -23,22 +23,6 @@ interface Brand {
   name: string;
 }
 
-interface DiscountEntry {
-  drawCount: string;
-  price: string;
-  label: string;
-}
-
-interface VariantEntry {
-  _id?: number; // DB id — undefined = new
-  prize: string;
-  name: string;
-  rarity: string;
-  stock: string;
-  imageUrl: string;
-  isActive: boolean;
-}
-
 const statusMap: Record<string, { label: string; className: string }> = {
   active: { label: '上架', className: 'bg-green-500/20 text-green-400' },
   draft: { label: '待定', className: 'bg-gray-500/20 text-zinc-400' },
@@ -46,14 +30,7 @@ const statusMap: Record<string, { label: string; className: string }> = {
   archived: { label: '已結束', className: 'bg-slate-500/20 text-zinc-400' },
 };
 
-const rarityOptions = [
-  { value: 'SSR', label: 'SSR' },
-  { value: 'SR', label: 'SR' },
-  { value: 'R', label: 'R' },
-  { value: 'N', label: 'N' },
-];
-
-const emptyFormData = {
+const emptyFormData: ProductFormData = {
   brandId: '',
   name: '',
   slug: '',
@@ -62,10 +39,10 @@ const emptyFormData = {
   totalTickets: '',
   status: 'active',
   coverImage: '',
-  galleryImages: [] as string[],
-  comboDiscounts: [] as DiscountEntry[],
-  fullSetDiscounts: [] as DiscountEntry[],
-  variants: [] as VariantEntry[],
+  galleryImages: [],
+  comboDiscounts: [],
+  fullSetDiscounts: [],
+  variants: [],
 };
 
 export default function ProductsPage() {
@@ -84,15 +61,13 @@ export default function ProductsPage() {
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // 記錄載入時的 variant IDs，用來算需要刪除哪些
   const [loadedVariantIds, setLoadedVariantIds] = useState<number[]>([]);
 
   const [filterBrand, setFilterBrand] = useState<string>('');
   const [filterStatus, setFilterStatus] = useState<string>('');
-  const [formData, setFormData] = useState({ ...emptyFormData });
+  const [formData, setFormData] = useState<ProductFormData>({ ...emptyFormData });
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
-  // SSR guard for createPortal
   useEffect(() => { setMounted(true); }, []);
 
   // 點擊外部關閉下拉選單
@@ -110,47 +85,8 @@ export default function ProductsPage() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, [openMenuId, menuAnchor]);
 
-  // ─── slug ───
-  function generateSlug(name: string): string {
-    return name.toLowerCase().trim()
-      .replace(/[^\w\u4e00-\u9fff\u3400-\u4dbf\s-]/g, '')
-      .replace(/[\s_]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-  }
-  function handleProductNameChange(name: string) {
-    setFormData(p => ({ ...p, name, ...(!slugManuallyEdited ? { slug: generateSlug(name) } : {}) }));
-  }
-  function handleProductSlugChange(slug: string) {
-    setSlugManuallyEdited(true);
-    setFormData(p => ({ ...p, slug }));
-  }
-
-  // ─── discount helpers ───
-  function addDiscount(type: 'comboDiscounts' | 'fullSetDiscounts') {
-    setFormData(p => ({ ...p, [type]: [...p[type], { drawCount: '', price: '', label: '' }] }));
-  }
-  function removeDiscount(type: 'comboDiscounts' | 'fullSetDiscounts', i: number) {
-    setFormData(p => ({ ...p, [type]: p[type].filter((_, j) => j !== i) }));
-  }
-  function updateDiscount(type: 'comboDiscounts' | 'fullSetDiscounts', i: number, field: keyof DiscountEntry, value: string) {
-    setFormData(p => ({ ...p, [type]: p[type].map((d, j) => j === i ? { ...d, [field]: value } : d) }));
-  }
-
-  // ─── variant helpers ───
-  function addVariant() {
-    setFormData(p => ({
-      ...p,
-      variants: [...p.variants, { prize: '', name: '', rarity: '', stock: '', imageUrl: '', isActive: true }],
-    }));
-  }
-  function removeVariant(i: number) {
-    setFormData(p => ({ ...p, variants: p.variants.filter((_, j) => j !== i) }));
-  }
-  function updateVariant(i: number, field: keyof VariantEntry, value: string | boolean) {
-    setFormData(p => ({ ...p, variants: p.variants.map((v, j) => j === i ? { ...v, [field]: value } : v) }));
-  }
-
   // ─── 儲存折扣 ───
-  async function saveDiscounts(productId: number) {
+  async function saveDiscounts(productId: number, data: ProductFormData) {
     const existingRes = await fetch(`/api/admin/discounts?productId=${productId}`);
     if (existingRes.ok) {
       const { discounts } = await existingRes.json();
@@ -160,8 +96,8 @@ export default function ProductsPage() {
       }
     }
     const all = [
-      ...formData.comboDiscounts.filter(d => d.drawCount && d.price).map(d => ({ ...d, type: 'combo', productId })),
-      ...formData.fullSetDiscounts.filter(d => d.drawCount && d.price).map(d => ({ ...d, type: 'full_set', productId })),
+      ...data.comboDiscounts.filter(d => d.drawCount && d.price).map(d => ({ ...d, type: 'combo', productId })),
+      ...data.fullSetDiscounts.filter(d => d.drawCount && d.price).map(d => ({ ...d, type: 'full_set', productId })),
     ];
     if (all.length > 0) {
       await Promise.all(all.map(d =>
@@ -170,16 +106,14 @@ export default function ProductsPage() {
   }
 
   // ─── 儲存獎項 ───
-  async function saveVariants(productId: number) {
-    const currentIds = formData.variants.filter(v => v._id).map(v => v._id!);
+  async function saveVariants(productId: number, data: ProductFormData) {
+    const currentIds = data.variants.filter(v => v._id).map(v => v._id!);
     const toDelete = loadedVariantIds.filter(id => !currentIds.includes(id));
 
     await Promise.all([
-      // 刪除被移除的
       ...toDelete.map(id =>
         fetch(`/api/admin/variants/${id}`, { method: 'DELETE' })),
-      // 新增 / 更新
-      ...formData.variants.filter(v => v.prize && v.name).map(v => {
+      ...data.variants.filter(v => v.prize && v.name).map(v => {
         const payload = { productId, prize: v.prize, name: v.name, rarity: v.rarity || null, stock: v.stock, imageUrl: v.imageUrl || null, isActive: v.isActive };
         if (v._id) {
           return fetch(`/api/admin/variants/${v._id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -213,9 +147,8 @@ export default function ProductsPage() {
     }
   }
 
-  // ─── submit ───
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  // ─── submit (called from panel) ───
+  async function handleSubmit() {
     setSaving(true);
     try {
       const url = editingId ? `/api/admin/products/${editingId}` : '/api/admin/products';
@@ -227,7 +160,7 @@ export default function ProductsPage() {
         const data = await res.json();
         const pid = editingId || data.product?.id;
         if (pid) {
-          await Promise.all([saveDiscounts(pid), saveVariants(pid)]);
+          await Promise.all([saveDiscounts(pid, formData), saveVariants(pid, formData)]);
         }
         setShowForm(false);
         setEditingId(null);
@@ -247,7 +180,7 @@ export default function ProductsPage() {
     }
   }
 
-  // ─── edit：用 admin API 一次取完 ───
+  // ─── edit ───
   async function handleEdit(product: Product) {
     try {
       const res = await fetch(`/api/admin/products/${product.id}`);
@@ -309,48 +242,8 @@ export default function ProductsPage() {
   function clearFilters() { setFilterBrand(''); setFilterStatus(''); }
 
   const hasActiveFilters = filterBrand || filterStatus;
-  const unitPrice = parseInt(formData.price) || 0;
 
-  // ─── Discount Row Component ───
-  const DiscountRow = ({ type, d, idx }: { type: 'comboDiscounts' | 'fullSetDiscounts'; d: DiscountEntry; idx: number }) => {
-    const drawNum = parseInt(d.drawCount) || 0;
-    const priceNum = parseInt(d.price) || 0;
-    const orig = drawNum * unitPrice;
-    const save = orig - priceNum;
-    return (
-      <div className="bg-surface-2/50 rounded-xl p-3 border border-surface-3/50">
-        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
-          <div>
-            <label className="block text-zinc-500 text-xs mb-1">抽數</label>
-            <input type="number" min="1" value={d.drawCount} onChange={e => updateDiscount(type, idx, 'drawCount', e.target.value)}
-              className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="3" />
-          </div>
-          <div>
-            <label className="block text-zinc-500 text-xs mb-1">總價</label>
-            <input type="number" min="0" value={d.price} onChange={e => updateDiscount(type, idx, 'price', e.target.value)}
-              className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="280" />
-          </div>
-          <div>
-            <label className="block text-zinc-500 text-xs mb-1">名稱</label>
-            <input type="text" value={d.label} onChange={e => updateDiscount(type, idx, 'label', e.target.value)}
-              className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="選填" />
-          </div>
-          <button type="button" onClick={() => removeDiscount(type, idx)} className="text-red-400 hover:text-red-300 p-2 cursor-pointer" title="移除">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-        {drawNum > 0 && priceNum > 0 && unitPrice > 0 && (
-          <div className="mt-2 flex items-center gap-3 text-xs">
-            <span className="text-zinc-500">原價 {orig} 點</span>
-            {save > 0 && <span className="text-green-400 font-medium">省 {save} 點</span>}
-            <span className="text-zinc-500">每抽 {Math.round(priceNum / drawNum)} 點</span>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ─── "..." trigger button (no hooks — just plain JSX) ───
+  // ─── "..." trigger button ───
   const renderMenuTrigger = (product: Product) => (
     <button
       onClick={(e) => {
@@ -394,10 +287,10 @@ export default function ProductsPage() {
           <p className="text-zinc-400 text-sm">共 {filteredProducts.length} 件商品</p>
         </div>
         <button
-          onClick={() => { if (showForm) handleCancelEdit(); else setShowForm(true); }}
+          onClick={() => { setFormData({ ...emptyFormData }); setEditingId(null); setSlugManuallyEdited(false); setLoadedVariantIds([]); setShowForm(true); }}
           className="bg-amber-500 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-xl font-medium hover:bg-amber-600 active:bg-amber-700 transition-all text-sm md:text-base min-h-[44px]"
         >
-          {showForm ? '取消' : '+ 新增'}
+          + 新增
         </button>
       </div>
 
@@ -438,155 +331,6 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
-
-      {/* ==================== 新增/編輯表單 ==================== */}
-      {showForm && (
-        <div className="bg-surface-1/60 rounded-xl p-4 md:p-6 border border-[var(--border)] mb-5 md:mb-8">
-          <h2 className="text-lg md:text-xl font-bold text-white mb-4">{editingId ? '編輯商品' : '新增商品'}</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-
-            {/* ── 基本資訊 ── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-zinc-300 mb-1.5 text-sm">選擇品牌 *</label>
-                <select required value={formData.brandId} onChange={e => setFormData({ ...formData, brandId: e.target.value })} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base">
-                  <option value="">請選擇品牌</option>
-                  {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-zinc-300 mb-1.5 text-sm">商品名稱 *</label>
-                <input type="text" required value={formData.name} onChange={e => handleProductNameChange(e.target.value)} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base" placeholder="例如：原神須彌主題一番賞" />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-zinc-300 mb-1.5 text-sm">Slug *</label>
-                <input type="text" required value={formData.slug} onChange={e => handleProductSlugChange(e.target.value)} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base" placeholder="自動產生" />
-              </div>
-              <div>
-                <label className="block text-zinc-300 mb-1.5 text-sm">狀態 *</label>
-                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base">
-                  <option value="active">上架</option>
-                  <option value="draft">待定</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-zinc-300 mb-1.5 text-sm">簡短描述</label>
-              <textarea value={formData.shortDescription} onChange={e => setFormData({ ...formData, shortDescription: e.target.value })} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base" rows={2} placeholder="簡短描述..." />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-zinc-300 mb-1.5 text-sm">單抽價格 (NT$) *</label>
-                <input type="number" required min="1" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base" placeholder="120" />
-              </div>
-              <div>
-                <label className="block text-zinc-300 mb-1.5 text-sm">總抽數 *</label>
-                <input type="number" required min="1" value={formData.totalTickets} onChange={e => setFormData({ ...formData, totalTickets: e.target.value })} className="w-full bg-surface-2 text-white border border-surface-3 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 text-base" placeholder="500" />
-              </div>
-            </div>
-
-            <ImageUpload label="商品封面圖" value={formData.coverImage} onChange={url => setFormData({ ...formData, coverImage: url })} />
-            <MultiImageUpload label="商品圖片集（最多 4 張）" images={formData.galleryImages} onChange={images => setFormData({ ...formData, galleryImages: images })} maxImages={4} />
-
-            {/* ── 組合價設定 ── */}
-            <div className="border-t border-white/[0.06] pt-5 mt-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="text-base font-bold text-white">組合價設定（選填）</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">任何時候都適用，例如：3 抽 280 元、5 抽 450 元</p>
-                </div>
-                <button type="button" onClick={() => addDiscount('comboDiscounts')} className="text-amber-400 hover:text-amber-300 active:text-amber-200 text-sm font-medium transition-colors min-h-[44px] cursor-pointer">+ 新增組合價</button>
-              </div>
-              {formData.comboDiscounts.length === 0
-                ? <p className="text-zinc-600 text-sm py-2">尚未新增任何組合價</p>
-                : <div className="space-y-3">{formData.comboDiscounts.map((d, i) => <DiscountRow key={i} type="comboDiscounts" d={d} idx={i} />)}</div>
-              }
-            </div>
-
-            {/* ── 開套優惠 ── */}
-            <div className="border-t border-white/[0.06] pt-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="text-base font-bold text-white">開套優惠（選填）</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">僅在整套完全未抽過時適用</p>
-                </div>
-                <button type="button" onClick={() => addDiscount('fullSetDiscounts')} className="text-amber-400 hover:text-amber-300 active:text-amber-200 text-sm font-medium transition-colors min-h-[44px] cursor-pointer">+ 新增開套優惠</button>
-              </div>
-              {formData.fullSetDiscounts.length === 0
-                ? <p className="text-zinc-600 text-sm py-2">尚未新增任何開套優惠</p>
-                : <div className="space-y-3">{formData.fullSetDiscounts.map((d, i) => <DiscountRow key={i} type="fullSetDiscounts" d={d} idx={i} />)}</div>
-              }
-            </div>
-
-            {/* ── 賞項設定 ── */}
-            <div className="border-t border-white/[0.06] pt-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="text-base font-bold text-white">賞項設定</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5">A 賞、B 賞等獎項</p>
-                </div>
-                <button type="button" onClick={addVariant} className="text-amber-400 hover:text-amber-300 active:text-amber-200 text-sm font-medium transition-colors min-h-[44px] cursor-pointer">+ 新增賞項</button>
-              </div>
-              {formData.variants.length === 0 ? (
-                <p className="text-zinc-600 text-sm py-2">尚未新增任何賞項，點擊上方按鈕新增</p>
-              ) : (
-                <div className="space-y-3">
-                  {formData.variants.map((v, i) => (
-                    <div key={i} className="bg-surface-2/50 rounded-xl p-3 border border-surface-3/50">
-                      <div className="grid grid-cols-[1fr_1fr] md:grid-cols-[1fr_1fr_80px_80px_auto] gap-2 items-end">
-                        <div>
-                          <label className="block text-zinc-500 text-xs mb-1">賞等 *</label>
-                          <input type="text" value={v.prize} onChange={e => updateVariant(i, 'prize', e.target.value)}
-                            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="A賞" />
-                        </div>
-                        <div>
-                          <label className="block text-zinc-500 text-xs mb-1">名稱 *</label>
-                          <input type="text" value={v.name} onChange={e => updateVariant(i, 'name', e.target.value)}
-                            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="獎項名稱" />
-                        </div>
-                        <div>
-                          <label className="block text-zinc-500 text-xs mb-1">稀有度</label>
-                          <select value={v.rarity} onChange={e => updateVariant(i, 'rarity', e.target.value)}
-                            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-2 py-2 text-sm focus:ring-2 focus:ring-amber-500">
-                            <option value="">-</option>
-                            {rarityOptions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-zinc-500 text-xs mb-1">庫存 *</label>
-                          <input type="number" min="0" value={v.stock} onChange={e => updateVariant(i, 'stock', e.target.value)}
-                            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-2 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="5" />
-                        </div>
-                        <button type="button" onClick={() => removeVariant(i)} className="text-red-400 hover:text-red-300 p-2 cursor-pointer self-end" title="移除">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
-                      </div>
-                      {/* 圖片上傳 */}
-                      <div className="mt-2">
-                        <ImageUpload label="" value={v.imageUrl} onChange={url => updateVariant(i, 'imageUrl', url)} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ── 儲存按鈕 ── */}
-            <div className="flex gap-3 pt-2 border-t border-white/[0.06]">
-              <button type="submit" disabled={saving}
-                className="flex-1 md:flex-none bg-amber-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-amber-600 active:bg-amber-700 transition-colors min-h-[44px] disabled:opacity-50">
-                {saving ? '儲存中...' : '儲存'}
-              </button>
-              <button type="button" onClick={handleCancelEdit}
-                className="flex-1 md:flex-none bg-surface-3 text-white px-6 py-3 rounded-xl font-medium hover:bg-gray-600 active:bg-gray-700 transition-colors min-h-[44px]">
-                取消
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
 
       {/* ==================== 商品列表 ==================== */}
       {filteredProducts.length === 0 ? (
@@ -683,7 +427,7 @@ export default function ProductsPage() {
         </>
       )}
 
-      {/* Portal: 單一共用的 "..." 下拉選單 */}
+      {/* Portal: "..." 下拉選單 */}
       {mounted && openMenuId !== null && menuAnchor && (() => {
         const openProduct = products.find(p => p.id === openMenuId);
         if (!openProduct) return null;
@@ -733,6 +477,20 @@ export default function ProductsPage() {
           document.body
         );
       })()}
+
+      {/* ==================== Slide-over Panel ==================== */}
+      <ProductFormPanel
+        open={showForm}
+        editingId={editingId}
+        formData={formData}
+        brands={brands}
+        saving={saving}
+        onFormDataChange={setFormData}
+        onSubmit={handleSubmit}
+        onCancel={handleCancelEdit}
+        onSlugManualEdit={() => setSlugManuallyEdited(true)}
+        slugManuallyEdited={slugManuallyEdited}
+      />
     </div>
   );
 }

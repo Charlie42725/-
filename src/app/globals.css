@@ -242,6 +242,29 @@ button:disabled,
   transform: translateY(0);
 }
 
+/* Slide-in / slide-out for right panel */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes slideOutRight {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.slide-in-right  { animation: slideInRight  0.3s ease-out both; }
+.slide-out-right { animation: slideOutRight 0.25s ease-in both; }
+.fade-in         { animation: fadeIn  0.3s ease-out both; }
+.fade-out        { animation: fadeOut 0.25s ease-in both; }
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -263,7 +286,11 @@ button:disabled,
   .live-badge,
   .fade-in-up,
   .slide-down,
-  .dropdown-in {
+  .dropdown-in,
+  .slide-in-right,
+  .slide-out-right,
+  .fade-in,
+  .fade-out {
     animation: none !important;
   }
 
