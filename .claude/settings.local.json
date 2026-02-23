@@ -53,7 +53,9 @@
       "Bash(head:*)",
       "Bash(cd:*)",
       "Bash(cat:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(echo PHP not available:*)",
+      "Bash(grep ^ii:*)"
     ],
     "deny": [],
     "ask": []
