@@ -7,6 +7,10 @@ import { prisma } from '@/lib/db';
  *
  * 回傳所有 draws + variants 初始庫存，供外部腳本驗算。
  * serverSeed 只在 sold_out / archived 時公開。
+ *
+ * 自動檢測演算法版本：
+ * - nonce 為 null 的 draws → deck-shuffle-v1（新版）
+ * - nonce 不為 null 的 draws → legacy（舊版）
  */
 export async function GET(req: NextRequest) {
   try {
@@ -23,6 +27,7 @@ export async function GET(req: NextRequest) {
         status: true,
         serverSeed: true,
         serverSeedHash: true,
+        totalTickets: true,
         variants: {
           where: { isActive: true },
           select: {
@@ -46,12 +51,9 @@ export async function GET(req: NextRequest) {
 
     const isRevealed = product.status === 'sold_out' || product.status === 'archived';
 
-    // 取得所有有 provably fair 資料的抽獎紀錄
+    // 取得所有抽獎紀錄
     const draws = await prisma.lotteryDraw.findMany({
-      where: {
-        productId,
-        nonce: { not: null },
-      },
+      where: { productId },
       select: {
         id: true,
         variantId: true,
@@ -61,13 +63,47 @@ export async function GET(req: NextRequest) {
         hashResult: true,
         createdAt: true,
       },
-      orderBy: { nonce: 'asc' },
+      orderBy: { ticketNumber: 'asc' },
+    });
+
+    // 自動檢測演算法版本
+    const hasLegacyDraws = draws.some(d => d.nonce !== null);
+    const hasNewDraws = draws.some(d => d.nonce === null);
+    const algorithm = hasLegacyDraws && !hasNewDraws
+      ? 'legacy'
+      : hasNewDraws && !hasLegacyDraws
+        ? 'deck-shuffle-v1'
+        : hasLegacyDraws && hasNewDraws
+          ? 'mixed'
+          : 'deck-shuffle-v1'; // 無 draws 時預設新版
+
+    // 根據演算法格式化 draws
+    const formattedDraws = draws.map(d => {
+      if (d.nonce !== null) {
+        // legacy 格式
+        return {
+          id: d.id,
+          variantId: d.variantId,
+          ticketNumber: d.ticketNumber,
+          clientSeed: d.clientSeed,
+          nonce: d.nonce,
+          hashResult: d.hashResult,
+        };
+      }
+      // deck-shuffle-v1 格式
+      return {
+        id: d.id,
+        variantId: d.variantId,
+        ticketNumber: d.ticketNumber,
+      };
     });
 
     return NextResponse.json({
       productId: product.id,
       productName: product.name,
       status: product.status,
+      algorithm,
+      totalTickets: product.totalTickets,
       serverSeedHash: product.serverSeedHash,
       serverSeed: isRevealed ? product.serverSeed : null,
       revealed: isRevealed,
@@ -77,14 +113,7 @@ export async function GET(req: NextRequest) {
         name: v.name,
         initialStock: v.stock,
       })),
-      draws: draws.map(d => ({
-        id: d.id,
-        variantId: d.variantId,
-        ticketNumber: d.ticketNumber,
-        clientSeed: d.clientSeed,
-        nonce: d.nonce,
-        hashResult: d.hashResult,
-      })),
+      draws: formattedDraws,
       totalDraws: draws.length,
     });
   } catch (error) {

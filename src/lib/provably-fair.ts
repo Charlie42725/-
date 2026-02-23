@@ -1,12 +1,16 @@
 /**
- * Provably Fair 抽獎驗證系統
+ * Provably Fair - Deck Shuffle v1
  *
  * 演算法：
- *   hash  = HMAC-SHA256(serverSeed, clientSeed + ":" + nonce)
- *   roll  = parseInt(hash[0..7], 16)   // 32-bit unsigned
- *   index = roll % totalWeight
- *   → 按 variantId 升序累加 remaining，第一個累計 > index 的即中獎
+ *   1. 建牌：按 variantId 升序，每個 variant 出現 stock 次
+ *   2. 洗牌：Fisher-Yates，每步用 HMAC-SHA256(serverSeed, String(i))
+ *      for i = len-1 downto 1:
+ *        hash = HMAC-SHA256(serverSeed, String(i))
+ *        j = parseInt(hash[0..7], 16) % (i + 1)
+ *        swap(deck[i], deck[j])
+ *   3. 對應：ticket #N → deck[N-1]
  *
+ * 不需要 clientSeed、nonce。
  * PHP 驗證只需 hash_hmac() + hexdec()，不需要 GMP。
  */
 
@@ -14,21 +18,9 @@ import crypto from 'crypto';
 
 // ─── Types ──────────────────────────────────────────────
 
-export interface VariantForDraw {
+export interface VariantForDeck {
   id: number;
-  remaining: number;
-}
-
-export interface DrawInput {
-  serverSeed: string;
-  clientSeed: string;
-  nonce: number;
-}
-
-export interface DrawOutcome {
-  variantId: number;
-  hashResult: string;
-  roll: number;
+  stock: number;
 }
 
 // ─── Seed helpers ───────────────────────────────────────
@@ -43,93 +35,66 @@ export function hashServerSeed(seed: string): string {
   return crypto.createHash('sha256').update(seed).digest('hex');
 }
 
-/** 產生 16-byte hex client seed（當使用者未提供時） */
-export function generateClientSeed(): string {
-  return crypto.randomBytes(16).toString('hex');
-}
-
-// ─── Core draw logic ────────────────────────────────────
-
-/** HMAC-SHA256(serverSeed, clientSeed:nonce) → hex string */
-export function computeDrawHash(input: DrawInput): string {
-  const message = `${input.clientSeed}:${input.nonce}`;
-  return crypto
-    .createHmac('sha256', input.serverSeed)
-    .update(message)
-    .digest('hex');
-}
-
-/** 取前 8 hex 字元轉 32-bit unsigned integer */
-export function extractRoll(hashHex: string, offset = 0): number {
-  const slice = hashHex.substring(offset, offset + 8);
-  return parseInt(slice, 16) >>> 0; // >>> 0 確保 unsigned
-}
+// ─── Deck Shuffle v1 ───────────────────────────────────
 
 /**
- * 加權選擇：按 variantId 升序累加 remaining，
- * 第一個使累計 > index 的 variant 即中獎。
+ * 建立未洗牌的 deck：按 variantId 升序，每個 variant 出現 stock 次。
  *
- * @param roll      - 32-bit unsigned random
- * @param variants  - 必須已按 id 升序排列
+ * 例：A賞(id=5)×3, B賞(id=8)×5, C賞(id=12)×2
+ * → deck = [5,5,5, 8,8,8,8,8, 12,12]
  */
-export function selectVariant(
-  roll: number,
-  variants: VariantForDraw[]
-): number {
-  const totalWeight = variants.reduce((s, v) => s + v.remaining, 0);
-  if (totalWeight === 0) throw new Error('所有獎項已全部抽完');
-
-  const index = roll % totalWeight;
-  let cumulative = 0;
-
-  for (const v of variants) {
-    cumulative += v.remaining;
-    if (cumulative > index) {
-      return v.id;
+export function buildDeck(variants: VariantForDeck[]): number[] {
+  const sorted = [...variants].sort((a, b) => a.id - b.id);
+  const deck: number[] = [];
+  for (const v of sorted) {
+    for (let i = 0; i < v.stock; i++) {
+      deck.push(v.id);
     }
   }
-
-  // fallback（理論上不會到這裡）
-  return variants[variants.length - 1].id;
+  return deck;
 }
 
 /**
- * 完整一抽流程：hash → roll → selectVariant
- */
-export function determineDrawOutcome(
-  input: DrawInput,
-  variants: VariantForDraw[]
-): DrawOutcome {
-  // 確保按 id 升序排列
-  const sorted = [...variants].sort((a, b) => a.id - b.id);
-  const hashResult = computeDrawHash(input);
-  const roll = extractRoll(hashResult);
-  const variantId = selectVariant(roll, sorted);
-  return { variantId, hashResult, roll };
-}
-
-/**
- * Hash-based Fisher-Yates shuffle（取代 Math.random）
- * 用於 batch open 模式的號碼洗牌。
+ * HMAC-based Fisher-Yates shuffle。
  *
- * 每一步 i 用 HMAC-SHA256(serverSeed, clientSeed:shuffle:i) 的前 8 hex
- * 產生一個 deterministic random index。
+ * for i = len-1 downto 1:
+ *   hash = HMAC-SHA256(serverSeed, String(i))
+ *   j = parseInt(hash[0..7], 16) % (i + 1)
+ *   swap(deck[i], deck[j])
  */
-export function hashBasedShuffle<T>(
-  arr: T[],
-  serverSeed: string,
-  clientSeed: string
-): T[] {
-  const result = [...arr];
+export function shuffleDeck(deck: number[], serverSeed: string): number[] {
+  const result = [...deck];
   for (let i = result.length - 1; i > 0; i--) {
-    const message = `${clientSeed}:shuffle:${i}`;
     const hash = crypto
       .createHmac('sha256', serverSeed)
-      .update(message)
+      .update(String(i))
       .digest('hex');
-    const rand = parseInt(hash.substring(0, 8), 16) >>> 0;
-    const j = rand % (i + 1);
+    const j = (parseInt(hash.substring(0, 8), 16) >>> 0) % (i + 1);
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
+}
+
+/**
+ * buildDeck + shuffleDeck 合一。
+ * 回傳洗好的牌組，index 0 對應 ticket #1。
+ */
+export function getShuffledDeck(variants: VariantForDeck[], serverSeed: string): number[] {
+  return shuffleDeck(buildDeck(variants), serverSeed);
+}
+
+/**
+ * 批次查詢：給定 ticketNumbers，回傳每張票對應的 variantId。
+ * ticketNumber 從 1 開始。
+ */
+export function getMultipleTicketResults(
+  variants: VariantForDeck[],
+  serverSeed: string,
+  ticketNumbers: number[]
+): Array<{ ticketNumber: number; variantId: number }> {
+  const deck = getShuffledDeck(variants, serverSeed);
+  return ticketNumbers.map(n => ({
+    ticketNumber: n,
+    variantId: deck[n - 1],
+  }));
 }

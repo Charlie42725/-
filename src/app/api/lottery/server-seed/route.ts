@@ -40,6 +40,7 @@ export async function GET(req: NextRequest) {
       productId: product.id,
       productName: product.name,
       status: product.status,
+      algorithm: 'deck-shuffle-v1',
       serverSeedHash: product.serverSeedHash,
       serverSeed: isRevealed ? product.serverSeed : null,
       revealed: isRevealed,

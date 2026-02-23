@@ -1,44 +1,141 @@
 <?php
 /**
- * Provably Fair 驗證腳本 (PHP)
+ * Provably Fair 驗證腳本 (PHP) - Deck Shuffle v1
  *
  * 演算法：
- *   hash  = HMAC-SHA256(serverSeed, clientSeed + ":" + nonce)
- *   roll  = hexdec(substr(hash, 0, 8))   ← 不需要 GMP
- *   index = roll % totalWeight
- *   → 按 variantId 升序累加 remaining，第一個累計 > index 的即中獎
+ *   1. 建牌：按 variantId 升序，每個 variant 出現 stock 次
+ *   2. 洗牌：Fisher-Yates，每步用 HMAC-SHA256(serverSeed, String(i))
+ *      for i = len-1 downto 1:
+ *        hash = HMAC-SHA256(serverSeed, String(i))
+ *        j = hexdec(substr(hash, 0, 8)) % (i + 1)
+ *        swap(deck[i], deck[j])
+ *   3. 對應：ticket #N → deck[N-1]
  *
  * 使用方式：
  *   php verify.php < data.json
- *   或在程式中：verify($data)
  *
- * JSON 格式：
+ * JSON 格式（deck-shuffle-v1）：
  * {
  *   "serverSeed": "hex...",
+ *   "serverSeedHash": "hex...",
  *   "variants": [
  *     { "id": 1, "initialStock": 5 },
  *     { "id": 2, "initialStock": 10 }
  *   ],
  *   "draws": [
- *     { "nonce": 0, "clientSeed": "hex...", "variantId": 2, "hashResult": "hex..." },
+ *     { "ticketNumber": 1, "variantId": 2 },
  *     ...
  *   ]
  * }
  */
 
-function computeDrawHash(string $serverSeed, string $clientSeed, int $nonce): string {
+// ─── Deck Shuffle v1 ───────────────────────────────────
+
+function buildDeck(array $variants): array {
+    // 按 id 升序排列
+    usort($variants, function ($a, $b) {
+        return $a['id'] - $b['id'];
+    });
+
+    $deck = [];
+    foreach ($variants as $v) {
+        $stock = $v['initialStock'] ?? $v['stock'] ?? 0;
+        for ($i = 0; $i < $stock; $i++) {
+            $deck[] = $v['id'];
+        }
+    }
+    return $deck;
+}
+
+function shuffleDeck(array $deck, string $serverSeed): array {
+    for ($i = count($deck) - 1; $i > 0; $i--) {
+        $hash = hash_hmac('sha256', strval($i), $serverSeed);
+        $j = intval(hexdec(substr($hash, 0, 8))) % ($i + 1);
+        // swap
+        $tmp = $deck[$i];
+        $deck[$i] = $deck[$j];
+        $deck[$j] = $tmp;
+    }
+    return $deck;
+}
+
+function getShuffledDeck(array $variants, string $serverSeed): array {
+    return shuffleDeck(buildDeck($variants), $serverSeed);
+}
+
+function verify(array $data): array {
+    $serverSeed     = $data['serverSeed'];
+    $serverSeedHash = $data['serverSeedHash'] ?? null;
+    $variants       = $data['variants'];
+    $draws          = $data['draws'];
+
+    // 驗證 serverSeedHash
+    $seedHashMatch = true;
+    if ($serverSeedHash !== null) {
+        $computedHash = hash('sha256', $serverSeed);
+        $seedHashMatch = ($computedHash === $serverSeedHash);
+    }
+
+    // 檢測演算法版本：如果 draws 中有 nonce 欄位且不為 null → legacy
+    $hasLegacyDraws = false;
+    foreach ($draws as $draw) {
+        if (isset($draw['nonce']) && $draw['nonce'] !== null) {
+            $hasLegacyDraws = true;
+            break;
+        }
+    }
+
+    if ($hasLegacyDraws) {
+        return verifyLegacy($data);
+    }
+
+    // deck-shuffle-v1 驗證
+    $deck = getShuffledDeck($variants, $serverSeed);
+
+    $results = [];
+    $passCount = 0;
+    $failCount = 0;
+
+    foreach ($draws as $draw) {
+        $ticketNumber      = $draw['ticketNumber'];
+        $expectedVariantId = $draw['variantId'];
+
+        $computedVariantId = $deck[$ticketNumber - 1] ?? null;
+        $pass = ($computedVariantId === $expectedVariantId);
+
+        if ($pass) $passCount++; else $failCount++;
+
+        $results[] = [
+            'ticketNumber'      => $ticketNumber,
+            'computedVariantId' => $computedVariantId,
+            'expectedVariantId' => $expectedVariantId,
+            'pass'              => $pass,
+        ];
+    }
+
+    return [
+        'algorithm'     => 'deck-shuffle-v1',
+        'seedHashMatch' => $seedHashMatch,
+        'totalDraws'    => count($draws),
+        'passed'        => $passCount,
+        'failed'        => $failCount,
+        'allPassed'     => ($failCount === 0 && $seedHashMatch),
+        'results'       => $results,
+    ];
+}
+
+// ─── Legacy 演算法（向後相容）──────────────────────────
+
+function computeDrawHashLegacy(string $serverSeed, string $clientSeed, int $nonce): string {
     $message = $clientSeed . ':' . $nonce;
     return hash_hmac('sha256', $message, $serverSeed);
 }
 
-function extractRoll(string $hashHex, int $offset = 0): int {
-    // 取前 8 個 hex 字元 → 32-bit unsigned integer
-    // PHP 在 64-bit 系統上 hexdec() 可安全處理 8 hex digits (最大 0xFFFFFFFF = 4294967295)
+function extractRollLegacy(string $hashHex, int $offset = 0): int {
     return intval(hexdec(substr($hashHex, $offset, 8)));
 }
 
-function selectVariant(int $roll, array $variants): int {
-    // $variants 必須已按 id 升序排列，每項有 'id' 和 'remaining'
+function selectVariantLegacy(int $roll, array $variants): int {
     $totalWeight = 0;
     foreach ($variants as $v) {
         $totalWeight += $v['remaining'];
@@ -57,27 +154,30 @@ function selectVariant(int $roll, array $variants): int {
         }
     }
 
-    // fallback
     return $variants[count($variants) - 1]['id'];
 }
 
-function verify(array $data): array {
-    $serverSeed = $data['serverSeed'];
-    $variants   = $data['variants'];
-    $draws      = $data['draws'];
+function verifyLegacy(array $data): array {
+    $serverSeed     = $data['serverSeed'];
+    $serverSeedHash = $data['serverSeedHash'] ?? null;
+    $variants       = $data['variants'];
+    $draws          = $data['draws'];
 
-    // 按 id 升序排列 variants
+    $seedHashMatch = true;
+    if ($serverSeedHash !== null) {
+        $computedHash = hash('sha256', $serverSeed);
+        $seedHashMatch = ($computedHash === $serverSeedHash);
+    }
+
     usort($variants, function ($a, $b) {
         return $a['id'] - $b['id'];
     });
 
-    // 建立剩餘庫存 tracker
     $remaining = [];
     foreach ($variants as $v) {
         $remaining[$v['id']] = $v['initialStock'];
     }
 
-    // 按 nonce 升序排列 draws
     usort($draws, function ($a, $b) {
         return $a['nonce'] - $b['nonce'];
     });
@@ -92,14 +192,11 @@ function verify(array $data): array {
         $expectedVariantId = $draw['variantId'];
         $expectedHash      = $draw['hashResult'] ?? null;
 
-        // 計算 hash
-        $hash = computeDrawHash($serverSeed, $clientSeed, $nonce);
+        $hash = computeDrawHashLegacy($serverSeed, $clientSeed, $nonce);
         $hashMatch = ($expectedHash === null) || ($hash === $expectedHash);
 
-        // 計算 roll
-        $roll = extractRoll($hash);
+        $roll = extractRollLegacy($hash);
 
-        // 建立當前庫存快照
         $currentVariants = [];
         foreach ($variants as $v) {
             $rem = $remaining[$v['id']];
@@ -108,11 +205,9 @@ function verify(array $data): array {
             }
         }
 
-        // 選擇 variant
-        $computedVariantId = selectVariant($roll, $currentVariants);
+        $computedVariantId = selectVariantLegacy($roll, $currentVariants);
         $variantMatch = ($computedVariantId === $expectedVariantId);
 
-        // 更新庫存
         if (isset($remaining[$computedVariantId])) {
             $remaining[$computedVariantId]--;
         }
@@ -134,11 +229,13 @@ function verify(array $data): array {
     }
 
     return [
-        'totalDraws' => count($draws),
-        'passed'     => $passCount,
-        'failed'     => $failCount,
-        'allPassed'  => ($failCount === 0),
-        'results'    => $results,
+        'algorithm'     => 'legacy',
+        'seedHashMatch' => $seedHashMatch,
+        'totalDraws'    => count($draws),
+        'passed'        => $passCount,
+        'failed'        => $failCount,
+        'allPassed'     => ($failCount === 0 && $seedHashMatch),
+        'results'       => $results,
     ];
 }
 
@@ -168,6 +265,10 @@ if (php_sapi_name() === 'cli') {
 
     // 摘要
     fwrite(STDERR, "\n=== 驗證結果 ===\n");
+    fwrite(STDERR, "演算法: {$result['algorithm']}\n");
+    if (isset($result['seedHashMatch'])) {
+        fwrite(STDERR, "Seed Hash: " . ($result['seedHashMatch'] ? '匹配' : '不匹配') . "\n");
+    }
     fwrite(STDERR, "總抽數: {$result['totalDraws']}\n");
     fwrite(STDERR, "通過:   {$result['passed']}\n");
     fwrite(STDERR, "失敗:   {$result['failed']}\n");
