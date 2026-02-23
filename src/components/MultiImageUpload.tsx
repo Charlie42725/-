@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 
 interface MultiImageUploadProps {
   label: string;
@@ -18,15 +17,18 @@ export default function MultiImageUpload({
 }: MultiImageUploadProps) {
   const hasLimit = maxImages > 0;
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
 
     if (files.length === 0) return;
 
+    setError('');
+
     // 檢查是否超過最大數量
     if (hasLimit && images.length + files.length > maxImages) {
-      alert(`最多只能上傳 ${maxImages} 張圖片`);
+      setError(`最多只能上傳 ${maxImages} 張圖片`);
       return;
     }
 
@@ -35,8 +37,8 @@ export default function MultiImageUpload({
     try {
       const uploadPromises = files.map(async (file) => {
         // 檢查文件大小
-        if (file.size > 5 * 1024 * 1024) {
-          throw new Error(`${file.name} 文件大小超過 5MB`);
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error(`${file.name} 檔案過大（${(file.size / 1024 / 1024).toFixed(1)}MB），上限 10MB`);
         }
 
         const formData = new FormData();
@@ -47,21 +49,26 @@ export default function MultiImageUpload({
           body: formData,
         });
 
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || '上傳失敗');
+        let data;
+        try {
+          data = await res.json();
+        } catch {
+          throw new Error(`伺服器回傳格式錯誤 (HTTP ${res.status})`);
         }
 
-        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `上傳失敗 (HTTP ${res.status})`);
+        }
+
         return data.url;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
       onChange([...images, ...uploadedUrls]);
-    } catch (error: unknown) {
-      console.error('上傳圖片失敗:', error);
-      const errorMessage = error instanceof Error ? error.message : '上傳圖片失敗';
-      alert(errorMessage);
+    } catch (err: unknown) {
+      console.error('上傳圖片失敗:', err);
+      const msg = err instanceof Error ? err.message : '上傳圖片失敗';
+      setError(msg);
     } finally {
       setUploading(false);
       // 清空 input
@@ -78,7 +85,7 @@ export default function MultiImageUpload({
     const url = prompt('請輸入圖片網址：');
     if (url && url.trim()) {
       if (hasLimit && images.length >= maxImages) {
-        alert(`最多只能上傳 ${maxImages} 張圖片`);
+        setError(`最多只能上傳 ${maxImages} 張圖片`);
         return;
       }
       onChange([...images, url.trim()]);
@@ -91,16 +98,26 @@ export default function MultiImageUpload({
         {label} ({images.length}{hasLimit ? `/${maxImages}` : ' 張'})
       </label>
 
+      {/* 錯誤提示 */}
+      {error && (
+        <div className="mb-3 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-center gap-2">
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          {error}
+        </div>
+      )}
+
       {/* 圖片預覽網格 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         {images.map((url, index) => (
           <div key={index} className="relative group">
             <div className="relative h-32 bg-zinc-700 rounded-lg overflow-hidden">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={url}
                 alt={`圖片 ${index + 1}`}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
             <button
@@ -137,7 +154,10 @@ export default function MultiImageUpload({
               className="hidden"
             />
             {uploading ? (
-              <div className="text-zinc-400 text-sm">上傳中...</div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 border-2 border-zinc-500/30 border-t-zinc-300 rounded-full animate-spin" />
+                <span className="text-zinc-400 text-sm">上傳中...</span>
+              </div>
             ) : (
               <>
                 <svg className="w-8 h-8 text-zinc-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +183,7 @@ export default function MultiImageUpload({
       </div>
 
       <p className="text-xs text-zinc-500 mt-2">
-        支援 JPG, PNG, GIF (最大 5MB)，拖動圖片可調整順序
+        支援 JPG, PNG, GIF, WebP (最大 10MB)
       </p>
     </div>
   );
