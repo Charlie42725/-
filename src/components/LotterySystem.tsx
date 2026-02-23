@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { isAuthenticated } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { calculateDiscountedPrice, type Discount, type PriceBreakdown } from '@/lib/discount-engine';
+import { showToast } from './Toast';
 
 interface Variant {
   id: number;
@@ -31,6 +32,7 @@ interface LotterySystemProps {
   productPrice: number;
   totalTickets: number;
   soldTickets: number;
+  serverSeedHash?: string | null;
   discounts: DiscountData[];
   onVariantsUpdate?: (variants: Variant[]) => void;
   onDrawComplete?: () => void;
@@ -46,11 +48,32 @@ interface LotteryResult {
   variant: Variant;
 }
 
+// ─── Tiny sound helper (Web Audio API) ──────────────────
+function playRevealSound() {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.15);
+  } catch {
+    // 靜音 fallback
+  }
+}
+
 export default function LotterySystem({
   productId,
   productPrice,
   totalTickets,
   soldTickets: initialSoldTickets,
+  serverSeedHash: initialSeedHash,
   discounts: discountData,
   onVariantsUpdate,
   onDrawComplete,
@@ -67,6 +90,9 @@ export default function LotterySystem({
   const [userPoints, setUserPoints] = useState(0);
   const [loading, setLoading] = useState(true);
   const [currentSoldTickets, setCurrentSoldTickets] = useState(initialSoldTickets);
+  const [serverSeedHash, setServerSeedHash] = useState(initialSeedHash || null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const abortRef = useRef<AbortController | null>(null);
 
   // 轉換 discounts 為引擎格式
   const discounts: Discount[] = useMemo(() =>
@@ -99,7 +125,6 @@ export default function LotterySystem({
       if (response.ok) {
         const data = await response.json();
         setDrawnTickets(data.drawnTickets);
-        // 同步更新 soldTickets
         setCurrentSoldTickets(data.drawnTickets.length);
       }
     } catch (error) {
@@ -137,6 +162,11 @@ export default function LotterySystem({
     Promise.all([loadDrawnTickets(), loadUserPoints()]);
   }, [loadDrawnTickets]);
 
+  // Cleanup abort controller on unmount
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
+
   const loadLatestVariants = async () => {
     try {
       const response = await fetch(`/api/lottery/variants?productId=${productId}`);
@@ -162,7 +192,7 @@ export default function LotterySystem({
         return prev.filter(n => n !== number);
       } else {
         if (prev.length >= 10) {
-          alert('一次最多只能選擇 10 個號碼');
+          showToast('一次最多只能選擇 10 個號碼', 'warning');
           return prev;
         }
         return [...prev, number];
@@ -172,13 +202,13 @@ export default function LotterySystem({
 
   const handleConfirmDraw = () => {
     if (!isAuthenticated()) {
-      alert('請先登入才能抽獎');
+      showToast('請先登入才能抽獎', 'warning');
       router.push('/login');
       return;
     }
 
     if (userPoints < priceBreakdown.totalPrice) {
-      alert(`點數不足！\n\n需要：${priceBreakdown.totalPrice} 點\n目前：${userPoints} 點\n\n請先購買點數`);
+      showToast(`點數不足！需要 ${priceBreakdown.totalPrice.toLocaleString()} 點，目前 ${userPoints.toLocaleString()} 點`, 'error');
       router.push('/member/points');
       return;
     }
@@ -196,19 +226,67 @@ export default function LotterySystem({
   // 開套按鈕點擊
   const handleBatchOpen = (discount: Discount) => {
     if (!isAuthenticated()) {
-      alert('請先登入才能抽獎');
+      showToast('請先登入才能抽獎', 'warning');
       router.push('/login');
       return;
     }
 
     if (userPoints < discount.price) {
-      alert(`點數不足！\n\n需要：${discount.price} 點\n目前：${userPoints} 點\n\n請先購買點數`);
+      showToast(`點數不足！需要 ${discount.price.toLocaleString()} 點，目前 ${userPoints.toLocaleString()} 點`, 'error');
       router.push('/member/points');
       return;
     }
 
     setShowBatchConfirm(discount);
     document.body.style.overflow = 'hidden';
+  };
+
+  // 共用抽獎 fetch 邏輯（帶 30s timeout）
+  const fetchDraw = async (body: Record<string, unknown>) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/lottery/draw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || '抽獎失敗');
+      }
+
+      return data;
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+
+  // 共用揭曉動畫
+  const revealResults = async (newResults: LotteryResult[]) => {
+    setResults(newResults);
+
+    for (let i = 0; i < newResults.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 150));
+      setCurrentRevealIndex(i);
+      if (soundEnabled) playRevealSound();
+    }
+
+    setDrawnTickets(prev => [...prev, ...newResults]);
+    loadLatestVariants();
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setIsDrawing(false);
   };
 
   // 執行開套抽獎
@@ -222,28 +300,17 @@ export default function LotterySystem({
     setCurrentRevealIndex(-1);
 
     try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/lottery/draw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          productId,
-          batchOpen: true,
-          drawCount: discount.drawCount
-        })
+      const data = await fetchDraw({
+        productId,
+        batchOpen: true,
+        drawCount: discount.drawCount
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || '抽獎失敗');
-      }
 
       setUserPoints(data.newBalance);
       setCurrentSoldTickets(prev => prev + discount.drawCount);
+      if (data.fairness?.serverSeedHash) {
+        setServerSeedHash(data.fairness.serverSeedHash);
+      }
 
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'points_updated',
@@ -255,23 +322,15 @@ export default function LotterySystem({
         variant: r.variant
       }));
 
-      setResults(newResults);
-
-      for (let i = 0; i < newResults.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 150));
-        setCurrentRevealIndex(i);
-      }
-
-      setDrawnTickets(prev => [...prev, ...newResults]);
-      loadLatestVariants();
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setIsDrawing(false);
+      await revealResults(newResults);
 
     } catch (error) {
       console.error('Draw error:', error);
-      const errorMessage = error instanceof Error ? error.message : '抽獎失敗，請稍後再試';
-      alert(errorMessage);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        showToast('抽獎請求逾時，請檢查網路後重試', 'error');
+      } else {
+        showToast(error instanceof Error ? error.message : '抽獎失敗，請稍後再試', 'error');
+      }
       setIsDrawing(false);
       setResults([]);
       setCurrentRevealIndex(-1);
@@ -288,27 +347,16 @@ export default function LotterySystem({
     setCurrentRevealIndex(-1);
 
     try {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/lottery/draw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          productId,
-          ticketNumbers: selectedNumbers
-        })
+      const data = await fetchDraw({
+        productId,
+        ticketNumbers: selectedNumbers
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || '抽獎失敗');
-      }
 
       setUserPoints(data.newBalance);
       setCurrentSoldTickets(prev => prev + selectedNumbers.length);
+      if (data.fairness?.serverSeedHash) {
+        setServerSeedHash(data.fairness.serverSeedHash);
+      }
 
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'points_updated',
@@ -320,25 +368,16 @@ export default function LotterySystem({
         variant: r.variant
       }));
 
-      setResults(newResults);
-
-      for (let i = 0; i < newResults.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 150));
-        setCurrentRevealIndex(i);
-      }
-
-      setDrawnTickets(prev => [...prev, ...newResults]);
       setSelectedNumbers([]);
-
-      loadLatestVariants();
-
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setIsDrawing(false);
+      await revealResults(newResults);
 
     } catch (error) {
       console.error('Draw error:', error);
-      const errorMessage = error instanceof Error ? error.message : '抽獎失敗，請稍後再試';
-      alert(errorMessage);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        showToast('抽獎請求逾時，請檢查網路後重試', 'error');
+      } else {
+        showToast(error instanceof Error ? error.message : '抽獎失敗，請稍後再試', 'error');
+      }
       setIsDrawing(false);
       setResults([]);
       setCurrentRevealIndex(-1);
@@ -346,15 +385,20 @@ export default function LotterySystem({
     }
   };
 
+  // P0: Soft reset instead of window.location.reload()
   const handleCloseResults = useCallback(() => {
     setResults([]);
+    setCurrentRevealIndex(-1);
     document.body.style.overflow = '';
     if (onDrawComplete) {
       onDrawComplete();
     } else {
-      window.location.reload();
+      // Soft refresh: reload drawn tickets + variants + points silently
+      loadDrawnTickets();
+      loadLatestVariants();
+      loadUserPoints();
     }
-  }, [onDrawComplete]);
+  }, [onDrawComplete, loadDrawnTickets]);
 
   // ESC key handler for dialogs
   useEffect(() => {
@@ -495,26 +539,9 @@ export default function LotterySystem({
               <p className="text-zinc-300 text-sm mb-2">消耗點數</p>
               <p className="text-amber-400 font-bold text-2xl">{priceBreakdown.totalPrice.toLocaleString()} 點</p>
               {hasDiscount && (
-                <>
-                  <p className="text-green-400 text-sm mt-1">
-                    原價 {priceBreakdown.regularPrice.toLocaleString()} 點，省 {priceBreakdown.savings.toLocaleString()} 點
-                  </p>
-                  {/* 折扣明細 */}
-                  <div className="mt-3 pt-3 border-t border-amber-500/20 text-left space-y-1">
-                    {priceBreakdown.segments.map((seg, idx) => (
-                      <div key={idx} className="flex justify-between text-xs">
-                        <span className="text-zinc-400">
-                          {seg.type === 'full_set' && (seg.label || `開套 ${seg.drawCount} 抽`)}
-                          {seg.type === 'combo' && `${seg.label || `${seg.drawCount} 抽組合`} x${seg.times}`}
-                          {seg.type === 'regular' && `原價 x${seg.drawCount}`}
-                        </span>
-                        <span className="text-zinc-300">
-                          {(seg.type === 'combo' ? seg.price * seg.times : seg.price).toLocaleString()} 點
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
+                <p className="text-green-400 text-sm mt-1">
+                  原價 {priceBreakdown.regularPrice.toLocaleString()} 點，省 {priceBreakdown.savings.toLocaleString()} 點
+                </p>
               )}
               <p className="text-zinc-500 text-xs mt-2">
                 剩餘點數: {(userPoints - priceBreakdown.totalPrice).toLocaleString()} 點
@@ -546,6 +573,9 @@ export default function LotterySystem({
   const ResultsPortal = () => {
     if (!mounted || results.length === 0) return null;
 
+    const revealedCount = Math.max(0, currentRevealIndex + 1);
+    const isRevealing = isDrawing && revealedCount < results.length;
+
     return createPortal(
       <div
         className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
@@ -559,20 +589,32 @@ export default function LotterySystem({
         }}
       >
         <div className="max-w-6xl w-full h-full max-h-[90vh] flex flex-col">
+          {/* Header + Progress */}
           <div className="text-center mb-4 flex-shrink-0">
             <h2 className="text-2xl md:text-3xl font-heading font-bold text-white mb-2">
-              {isDrawing ? '抽獎中...' : '抽獎結果'}
+              {isRevealing ? (
+                <span className="inline-flex items-center gap-3">
+                  <span className="inline-block w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+                  揭曉中 {revealedCount}/{results.length}
+                </span>
+              ) : isDrawing ? '抽獎中...' : '抽獎結果'}
             </h2>
             <p className="text-zinc-500">
               共抽出 <span className="text-amber-400 font-bold">{results.length}</span> 個號碼
             </p>
+            {/* Reveal progress bar */}
+            {isDrawing && (
+              <div className="w-48 mx-auto mt-2 h-1 bg-surface-3 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 rounded-full transition-all duration-150"
+                  style={{ width: `${(revealedCount / results.length) * 100}%` }}
+                />
+              </div>
+            )}
           </div>
 
-          <div
-            className="flex-1 overflow-y-auto custom-scrollbar"
-            onTouchMove={(e) => e.stopPropagation()}
-            onWheel={(e) => e.stopPropagation()}
-          >
+          {/* P1: Fixed mobile scrolling — removed stopPropagation */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4">
               {results.map((result, index) => {
                 const isRevealed = index <= currentRevealIndex;
@@ -633,14 +675,26 @@ export default function LotterySystem({
             </div>
           </div>
 
+          {/* Bottom: Close + Fairness info */}
           {!isDrawing && (
-            <div className="text-center mt-4 flex-shrink-0">
+            <div className="text-center mt-4 flex-shrink-0 space-y-3">
               <button
                 onClick={handleCloseResults}
                 className="bg-amber-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-amber-600 transition-all duration-200 shadow-lg"
               >
                 關閉結果
               </button>
+
+              {/* P0: Provably Fair 驗證資訊 */}
+              {serverSeedHash && (
+                <div className="flex items-center justify-center gap-2 text-xs text-zinc-500">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                  </svg>
+                  <span>Provably Fair</span>
+                  <span className="font-mono text-zinc-600">{serverSeedHash.slice(0, 16)}...</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -749,6 +803,7 @@ export default function LotterySystem({
           </div>
         </div>
 
+        {/* P2: min-h-[44px] 確保觸控目標足夠大 */}
         <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-[repeat(14,minmax(0,1fr))] xl:grid-cols-[repeat(16,minmax(0,1fr))] gap-2 md:gap-3">
           {Array.from({ length: totalTickets }, (_, i) => i + 1).map(number => {
             const variant = drawnTicketMap.get(number) ?? null;
@@ -761,7 +816,7 @@ export default function LotterySystem({
                 onClick={() => handleNumberClick(number)}
                 disabled={drawn || isDrawing}
                 className={`
-                  aspect-square rounded-lg font-bold text-sm transition-all duration-200 relative overflow-hidden
+                  aspect-square min-h-[44px] rounded-lg font-bold text-sm transition-all duration-200 relative overflow-hidden
                   ${drawn
                     ? 'bg-surface-2/50 text-zinc-500'
                     : selected
@@ -785,10 +840,22 @@ export default function LotterySystem({
             );
           })}
         </div>
+
+        {/* P0: Provably Fair badge */}
+        {serverSeedHash && (
+          <div className="mt-4 flex items-center gap-2 text-xs text-zinc-600">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            <span>Provably Fair</span>
+            <span className="font-mono">{serverSeedHash.slice(0, 16)}...</span>
+          </div>
+        )}
       </div>
 
+      {/* P2: Responsive bottom action bar — short text on mobile */}
       <div className="sticky bottom-16 bg-surface-deep/95 backdrop-blur-md border-t border-[var(--border)] -mx-4 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] mt-6 z-40 md:static md:bottom-auto md:bg-transparent md:backdrop-blur-none md:border-0 md:mx-0 md:px-0 md:py-0 md:mt-0 md:z-auto">
-        <div className="flex gap-4 max-w-2xl mx-auto md:max-w-none">
+        <div className="flex gap-4 max-w-2xl mx-auto md:max-w-none items-center">
           <button
             onClick={handleConfirmDraw}
             disabled={selectedNumbers.length === 0 || isDrawing}
@@ -796,20 +863,52 @@ export default function LotterySystem({
           >
             {isDrawing
               ? '抽獎中...'
-              : priceBreakdown.savings > 0
-                ? `開始抽獎 (${selectedNumbers.length} 抽 = ${priceBreakdown.totalPrice.toLocaleString()} 點，省 ${priceBreakdown.savings.toLocaleString()})`
-                : `開始抽獎 (${selectedNumbers.length} 抽 = ${priceBreakdown.totalPrice.toLocaleString()} 點)`
+              : selectedNumbers.length === 0
+                ? '請選擇號碼'
+                : (
+                  <>
+                    {/* Desktop: full text */}
+                    <span className="hidden sm:inline">
+                      {priceBreakdown.savings > 0
+                        ? `開始抽獎 (${selectedNumbers.length} 抽 = ${priceBreakdown.totalPrice.toLocaleString()} 點，省 ${priceBreakdown.savings.toLocaleString()})`
+                        : `開始抽獎 (${selectedNumbers.length} 抽 = ${priceBreakdown.totalPrice.toLocaleString()} 點)`
+                      }
+                    </span>
+                    {/* Mobile: short text */}
+                    <span className="sm:hidden">
+                      抽獎 {selectedNumbers.length} 抽 / {priceBreakdown.totalPrice.toLocaleString()} 點
+                    </span>
+                  </>
+                )
             }
           </button>
 
           {selectedNumbers.length > 0 && !isDrawing && (
             <button
               onClick={() => setSelectedNumbers([])}
-              className="bg-zinc-700 text-white font-medium py-4 px-6 rounded-xl hover:bg-zinc-600 transition-colors duration-200"
+              className="bg-zinc-700 text-white font-medium py-4 px-6 rounded-xl hover:bg-zinc-600 transition-colors duration-200 flex-shrink-0"
             >
-              清除選擇
+              <span className="hidden sm:inline">清除選擇</span>
+              <span className="sm:hidden">清除</span>
             </button>
           )}
+
+          {/* P3: Sound toggle */}
+          <button
+            onClick={() => setSoundEnabled(v => !v)}
+            className="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-xl bg-surface-3 text-zinc-400 hover:text-white transition-colors"
+            title={soundEnabled ? '關閉音效' : '開啟音效'}
+          >
+            {soundEnabled ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </>

@@ -265,6 +265,18 @@ button:disabled,
 .fade-in         { animation: fadeIn  0.3s ease-out both; }
 .fade-out        { animation: fadeOut 0.25s ease-in both; }
 
+/* P3: Simplify flip animation on low-end mobile (< 640px) */
+@media (max-width: 639px) {
+  .flip-card {
+    transition: transform 0.4s, opacity 0.4s;
+  }
+}
+
+/* Queue countdown warning blink */
+.queue-countdown-warning {
+  animation: pulse 1s ease-in-out infinite;
+}
+
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *,

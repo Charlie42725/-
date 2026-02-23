@@ -5,6 +5,7 @@ import { isAuthenticated, getAuthToken } from '@/lib/auth';
 import LotterySystem from './LotterySystem';
 import QueueWaitingUI from './QueueWaitingUI';
 import QueueCountdown from './QueueCountdown';
+import { showToast } from './Toast';
 
 type QueueState =
   | 'checking'
@@ -29,7 +30,9 @@ interface DrawQueueManagerProps {
   totalTickets: number;
   productStatus: string;
   soldTickets: number;
+  serverSeedHash?: string | null;
   discounts: DiscountData[];
+  onVariantsUpdate?: (variants: { id: number; prize: string; name: string; rarity: string | null; value: number; stock: number; imageUrl: string | null }[]) => void;
 }
 
 export default function DrawQueueManager({
@@ -38,13 +41,16 @@ export default function DrawQueueManager({
   totalTickets,
   productStatus,
   soldTickets,
+  serverSeedHash,
   discounts,
+  onVariantsUpdate,
 }: DrawQueueManagerProps) {
   const [queueState, setQueueState] = useState<QueueState>('checking');
   const [totalInQueue, setTotalInQueue] = useState(0);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevQueueRef = useRef(0);
 
   // 清除 SSE 和心跳
   const cleanup = useCallback(() => {
@@ -65,6 +71,17 @@ export default function DrawQueueManager({
     }));
   }, [productId]);
 
+  // P1: Browser notification helper
+  const sendNotification = useCallback((title: string, body: string) => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification(title, { body, icon: '/assets/images/logos/apple-touch-icon.png' });
+      } catch {
+        // 忽略
+      }
+    }
+  }, []);
+
   // 建立 SSE 連線
   const connectSSE = useCallback(() => {
     const token = getAuthToken();
@@ -83,6 +100,7 @@ export default function DrawQueueManager({
           case 'your_turn':
             setQueueState('active');
             setExpiresAt(data.expiresAt);
+            sendNotification('輪到你了！', '你的抽獎回合已開始，5 分鐘內完成抽獎');
             break;
 
           case 'queue_update':
@@ -123,7 +141,7 @@ export default function DrawQueueManager({
     es.onerror = () => {
       // SSE 會自動重連
     };
-  }, [productId, cleanup, emitQueueChange]);
+  }, [productId, cleanup, emitQueueChange, sendNotification]);
 
   // 啟動心跳
   const startHeartbeat = useCallback(() => {
@@ -196,6 +214,23 @@ export default function DrawQueueManager({
     return cleanup;
   }, [productId, connectSSE, startHeartbeat, cleanup]);
 
+  // P1: Request notification permission on mount
+  useEffect(() => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      // Defer request so it doesn't block paint
+      const t = setTimeout(() => Notification.requestPermission(), 3000);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  // P1: Notify when queue position is getting close
+  useEffect(() => {
+    if (queueState === 'waiting' && prevQueueRef.current > 2 && totalInQueue <= 2 && totalInQueue > 0) {
+      sendNotification('快輪到你了！', `前面還有 ${totalInQueue} 人，請準備好`);
+    }
+    prevQueueRef.current = totalInQueue;
+  }, [totalInQueue, queueState, sendNotification]);
+
   // beforeunload 時通知離開
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -217,7 +252,7 @@ export default function DrawQueueManager({
   // 加入排隊
   const handleJoinQueue = async () => {
     if (!isAuthenticated()) {
-      alert('請先登入才能抽獎');
+      showToast('請先登入才能抽獎', 'warning');
       return;
     }
 
@@ -236,7 +271,7 @@ export default function DrawQueueManager({
 
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || '加入排隊失敗');
+        showToast(data.error || '加入排隊失敗', 'error');
         setQueueState('idle');
         return;
       }
@@ -258,7 +293,7 @@ export default function DrawQueueManager({
       connectSSE();
       startHeartbeat();
     } catch {
-      alert('加入排隊失敗，請重試');
+      showToast('加入排隊失敗，請重試', 'error');
       setQueueState('idle');
     }
   };
@@ -284,11 +319,11 @@ export default function DrawQueueManager({
     emitQueueChange();
   };
 
-  // 抽獎完成回調
+  // 抽獎完成回調 — soft reset
   const handleDrawComplete = () => {
     cleanup();
     emitQueueChange();
-    window.location.reload();
+    // 不再 window.location.reload()，LotterySystem 內部會 soft refresh
   };
 
   // 超時回調
@@ -305,7 +340,8 @@ export default function DrawQueueManager({
   if (queueState === 'checking') {
     return (
       <div className="text-center py-12">
-        <div className="text-zinc-500">載入中...</div>
+        <div className="inline-block w-6 h-6 border-2 border-zinc-600 border-t-amber-400 rounded-full animate-spin" />
+        <p className="text-zinc-500 mt-3 text-sm">載入中...</p>
       </div>
     );
   }
@@ -342,7 +378,8 @@ export default function DrawQueueManager({
   if (queueState === 'joining') {
     return (
       <div className="text-center py-12">
-        <div className="text-zinc-500">加入排隊中...</div>
+        <div className="inline-block w-6 h-6 border-2 border-zinc-600 border-t-amber-400 rounded-full animate-spin" />
+        <p className="text-zinc-500 mt-3 text-sm">加入排隊中...</p>
       </div>
     );
   }
@@ -392,7 +429,9 @@ export default function DrawQueueManager({
         productPrice={productPrice}
         totalTickets={totalTickets}
         soldTickets={soldTickets}
+        serverSeedHash={serverSeedHash}
         discounts={discounts}
+        onVariantsUpdate={onVariantsUpdate}
         onDrawComplete={handleDrawComplete}
       />
     </div>
