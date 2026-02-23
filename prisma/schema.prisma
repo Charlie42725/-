@@ -64,6 +64,8 @@ model Product {
   soldTickets      Int             @default(0)
   status           ProductStatus   @default(draft)
   coverImage       String?
+  serverSeed       String?         // Provably Fair: 伺服器種子（售完後公開）
+  serverSeedHash   String?         // Provably Fair: SHA-256(serverSeed) 公開承諾
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -245,6 +247,9 @@ model LotteryDraw {
   triggeredPity   Boolean          @default(false)  // 是否觸發保底
   isLastPrize     Boolean          @default(false)  // 是否為 Last 賞
   isRedeemed      Boolean          @default(false)  // 是否已兌換成點數
+  clientSeed      String?          // Provably Fair: 客戶端種子
+  nonce           Int?             // Provably Fair: 遞增序號
+  hashResult      String?          // Provably Fair: HMAC-SHA256 結果
   createdAt       DateTime         @default(now())
 
   redemption      PrizeRedemption?

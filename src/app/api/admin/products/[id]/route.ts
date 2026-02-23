@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 // import { verifyAdmin } from '@/lib/auth';
 import { validateId } from '@/lib/validation';
+import { generateServerSeed, hashServerSeed } from '@/lib/provably-fair';
 
 // 取得單一商品
 export async function GET(
@@ -166,6 +167,19 @@ export async function PUT(
       return NextResponse.json({ error: '總票數必須大於 0' }, { status: 400 });
     }
 
+    // Provably Fair: 當 status 設為 active 時，自動生成 serverSeed
+    let seedData: { serverSeed: string; serverSeedHash: string } | undefined;
+    if (status === 'active') {
+      const existing = await prisma.product.findUnique({
+        where: { id },
+        select: { serverSeed: true },
+      });
+      if (!existing?.serverSeed) {
+        const seed = generateServerSeed();
+        seedData = { serverSeed: seed, serverSeedHash: hashServerSeed(seed) };
+      }
+    }
+
     // 先刪除現有的畫廊圖片
     await prisma.image.deleteMany({
       where: {
@@ -187,6 +201,7 @@ export async function PUT(
         totalTickets: parseInt(totalTickets),
         status: status || 'draft',
         coverImage: coverImage || null,
+        ...(seedData || {}),
         images: galleryImages && galleryImages.length > 0 ? {
           create: galleryImages.map((url: string, index: number) => ({
             url,
