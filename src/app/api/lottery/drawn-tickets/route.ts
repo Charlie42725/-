@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
           ticketNumber: 'asc'
         }
       }),
-      10000
+      3000
     );
 
     return NextResponse.json({ drawnTickets });

@@ -1,17 +1,18 @@
 // SSE 連線管理器（單例模式）
-// key = `product:${productId}`，value = Map<userId, controller>
+// key = productId，value = Map<userId, { controller, connectedAt }>
 
 type SSEController = ReadableStreamDefaultController;
 
-interface SSEConnection {
+interface SSEEntry {
   controller: SSEController;
-  productId: number;
-  userId: number;
+  connectedAt: number;
 }
 
+const MAX_CONNECTION_AGE_MS = 30 * 60 * 1000; // 30 分鐘自動清理
+
 class SSERegistry {
-  // productId → Map<userId, controller>
-  private connections = new Map<number, Map<number, SSEController>>();
+  // productId → Map<userId, SSEEntry>
+  private connections = new Map<number, Map<number, SSEEntry>>();
 
   addConnection(productId: number, userId: number, controller: SSEController) {
     if (!this.connections.has(productId)) {
@@ -21,19 +22,19 @@ class SSERegistry {
     const productConns = this.connections.get(productId)!;
 
     // 關閉同一使用者的舊連線（多分頁情境）
-    const existingController = productConns.get(userId);
-    if (existingController) {
+    const existing = productConns.get(userId);
+    if (existing) {
       try {
-        existingController.enqueue(
+        existing.controller.enqueue(
           new TextEncoder().encode(`data: ${JSON.stringify({ type: 'replaced', message: '連線已被新分頁取代' })}\n\n`)
         );
-        existingController.close();
+        existing.controller.close();
       } catch {
         // 舊連線可能已經關閉
       }
     }
 
-    productConns.set(userId, controller);
+    productConns.set(userId, { controller, connectedAt: Date.now() });
   }
 
   removeConnection(productId: number, userId: number) {
@@ -46,20 +47,19 @@ class SSERegistry {
     }
   }
 
-  // 廣播訊息給該商品的所有連線
+  // 廣播訊息給該商品的所有連線（共用 encoded message）
   broadcast(productId: number, data: Record<string, unknown>) {
     const productConns = this.connections.get(productId);
-    if (!productConns) return;
+    if (!productConns || productConns.size === 0) return;
 
     const message = new TextEncoder().encode(
       `data: ${JSON.stringify(data)}\n\n`
     );
 
-    for (const [userId, controller] of productConns) {
+    for (const [userId, entry] of productConns) {
       try {
-        controller.enqueue(message);
+        entry.controller.enqueue(message);
       } catch {
-        // 連線已斷開，清除
         productConns.delete(userId);
       }
     }
@@ -70,11 +70,11 @@ class SSERegistry {
     const productConns = this.connections.get(productId);
     if (!productConns) return;
 
-    const controller = productConns.get(userId);
-    if (!controller) return;
+    const entry = productConns.get(userId);
+    if (!entry) return;
 
     try {
-      controller.enqueue(
+      entry.controller.enqueue(
         new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`)
       );
     } catch {
@@ -84,6 +84,31 @@ class SSERegistry {
 
   getConnectionCount(productId: number): number {
     return this.connections.get(productId)?.size || 0;
+  }
+
+  // 清理超時連線（防止記憶體洩漏）
+  cleanup() {
+    const deadline = Date.now() - MAX_CONNECTION_AGE_MS;
+
+    for (const [productId, productConns] of this.connections) {
+      for (const [userId, entry] of productConns) {
+        if (entry.connectedAt < deadline) {
+          try { entry.controller.close(); } catch { /* ignore */ }
+          productConns.delete(userId);
+        }
+      }
+      if (productConns.size === 0) {
+        this.connections.delete(productId);
+      }
+    }
+  }
+
+  get totalConnections(): number {
+    let count = 0;
+    for (const conns of this.connections.values()) {
+      count += conns.size;
+    }
+    return count;
   }
 }
 
@@ -96,3 +121,8 @@ export const sseRegistry =
 if (process.env.NODE_ENV !== 'production') {
   globalForSSE.sseRegistry = sseRegistry;
 }
+
+// 每 5 分鐘清理超時 SSE 連線
+setInterval(() => {
+  sseRegistry.cleanup();
+}, 5 * 60 * 1000);

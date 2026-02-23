@@ -229,6 +229,7 @@ model PointTransaction {
   @@index([userId])
   @@index([type])
   @@index([createdAt])
+  @@index([userId, type])               // 複合索引：加速用戶+類型查詢
 }
 
 // -----------------------------
@@ -259,8 +260,10 @@ model LotteryDraw {
   @@index([variantId])
   @@index([createdAt])
   @@index([isRedeemed])
-  @@index([userId, isRedeemed])  // 複合索引：加速 prizes API 查詢
-  @@unique([productId, ticketNumber]) // 每個商品的每個號碼只能被抽一次
+  @@index([userId, isRedeemed])         // 複合索引：加速 prizes API 查詢
+  @@index([userId, productId])          // 複合索引：加速用戶+商品查詢
+  @@index([productId, isRedeemed])      // 複合索引：加速商品未兌換查詢
+  @@unique([productId, ticketNumber])   // 每個商品的每個號碼只能被抽一次
 }
 
 // -----------------------------
@@ -389,4 +392,7 @@ model DrawQueue {
   @@index([productId, position])
   @@index([userId])
   @@index([expiresAt])
+  @@index([userId, productId, status])  // 複合索引：加速排隊狀態查詢
+  @@index([status, expiresAt])          // 複合索引：加速過期檢查
+  @@index([status, lastHeartbeat])      // 複合索引：加速心跳超時檢查
 }

@@ -21,22 +21,22 @@ export async function joinQueue(productId: number, userId: number) {
     return existing;
   }
 
-  // 取得下一個 position
-  const lastEntry = await prisma.drawQueue.findFirst({
-    where: { productId },
-    orderBy: { position: 'desc' },
-  });
+  // 取得下一個 position + 當前活躍人數（合併為一次查詢）
+  const [lastEntry, activeCount] = await Promise.all([
+    prisma.drawQueue.findFirst({
+      where: { productId },
+      orderBy: { position: 'desc' },
+      select: { position: true },
+    }),
+    prisma.drawQueue.count({
+      where: {
+        productId,
+        status: { in: ['waiting', 'active'] },
+      },
+    }),
+  ]);
 
   const nextPosition = (lastEntry?.position ?? 0) + 1;
-
-  // 檢查是否有其他人正在排隊或抽獎
-  const activeCount = await prisma.drawQueue.count({
-    where: {
-      productId,
-      status: { in: ['waiting', 'active'] },
-    },
-  });
-
   const now = new Date();
   const isFirstInLine = activeCount === 0;
 
@@ -57,7 +57,6 @@ export async function joinQueue(productId: number, userId: number) {
   broadcastQueueUpdate(productId);
 
   if (isFirstInLine) {
-    // 通知該使用者輪到他了
     sseRegistry.sendToUser(productId, userId, {
       type: 'your_turn',
       expiresAt: entry.expiresAt?.toISOString(),
@@ -67,57 +66,46 @@ export async function joinQueue(productId: number, userId: number) {
   return entry;
 }
 
-// 查詢排隊狀態
+// 查詢排隊狀態 — 合併為單次查詢
 export async function getQueueStatus(productId: number, userId: number) {
-  const entry = await prisma.drawQueue.findFirst({
+  // 一次查詢取得：用戶自己的記錄 + 全部活躍記錄
+  const allActive = await prisma.drawQueue.findMany({
     where: {
       productId,
-      userId,
       status: { in: ['waiting', 'active'] },
+    },
+    orderBy: { position: 'asc' },
+    select: {
+      userId: true,
+      status: true,
+      position: true,
+      expiresAt: true,
     },
   });
 
-  if (!entry) {
-    // 檢查是否有其他人在排隊
-    const queueCount = await prisma.drawQueue.count({
-      where: {
-        productId,
-        status: { in: ['waiting', 'active'] },
-      },
-    });
+  const totalInQueue = allActive.length;
 
+  // 找用戶自己的記錄
+  const myIndex = allActive.findIndex(e => e.userId === userId);
+
+  if (myIndex === -1) {
     return {
       inQueue: false,
-      queueLength: queueCount,
+      queueLength: totalInQueue,
       status: null,
       position: null,
       expiresAt: null,
     };
   }
 
-  // 計算前方等待人數
-  const aheadCount = await prisma.drawQueue.count({
-    where: {
-      productId,
-      status: { in: ['waiting', 'active'] },
-      position: { lt: entry.position },
-    },
-  });
-
-  // 排隊總人數
-  const totalInQueue = await prisma.drawQueue.count({
-    where: {
-      productId,
-      status: { in: ['waiting', 'active'] },
-    },
-  });
+  const myEntry = allActive[myIndex];
 
   return {
     inQueue: true,
-    status: entry.status,
-    position: aheadCount + 1,
+    status: myEntry.status,
+    position: myIndex + 1,
     totalInQueue,
-    expiresAt: entry.expiresAt?.toISOString() || null,
+    expiresAt: myEntry.expiresAt?.toISOString() || null,
     queueLength: totalInQueue,
   };
 }
@@ -152,22 +140,17 @@ export async function leaveQueue(productId: number, userId: number) {
 
 // 心跳更新
 export async function heartbeat(productId: number, userId: number) {
-  const entry = await prisma.drawQueue.findFirst({
+  // 直接用 updateMany 減少 findFirst + update 兩步
+  const result = await prisma.drawQueue.updateMany({
     where: {
       productId,
       userId,
       status: { in: ['waiting', 'active'] },
     },
-  });
-
-  if (!entry) return null;
-
-  await prisma.drawQueue.update({
-    where: { id: entry.id },
     data: { lastHeartbeat: new Date() },
   });
 
-  return entry;
+  return result.count > 0 ? true : null;
 }
 
 // 抽獎完成，結束 session 並啟動下一位
@@ -199,21 +182,15 @@ export async function activateNext(productId: number) {
   // 先檢查商品是否還有庫存
   const product = await prisma.product.findUnique({
     where: { id: productId },
-    select: { status: true, totalTickets: true, soldTickets: true },
+    select: { status: true },
   });
 
   if (!product || product.status === 'sold_out') {
-    // 商品完售，通知所有等待者
-    const waitingEntries = await prisma.drawQueue.findMany({
+    // 商品完售，批次更新所有等待者
+    await prisma.drawQueue.updateMany({
       where: { productId, status: 'waiting' },
+      data: { status: 'left', completedAt: new Date() },
     });
-
-    for (const entry of waitingEntries) {
-      await prisma.drawQueue.update({
-        where: { id: entry.id },
-        data: { status: 'left', completedAt: new Date() },
-      });
-    }
 
     sseRegistry.broadcast(productId, {
       type: 'product_sold_out',
@@ -244,7 +221,6 @@ export async function activateNext(productId: number) {
     },
   });
 
-  // 通知該使用者
   sseRegistry.sendToUser(nextEntry.productId, nextEntry.userId, {
     type: 'your_turn',
     expiresAt: new Date(now.getTime() + ACTIVE_SESSION_DURATION_MS).toISOString(),
@@ -261,6 +237,7 @@ export async function isUserActive(productId: number, userId: number) {
       userId,
       status: 'active',
     },
+    select: { expiresAt: true },
   });
 
   if (!entry) return false;
@@ -269,82 +246,62 @@ export async function isUserActive(productId: number, userId: number) {
   return true;
 }
 
-// 定時檢查超時的 session
+// 定時檢查超時的 session — 合併為一次查詢
 export async function checkExpiredSessions() {
   const now = new Date();
+  const heartbeatDeadline = new Date(now.getTime() - HEARTBEAT_TIMEOUT_ACTIVE_MS);
+  const waitingDeadline = new Date(now.getTime() - HEARTBEAT_TIMEOUT_WAITING_MS);
 
-  // 1. 檢查 active 且 expiresAt 已過期
-  const expiredActive = await prisma.drawQueue.findMany({
+  // 單次查詢取得所有需要清理的記錄
+  const staleEntries = await prisma.drawQueue.findMany({
     where: {
-      status: 'active',
-      expiresAt: { lt: now },
+      OR: [
+        // active 且過期
+        { status: 'active', expiresAt: { lt: now } },
+        // active 且心跳超時
+        { status: 'active', lastHeartbeat: { lt: heartbeatDeadline } },
+        // waiting 且心跳超時
+        { status: 'waiting', lastHeartbeat: { lt: waitingDeadline } },
+      ],
     },
+    select: { id: true, productId: true, userId: true, status: true },
   });
+
+  if (staleEntries.length === 0) return;
 
   const affectedProductIds = new Set<number>();
+  const expiredIds: number[] = [];
+  const leftIds: number[] = [];
 
-  for (const entry of expiredActive) {
-    await prisma.drawQueue.update({
-      where: { id: entry.id },
-      data: {
-        status: 'expired',
-        completedAt: now,
-      },
-    });
-
-    sseRegistry.sendToUser(entry.productId, entry.userId, {
-      type: 'session_expired',
-      message: '您的抽獎時間已過期',
-    });
-
+  for (const entry of staleEntries) {
     affectedProductIds.add(entry.productId);
+
+    if (entry.status === 'active') {
+      expiredIds.push(entry.id);
+      // 通知用戶 session 過期
+      sseRegistry.sendToUser(entry.productId, entry.userId, {
+        type: 'session_expired',
+        message: '您的抽獎時間已過期',
+      });
+    } else {
+      leftIds.push(entry.id);
+    }
   }
 
-  // 2. 檢查 active 且心跳超時
-  const heartbeatDeadline = new Date(now.getTime() - HEARTBEAT_TIMEOUT_ACTIVE_MS);
-  const staleActive = await prisma.drawQueue.findMany({
-    where: {
-      status: 'active',
-      lastHeartbeat: { lt: heartbeatDeadline },
-    },
-  });
-
-  for (const entry of staleActive) {
-    await prisma.drawQueue.update({
-      where: { id: entry.id },
-      data: {
-        status: 'expired',
-        completedAt: now,
-      },
-    });
-
-    affectedProductIds.add(entry.productId);
-  }
-
-  // 3. 檢查 waiting 且心跳超時
-  const waitingDeadline = new Date(now.getTime() - HEARTBEAT_TIMEOUT_WAITING_MS);
-  const staleWaiting = await prisma.drawQueue.findMany({
-    where: {
-      status: 'waiting',
-      lastHeartbeat: { lt: waitingDeadline },
-    },
-  });
-
-  for (const entry of staleWaiting) {
-    await prisma.drawQueue.update({
-      where: { id: entry.id },
-      data: {
-        status: 'left',
-        completedAt: now,
-      },
-    });
-
-    affectedProductIds.add(entry.productId);
-  }
+  // 批次更新（2 次 updateMany 取代 N 次 update）
+  await Promise.all([
+    expiredIds.length > 0 && prisma.drawQueue.updateMany({
+      where: { id: { in: expiredIds } },
+      data: { status: 'expired', completedAt: now },
+    }),
+    leftIds.length > 0 && prisma.drawQueue.updateMany({
+      where: { id: { in: leftIds } },
+      data: { status: 'left', completedAt: now },
+    }),
+  ]);
 
   // 為所有受影響的商品啟動下一位
   for (const productId of affectedProductIds) {
-    // 只在沒有 active 的情況下啟動下一位
     const currentActive = await prisma.drawQueue.count({
       where: { productId, status: 'active' },
     });
@@ -357,8 +314,11 @@ export async function checkExpiredSessions() {
   }
 }
 
-// 廣播排隊狀態更新
+// 廣播排隊狀態更新 — 只查 count + 只發送給有 SSE 連線的用戶
 async function broadcastQueueUpdate(productId: number) {
+  // 先檢查有沒有 SSE 連線，沒有就不查 DB
+  if (sseRegistry.getConnectionCount(productId) === 0) return;
+
   const waitingEntries = await prisma.drawQueue.findMany({
     where: {
       productId,
@@ -368,26 +328,27 @@ async function broadcastQueueUpdate(productId: number) {
     select: {
       userId: true,
       status: true,
-      position: true,
     },
   });
 
-  // 通知每位使用者他們的位置
+  const totalInQueue = waitingEntries.length;
+
+  // 只對有 SSE 連線的用戶發送個人位置
   let queuePosition = 0;
   for (const entry of waitingEntries) {
     queuePosition++;
     sseRegistry.sendToUser(productId, entry.userId, {
       type: 'queue_update',
       position: queuePosition,
-      totalInQueue: waitingEntries.length,
+      totalInQueue,
       status: entry.status,
     });
   }
 
-  // 廣播整體排隊人數
+  // 廣播整體排隊人數（給旁觀者）
   sseRegistry.broadcast(productId, {
     type: 'queue_count',
-    count: waitingEntries.length,
+    count: totalInQueue,
   });
 }
 
