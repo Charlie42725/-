@@ -1,8 +1,6 @@
 export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { put } from '@vercel/blob';
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -45,35 +43,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // 讀取文件內容
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // 生成安全的文件名（移除非 ASCII、保留副檔名）
+    // 生成安全的文件名
     const timestamp = Date.now();
     const safeName = file.name
       .replace(/[^\w.\-]/g, '_')
       .replace(/_+/g, '_')
       .replace(/^_|_$/g, '');
-    const fileName = `${timestamp}-${safeName || `upload.${ext || 'jpg'}`}`;
+    const fileName = `uploads/${timestamp}-${safeName || `upload.${ext || 'jpg'}`}`;
 
-    // 確保上傳目錄存在
-    const uploadDir = join(process.cwd(), 'public', 'uploads');
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // 儲存文件
-    const filePath = join(uploadDir, fileName);
-    await writeFile(filePath, buffer);
-
-    // 返回可訪問的 URL
-    const url = `/uploads/${fileName}`;
+    // 上傳到 Vercel Blob
+    const blob = await put(fileName, file, {
+      access: 'public',
+    });
 
     return NextResponse.json({
       success: true,
-      url,
-      fileName,
+      url: blob.url,
+      fileName: blob.pathname,
     });
   } catch (error) {
     console.error('上傳圖片失敗:', error);

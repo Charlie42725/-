@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import ImageUpload from '@/components/ImageUpload';
 import MultiImageUpload from '@/components/MultiImageUpload';
@@ -71,6 +71,54 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: 'discounts', label: '折扣' },
   { key: 'variants', label: '賞項' },
 ];
+
+// ─── DiscountRow（獨立組件，避免每次 re-render 失去 focus）───
+const DiscountRow = React.memo(function DiscountRow({
+  type, d, idx, unitPrice, onUpdate, onRemove,
+}: {
+  type: 'comboDiscounts' | 'fullSetDiscounts';
+  d: DiscountEntry;
+  idx: number;
+  unitPrice: number;
+  onUpdate: (type: 'comboDiscounts' | 'fullSetDiscounts', i: number, field: keyof DiscountEntry, value: string) => void;
+  onRemove: (type: 'comboDiscounts' | 'fullSetDiscounts', i: number) => void;
+}) {
+  const drawNum = parseInt(d.drawCount) || 0;
+  const priceNum = parseInt(d.price) || 0;
+  const orig = drawNum * unitPrice;
+  const save = orig - priceNum;
+  return (
+    <div className="bg-surface-2/50 rounded-xl p-3 border border-surface-3/50">
+      <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
+        <div>
+          <label className="block text-zinc-500 text-xs mb-1">抽數</label>
+          <input type="number" min="1" value={d.drawCount} onChange={e => onUpdate(type, idx, 'drawCount', e.target.value)}
+            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="3" />
+        </div>
+        <div>
+          <label className="block text-zinc-500 text-xs mb-1">總價</label>
+          <input type="number" min="0" value={d.price} onChange={e => onUpdate(type, idx, 'price', e.target.value)}
+            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="280" />
+        </div>
+        <div>
+          <label className="block text-zinc-500 text-xs mb-1">名稱</label>
+          <input type="text" value={d.label} onChange={e => onUpdate(type, idx, 'label', e.target.value)}
+            className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="選填" />
+        </div>
+        <button type="button" onClick={() => onRemove(type, idx)} className="text-red-400 hover:text-red-300 p-2 cursor-pointer" title="移除">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      {drawNum > 0 && priceNum > 0 && unitPrice > 0 && (
+        <div className="mt-2 flex items-center gap-3 text-xs">
+          <span className="text-zinc-500">原價 {orig} 點</span>
+          {save > 0 && <span className="text-green-400 font-medium">省 {save} 點</span>}
+          <span className="text-zinc-500">每抽 {Math.round(priceNum / drawNum)} 點</span>
+        </div>
+      )}
+    </div>
+  );
+});
 
 // ─── Component ───────────────────────────────────────────
 export default function ProductFormPanel({
@@ -186,45 +234,6 @@ export default function ProductFormPanel({
         return null;
     }
   }
-
-  // ─── Discount Row ───
-  const DiscountRow = ({ type, d, idx }: { type: 'comboDiscounts' | 'fullSetDiscounts'; d: DiscountEntry; idx: number }) => {
-    const drawNum = parseInt(d.drawCount) || 0;
-    const priceNum = parseInt(d.price) || 0;
-    const orig = drawNum * unitPrice;
-    const save = orig - priceNum;
-    return (
-      <div className="bg-surface-2/50 rounded-xl p-3 border border-surface-3/50">
-        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
-          <div>
-            <label className="block text-zinc-500 text-xs mb-1">抽數</label>
-            <input type="number" min="1" value={d.drawCount} onChange={e => updateDiscount(type, idx, 'drawCount', e.target.value)}
-              className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="3" />
-          </div>
-          <div>
-            <label className="block text-zinc-500 text-xs mb-1">總價</label>
-            <input type="number" min="0" value={d.price} onChange={e => updateDiscount(type, idx, 'price', e.target.value)}
-              className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="280" />
-          </div>
-          <div>
-            <label className="block text-zinc-500 text-xs mb-1">名稱</label>
-            <input type="text" value={d.label} onChange={e => updateDiscount(type, idx, 'label', e.target.value)}
-              className="w-full bg-surface-deep text-white border border-surface-3 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500" placeholder="選填" />
-          </div>
-          <button type="button" onClick={() => removeDiscount(type, idx)} className="text-red-400 hover:text-red-300 p-2 cursor-pointer" title="移除">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-        {drawNum > 0 && priceNum > 0 && unitPrice > 0 && (
-          <div className="mt-2 flex items-center gap-3 text-xs">
-            <span className="text-zinc-500">原價 {orig} 點</span>
-            {save > 0 && <span className="text-green-400 font-medium">省 {save} 點</span>}
-            <span className="text-zinc-500">每抽 {Math.round(priceNum / drawNum)} 點</span>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   // ─── Render nothing if not open or SSR ───
   if (!mounted || (!open && !closing)) return null;
@@ -346,7 +355,7 @@ export default function ProductFormPanel({
                 </div>
                 {formData.comboDiscounts.length === 0
                   ? <p className="text-zinc-600 text-sm py-2">尚未新增任何組合價</p>
-                  : <div className="space-y-3">{formData.comboDiscounts.map((d, i) => <DiscountRow key={i} type="comboDiscounts" d={d} idx={i} />)}</div>
+                  : <div className="space-y-3">{formData.comboDiscounts.map((d, i) => <DiscountRow key={i} type="comboDiscounts" d={d} idx={i} unitPrice={unitPrice} onUpdate={updateDiscount} onRemove={removeDiscount} />)}</div>
                 }
               </div>
 
@@ -361,7 +370,7 @@ export default function ProductFormPanel({
                 </div>
                 {formData.fullSetDiscounts.length === 0
                   ? <p className="text-zinc-600 text-sm py-2">尚未新增任何開套優惠</p>
-                  : <div className="space-y-3">{formData.fullSetDiscounts.map((d, i) => <DiscountRow key={i} type="fullSetDiscounts" d={d} idx={i} />)}</div>
+                  : <div className="space-y-3">{formData.fullSetDiscounts.map((d, i) => <DiscountRow key={i} type="fullSetDiscounts" d={d} idx={i} unitPrice={unitPrice} onUpdate={updateDiscount} onRemove={removeDiscount} />)}</div>
                 }
               </div>
             </div>
