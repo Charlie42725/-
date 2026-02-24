@@ -1,6 +1,6 @@
 export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { supabaseAdmin, STORAGE_BUCKET, getPublicUrl } from '@/lib/supabase-storage';
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -49,17 +49,34 @@ export async function POST(request: Request) {
       .replace(/[^\w.\-]/g, '_')
       .replace(/_+/g, '_')
       .replace(/^_|_$/g, '');
-    const fileName = `uploads/${timestamp}-${safeName || `upload.${ext || 'jpg'}`}`;
+    const filePath = `${timestamp}-${safeName || `upload.${ext || 'jpg'}`}`;
 
-    // 上傳到 Vercel Blob
-    const blob = await put(fileName, file, {
-      access: 'public',
-    });
+    // 讀取文件內容
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    // 上傳到 Supabase Storage
+    const { error } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .upload(filePath, buffer, {
+        contentType: file.type || 'image/jpeg',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('Supabase Storage 上傳失敗:', error);
+      return NextResponse.json(
+        { error: `上傳失敗：${error.message}` },
+        { status: 500 }
+      );
+    }
+
+    // 取得公開 URL
+    const url = getPublicUrl(filePath);
 
     return NextResponse.json({
       success: true,
-      url: blob.url,
-      fileName: blob.pathname,
+      url,
+      fileName: filePath,
     });
   } catch (error) {
     console.error('上傳圖片失敗:', error);
