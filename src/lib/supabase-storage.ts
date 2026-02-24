@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-export const STORAGE_BUCKET = 'uploads';
+export const STORAGE_BUCKET = 'upload';
 
 let _client: SupabaseClient | null = null;
 
