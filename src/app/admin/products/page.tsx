@@ -153,9 +153,9 @@ export default function ProductsPage() {
     try {
       const url = editingId ? `/api/admin/products/${editingId}` : '/api/admin/products';
       const method = editingId ? 'PUT' : 'POST';
-      const { comboDiscounts: _c, fullSetDiscounts: _f, variants: _v, ...productPayload } = formData;
+      const { comboDiscounts: _c, fullSetDiscounts: _f, variants, ...productPayload } = formData;
 
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productPayload) });
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...productPayload, variants }) });
       if (res.ok) {
         const data = await res.json();
         const pid = editingId || data.product?.id;
