@@ -153,13 +153,19 @@ export default function ProductsPage() {
     try {
       const url = editingId ? `/api/admin/products/${editingId}` : '/api/admin/products';
       const method = editingId ? 'PUT' : 'POST';
-      const { comboDiscounts: _c, fullSetDiscounts: _f, variants, ...productPayload } = formData;
+      const { comboDiscounts: _c, fullSetDiscounts: _f, variants: _v, ...productPayload } = formData;
 
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...productPayload, variants }) });
+      // 編輯時：先存賞項和折扣到 DB，這樣商品 API 驗證庫存時才能查到正確數量
+      if (editingId) {
+        await Promise.all([saveDiscounts(editingId, formData), saveVariants(editingId, formData)]);
+      }
+
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(productPayload) });
       if (res.ok) {
         const data = await res.json();
         const pid = editingId || data.product?.id;
-        if (pid) {
+        // 新增時：商品建好後再存賞項和折扣
+        if (pid && !editingId) {
           await Promise.all([saveDiscounts(pid, formData), saveVariants(pid, formData)]);
         }
         setShowForm(false);

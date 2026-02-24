@@ -149,7 +149,6 @@ export async function PUT(
       status,
       coverImage,
       galleryImages,
-      variants: submittedVariants,
     } = body;
 
     if (!brandId || !name || !slug || !price || !totalTickets) {
@@ -171,25 +170,18 @@ export async function PUT(
     // Provably Fair: 當 status 設為 active 時，驗證 variant stock 總和 === totalTickets
     let seedData: { serverSeed: string; serverSeedHash: string } | undefined;
     if (status === 'active') {
-      // 優先用前端提交的 variants 資料驗證（因為 variants 可能尚未寫入 DB）
-      let totalStock: number;
-      if (Array.isArray(submittedVariants) && submittedVariants.length > 0) {
-        totalStock = submittedVariants
-          .filter((v: { isActive?: boolean }) => v.isActive !== false)
-          .reduce((sum: number, v: { stock: string | number }) => sum + (parseInt(String(v.stock)) || 0), 0);
-      } else {
-        const existingWithVariants = await prisma.product.findUnique({
-          where: { id },
-          select: {
-            variants: {
-              where: { isActive: true },
-              select: { stock: true },
-            },
+      const existingWithVariants = await prisma.product.findUnique({
+        where: { id },
+        select: {
+          serverSeed: true,
+          variants: {
+            where: { isActive: true },
+            select: { stock: true },
           },
-        });
-        totalStock = existingWithVariants?.variants.reduce((sum, v) => sum + v.stock, 0) ?? 0;
-      }
+        },
+      });
 
+      const totalStock = existingWithVariants?.variants.reduce((sum, v) => sum + v.stock, 0) ?? 0;
       if (totalStock !== parseInt(totalTickets)) {
         return NextResponse.json(
           { error: `獎項庫存總和 (${totalStock}) 必須等於總票數 (${totalTickets})。請調整獎項庫存或總票數。` },
@@ -197,12 +189,7 @@ export async function PUT(
         );
       }
 
-      // 自動生成 serverSeed
-      const existing = await prisma.product.findUnique({
-        where: { id },
-        select: { serverSeed: true },
-      });
-      if (!existing?.serverSeed) {
+      if (!existingWithVariants?.serverSeed) {
         const seed = generateServerSeed();
         seedData = { serverSeed: seed, serverSeedHash: hashServerSeed(seed) };
       }
