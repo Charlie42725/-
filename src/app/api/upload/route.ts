@@ -1,6 +1,6 @@
 export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
-import { supabaseAdmin, STORAGE_BUCKET, getPublicUrl } from '@/lib/supabase-storage';
+import { getSupabaseAdmin, STORAGE_BUCKET, getPublicUrl } from '@/lib/supabase-storage';
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // 上傳到 Supabase Storage
-    const { error } = await supabaseAdmin.storage
+    const { error } = await getSupabaseAdmin().storage
       .from(STORAGE_BUCKET)
       .upload(filePath, buffer, {
         contentType: file.type || 'image/jpeg',
