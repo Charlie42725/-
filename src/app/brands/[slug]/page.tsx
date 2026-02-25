@@ -34,7 +34,8 @@ export default async function BrandPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
 
   const brand = await getBrandData(slug);
 
