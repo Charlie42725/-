@@ -6,74 +6,71 @@ import DrawQueueManager from '@/components/DrawQueueManager';
 import ProductDetailClient from '@/components/ProductDetailClient';
 import ProductImageGallery from '@/components/ProductImageGallery';
 import QueueStatusBadge from '@/components/QueueStatusBadge';
-import { unstable_cache } from 'next/cache';
 
-const getProduct = unstable_cache(
-  async (slug: string) => {
-    return prisma.product.findFirst({
-      where: { slug },
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        shortDescription: true,
-        longDescription: true,
-        price: true,
-        totalTickets: true,
-        soldTickets: true,
-        status: true,
-        coverImage: true,
-        serverSeedHash: true,
-        brand: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        variants: {
-          where: { isActive: true },
-          select: {
-            id: true,
-            prize: true,
-            name: true,
-            rarity: true,
-            value: true,
-            stock: true,
-            imageUrl: true,
-            _count: {
-              select: { lotteryDraws: true }
-            },
-          },
-          orderBy: { name: 'asc' },
-        },
-        discounts: {
-          where: { isActive: true },
-          select: {
-            id: true,
-            type: true,
-            drawCount: true,
-            price: true,
-            label: true,
-            isActive: true,
-          },
-          orderBy: [{ type: 'asc' }, { drawCount: 'asc' }],
-        },
-        images: {
-          select: {
-            id: true,
-            url: true,
-            type: true,
-            sortOrder: true,
-          },
-          orderBy: { sortOrder: 'asc' },
+export const dynamic = 'force-dynamic';
+
+async function getProduct(slug: string) {
+  return prisma.product.findFirst({
+    where: { slug },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      shortDescription: true,
+      longDescription: true,
+      price: true,
+      totalTickets: true,
+      soldTickets: true,
+      status: true,
+      coverImage: true,
+      serverSeedHash: true,
+      brand: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
         },
       },
-    });
-  },
-  ['product-detail'],
-  { revalidate: 30 }
-);
+      variants: {
+        where: { isActive: true },
+        select: {
+          id: true,
+          prize: true,
+          name: true,
+          rarity: true,
+          value: true,
+          stock: true,
+          imageUrl: true,
+          _count: {
+            select: { lotteryDraws: true }
+          },
+        },
+        orderBy: { name: 'asc' },
+      },
+      discounts: {
+        where: { isActive: true },
+        select: {
+          id: true,
+          type: true,
+          drawCount: true,
+          price: true,
+          label: true,
+          isActive: true,
+        },
+        orderBy: [{ type: 'asc' }, { drawCount: 'asc' }],
+      },
+      images: {
+        select: {
+          id: true,
+          url: true,
+          type: true,
+          sortOrder: true,
+        },
+        orderBy: { sortOrder: 'asc' },
+      },
+    },
+  });
+}
 
 export default async function ProductDetailPage({
   params,

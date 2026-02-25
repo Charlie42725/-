@@ -57,7 +57,8 @@
       "Bash(echo PHP not available:*)",
       "Bash(grep ^ii:*)",
       "Bash(tail:*)",
-      "Bash(dd if=/dev/urandom of=/tmp/test-huge.jpg bs=1024 count=6000 2>/dev/null && curl -s -w \"\\\\nHTTP_CODE:%{http_code}\" -X POST http://localhost:3000/api/upload -F \"file=@/tmp/test-huge.jpg;type=image/jpeg\" 2>&1)"
+      "Bash(dd if=/dev/urandom of=/tmp/test-huge.jpg bs=1024 count=6000 2>/dev/null && curl -s -w \"\\\\nHTTP_CODE:%{http_code}\" -X POST http://localhost:3000/api/upload -F \"file=@/tmp/test-huge.jpg;type=image/jpeg\" 2>&1)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []
