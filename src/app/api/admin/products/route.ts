@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { generateServerSeed, hashServerSeed } from '@/lib/provably-fair';
 
 // 獲取所有商品（後台用）
 export async function GET() {
@@ -46,6 +47,13 @@ export async function POST(request: Request) {
       );
     }
 
+    // Provably Fair: 當 status 設為 active 時，自動生成 serverSeed
+    let seedData: { serverSeed: string; serverSeedHash: string } | undefined;
+    if (status === 'active') {
+      const seed = generateServerSeed();
+      seedData = { serverSeed: seed, serverSeedHash: hashServerSeed(seed) };
+    }
+
     const product = await prisma.product.create({
       data: {
         brandId: parseInt(brandId),
@@ -58,6 +66,7 @@ export async function POST(request: Request) {
         soldTickets: 0,
         status: status || 'draft',
         coverImage: coverImage || null,
+        ...(seedData || {}),
         images: galleryImages && galleryImages.length > 0 ? {
           create: galleryImages.map((url: string, index: number) => ({
             url,
