@@ -167,29 +167,15 @@ export async function PUT(
       return NextResponse.json({ error: '總票數必須大於 0' }, { status: 400 });
     }
 
-    // Provably Fair: 當 status 設為 active 時，驗證 variant stock 總和 === totalTickets
+    // Provably Fair: 當 status 設為 active 時，自動生成 serverSeed
     let seedData: { serverSeed: string; serverSeedHash: string } | undefined;
     if (status === 'active') {
-      const existingWithVariants = await prisma.product.findUnique({
+      const existing = await prisma.product.findUnique({
         where: { id },
-        select: {
-          serverSeed: true,
-          variants: {
-            where: { isActive: true },
-            select: { stock: true },
-          },
-        },
+        select: { serverSeed: true },
       });
 
-      const totalStock = existingWithVariants?.variants.reduce((sum, v) => sum + v.stock, 0) ?? 0;
-      if (totalStock !== parseInt(totalTickets)) {
-        return NextResponse.json(
-          { error: `獎項庫存總和 (${totalStock}) 必須等於總票數 (${totalTickets})。請調整獎項庫存或總票數。` },
-          { status: 400 }
-        );
-      }
-
-      if (!existingWithVariants?.serverSeed) {
+      if (!existing?.serverSeed) {
         const seed = generateServerSeed();
         seedData = { serverSeed: seed, serverSeedHash: hashServerSeed(seed) };
       }
