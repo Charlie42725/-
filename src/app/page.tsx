@@ -12,7 +12,7 @@ const getHomeData = unstable_cache(
         orderBy: { createdAt: 'desc' },
         include: {
           brand: true,
-          variants: { where: { isActive: true } },
+          variants: { where: { isActive: true }, orderBy: { prize: 'asc' } },
           images: { orderBy: { sortOrder: 'asc' } },
         },
       }),

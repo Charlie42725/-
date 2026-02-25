@@ -102,7 +102,16 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
         const progress = calculateProgress(product.soldTickets, product.totalTickets);
         const remaining = product.totalTickets - product.soldTickets;
         const isSoldOut = product.status === 'sold_out';
-        const variants = product.variants || [];
+        const rawVariants = product.variants || [];
+        const variants = [...rawVariants].sort((a, b) => {
+          const getPrizeOrder = (prize: string) => {
+            if (prize.toLowerCase().includes('last')) return 999;
+            const match = prize.match(/([A-Z])/i);
+            if (match) return match[1].toUpperCase().charCodeAt(0);
+            return 1000;
+          };
+          return getPrizeOrder(a.prize) - getPrizeOrder(b.prize);
+        });
 
         return (
           <Link
